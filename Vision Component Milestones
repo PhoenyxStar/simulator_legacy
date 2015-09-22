@@ -1,0 +1,38 @@
+ROBOSUB Rough outline
+Goals and timelines for Vision requirements
+BY: Mario Migliacio :: ID 11362805
+Fall Semester, 2015.
+---------------------------------------
+
+* at any given time *
+- Collaberate with other group members and determine where work is needed most.
+* at any given time *
+
+Friday, Oct 2nd: 
+- Understand how the Camera speaks to the Broker. 
+- Understand how the Image needs to be processed (*plan a design* for a class to handle the data).
+- Research TCP/IP, get a rough feel for how the data is going to be relayed through the system.
+
+Friday, Oct 16th:
+- Plan to have starter code that can store the image data, and is not overly complicated. Simplicity 
+is the main goal for this milestone.
+- Continue researching TCP/IP if there are any uncertainties with how Vision communicates with system.
+- Make as many simple abstractions as possible. The simpler the implementation, the easier it is for 
+the rest of the group to utilize.
+
+Friday, Oct 30th - Friday, Nov 13th:
+- A working abstraction of the Vision class should be in place. The next step is to implement Unit tests.
+- Ensure that the Images can be communicated to parts of the sub that need them as inputs. It is very 
+important that the images are handled efficiently eventually, but at first; just passing images to other 
+components should be possible.
+- Many forms of testing should be in place to ensure Vision protocol is working as expected, Or determine
+where bugs arise and how to eliminate as many unexpected bugs as possible. DEBUG, TEST, DEBUG! repeat.
+- Any further neccessary research for uncertain topics should be weighed and considered at this time.
+
+Friday, Nov 27th:
+- Success in many tests should be accomplished by this point. Work on revisions, run more unit tests, and 
+stress the components. Refine the Vision abstractions and strive for efficiency without breaking the working
+model.
+
+December:
+- Testing should be the top priority in December. All programming *SHOULD* be in place at this point.
