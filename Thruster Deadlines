@@ -1,0 +1,19 @@
+Oct 9: Research on the physics of propulsion in water finished
+	-Propulsion system - sub/software
+		-Where the thrusters
+	-Bouy force
+	-Physical Char of the sub
+	-Physics - equations, how it works.
+	-Videos of the sub
+Oct 23: Vertical movement added
+	-Application bouy force
+	-How it idles
+	-How much forces it takes
+	-How the software would get it to go
+Nov 6: Forward/Backward movement added 
+
+Nov 20: Roll added
+
+Dec 4: Pitch added
+
+Dec 20: Yaw added
