@@ -1,0 +1,90 @@
+2.0 
+Simulator Functional Requirements:
+
+2.1
+Communication:
+
+1. Proper Data Management
+Description:
+	For any of the functions of our simulator to work effectively, proper communication needs to 
+	take place. The input and output data needs to be relayed to the appropriate TCP connections
+	(through broker, and the correct communicators). The data needs to be in JSON packet information 
+	format for the messaging to work, once communication is complete the data needs to be 
+	parsed and then converted to meaningful information for the appropriate receiver.
+Source: Team Stark
+Priority: 1 (essential and required)
+
+
+2.2
+Vision:
+
+1. Memory Management
+Description: 
+	The simulator shall be required to gather video streams from the Unity engine and be 
+	able to pass the data to Boost shared memory. The data being passed should be forwarded
+	to the AI unit so the proper actions can then be determined.
+Source: Team Stark
+Priority: 1 (essential and required)
+
+2. Changing Camera Lenses
+Description:
+	In the Unity engine, the simulator should be able to change from third person camera mode,
+	and Submarine view camera mode at any desired time. The simulator Submarine point of view 
+	camera should be as close to the specs on the real Submarines camera as possible, while
+	the third person camera should give the user an accurate descritption of its location in a 
+	three dimensional environment.
+Source: Team Stark
+Priority: 1 (essential and required)
+
+3. Shape/Color Recognition
+Description:
+	Based on the data relayed through vision to boost shared memory, the AI unit should be able
+	to determine if the submarine has vision of a particular color or shape and take the appropriate
+	actions based on the data vision shares. 
+	(this requirement is more oriented towards AI, but stems from the data sent by the vision requirements)
+Source: Team Stark
+Priority: 2 (desired functionality)
+
+4. Applying of Filters
+Description:
+	The simulator can be used to make the camera more realistic by applying algorithms to change 
+	what is viewed through the scene. Some filters include blurring, adding tints and colors, 
+	zooming in or out, and even adding particles, all to simulate being underwater. These filters
+	are desired, but not completely necessary for the functionality of the simulator.
+Source: Team Stark
+Priority: 3 (extra feature)
+
+
+2.3
+Thrusters and Physics:
+
+1. Simulate realistic rigid-body physics
+	It is very important for the Unity engine simulator to have realistic movements for the submarine. 
+	It is imperative that physical movement of the sub in the simulator matches that which would occur
+	based on the laws of physics
+Source: Team Stark
+Priority: 1 (essential and required)
+
+2. Dynamic Accuracy of Thrust
+	For the simulator to accurately portray what the submarine should do, the equations for the physical
+	motion in place should match that which is seen in the real submarine. That is, the acceleration of 
+	the thrusters in simulator should be able to dynamically match that of the actual thruster's acceleration.
+Source: Team Stark
+Priority: 1 (essential and required)
+
+3. Accept Input from AI
+	Based on the actions AI engine wants to perform, our Physics engine should be able to accept and carry
+	out these actions in the simulator.
+Source: Team Stark
+Priority: 1 (essential and required)
+
+
+2.4
+Sensor:
+
+1. Formatting of Packet Information
+	For our sensor simulator information to be useful, it must be able to pass accelerometer, magnetometer,
+	gyroscope, depth, and voltage informations to the AI engine. In order for this information to be meaningful,
+	it must be properly formatted to JSON packets and sent through the proper communication proticol.
+Source: Team Stark
+Priority: 1 (essential and required)
