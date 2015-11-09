@@ -13,9 +13,15 @@ namespace TeamStark.RobosubSimulator
 
         public SensorTest()
         {
-            sensor = new Sensors();
         }
 
+        // Initialize testing
+        [TestFixtureSetUp]
+        public void TestFixtureSetup()
+        {
+            sensor = new Sensors();
+        }
+        
         /*
             // Depth test
             for (int i = 0; i < 15; i++)
