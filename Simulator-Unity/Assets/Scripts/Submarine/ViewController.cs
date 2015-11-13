@@ -60,6 +60,12 @@ namespace TeamStark.RobosubSimulator
         private bool m_Jumping;
         private AudioSource m_AudioSource;
 
+        private System.Diagnostics.Stopwatch stopWatch = new System.Diagnostics.Stopwatch();
+        private int m_idObjLastHit;
+        private float m_lastLogTime = -LogInterval; // make sure the first time log effects
+        // logging interval in seconds
+        public static readonly float LogInterval = 2f;
+
         // Use this for initialization
         private void Start()
         {
@@ -73,6 +79,7 @@ namespace TeamStark.RobosubSimulator
             m_Jumping = false;
             m_AudioSource = GetComponent<AudioSource>();
             m_MouseLook.Init(transform, m_Camera.transform);
+            stopWatch.Start();
             LoggingSystem.log.Info("ViewController started");
         }
 
@@ -260,10 +267,19 @@ namespace TeamStark.RobosubSimulator
         private void OnControllerColliderHit(ControllerColliderHit hit)
         {
             Rigidbody body = hit.collider.attachedRigidbody;
+            
             if (hit.gameObject.name != "Terrain")
             {
-                LoggingSystem.log.Info("Collided with " + hit.gameObject.name);
+                // Log the collision object when hit the different object from last one or LogInterval seconds has passed since last logging
+                if(m_idObjLastHit != hit.gameObject.GetInstanceID() || stopWatch.Elapsed.Seconds - m_lastLogTime >= LogInterval )
+                {
+                    m_lastLogTime = stopWatch.Elapsed.Seconds;
+                    LoggingSystem.log.Info("Collided with " + hit.gameObject.name);
+                }
+                // save the object id last hit
+                m_idObjLastHit = hit.gameObject.GetInstanceID();
             }
+
             //dont move the rigidbody if the character is on top of it
             if (m_CollisionFlags == CollisionFlags.Below)
             {
