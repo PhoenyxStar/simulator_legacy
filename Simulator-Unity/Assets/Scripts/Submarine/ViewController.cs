@@ -260,6 +260,7 @@ namespace TeamStark.RobosubSimulator
 
         private void RotateView()
         {
+            return;
             m_MouseLook.LookRotation(transform, m_Camera.transform);
         }
 
