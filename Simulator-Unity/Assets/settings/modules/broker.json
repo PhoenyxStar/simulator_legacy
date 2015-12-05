@@ -1,0 +1,9 @@
+{
+	"fps": 400,
+	"initportp": "tcp://localhost:1991",
+	"initports": "tcp://192.168.128.162:1991",
+	"baseip": "tcp://192.168.128.162",
+	"port": 3008,
+	"sndbuf": 1024,
+	"hwm": 1024
+}
