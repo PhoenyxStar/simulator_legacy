@@ -133,7 +133,7 @@ public class Communicator : MonoBehaviour
     //NetMQ.Sockets.PublisherSocket pub;
     //NetMQ.Sockets.SubscriberSocket sub;
     NetMQ.Sockets.DealerSocket socket;
-    List<string> messages;
+    List<string> messages = new List<string>();
 
     // The communicator handles requesting the module be added to the
     // broker and sets up the modules pub and sub sockets.
@@ -191,7 +191,7 @@ public class Communicator : MonoBehaviour
         {
             bool ret = socket.TryReceiveFrameString(out message);  //recv(&message, ZMQ_DONTWAIT);
             // If there are multiple messages keep getting them
-            if (message.Equals(""))
+            if (string.IsNullOrEmpty(message))
             {
                 break;
             }
@@ -247,8 +247,12 @@ public class Communicator : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        return;
+        if (socket == null)
+        {
+            return;
+        }
         List<string> received;
+        
         received = receive_messages();
         if (received.Count > 0)
         {
