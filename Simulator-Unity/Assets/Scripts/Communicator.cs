@@ -22,11 +22,11 @@ class sensor_packet
     public string whole;
 
     public sensor_packet(string raw)
-	{
+    {
         JObject d = JObject.Parse(raw);
-		try
-		{
-			pitch = (int)d["pitch"];
+        try
+        {
+            pitch = (int)d["pitch"];
             roll = (int)d["roll"];
             yaw = (int)d["yaw"];
             depth = (float)d["depth"];
@@ -35,24 +35,24 @@ class sensor_packet
             dt = (double)d["dt"];
             whole = raw;
 
-		}
-		catch (Exception e)
-		{
+        }
+        catch (Exception e)
+        {
             LoggingSystem.log.Error("Sensor packet: unable to parse string.\n");
-			return;
-		}
+            return;
+        }
 
-	}
+    }
 
     public sensor_packet(int pitch, int roll, int yaw, float depth, float battery, bool start_switch, double dt)
-	{
+    {
         this.pitch = pitch;
-		this.roll = roll;
-		this.yaw = yaw;
-		this.depth = depth;
-		this.battery = battery;
-		this.start_switch = start_switch;
-		this.dt = dt;
+        this.roll = roll;
+        this.yaw = yaw;
+        this.depth = depth;
+        this.battery = battery;
+        this.start_switch = start_switch;
+        this.dt = dt;
         setupJSON();
 
     }
@@ -71,6 +71,63 @@ class sensor_packet
         whole = d.ToString();
     }
 }
+
+class thruster_packet
+{
+    public thruster_packet(string raw)
+    {
+        JObject d = JObject.Parse(raw);
+        try
+        {
+            xa = (int)d["xa"];
+            xb = (int)d["xb"];
+            ya = (int)d["ya"];
+            yb = (int)d["yb"];
+            za = (int)d["za"];
+            zb = (int)d["zb"];
+            whole = d.ToString();
+
+        }
+        catch (Exception e)
+        {
+            LoggingSystem.log.Error("Thrustet packet: unable to parse string.\n");
+            return;
+        }
+    }
+    public thruster_packet(int xa, int xb, int ya, int yb, int za, int zb)
+    {
+        this.xa = xa;
+        this.xb = xb;
+        this.ya = ya;
+        this.yb = yb;
+        this.za = za;
+        this.zb = zb;
+        setupJSON();
+    }
+    string JSON = "{ \"xa\": \"\", \"xb\": \"\", \"ya\": \"\", \"yb\": \"\", \"za\": \"\", \"zb\": \"\"}";
+    int xa;
+    int xb;
+    int ya;
+    int yb;
+    int za;
+    int zb;
+    public string whole;
+    
+    void setupJSON()
+    {
+        JObject d = JObject.Parse(JSON);
+
+        d["xa"] = xa;
+        d["xb"] = xb;
+        d["ya"] = ya;
+        d["yb"] = yb;
+        d["za"] = za;
+        d["zb"] = zb;
+        whole = d.ToString();
+    }
+    thruster_packet(int a) { setupJSON(); }
+};
+
 class message
 {
     public string JSON = "{\"sender\": \"\", \"recipient\": \"\",\"mtype\": \"\", \"value\": \"\"}";
@@ -187,7 +244,7 @@ public class Communicator : MonoBehaviour
         if (socket == null) return null;
 
         string message; //zmq::message_t message;
-        while(true)
+        while (true)
         {
             bool ret = socket.TryReceiveFrameString(out message);  //recv(&message, ZMQ_DONTWAIT);
             // If there are multiple messages keep getting them
@@ -218,6 +275,20 @@ public class Communicator : MonoBehaviour
         LoggingSystem.log.Info("Sending message: " + msg.whole);
         return socket.TrySendFrame(msg.whole);
     }
+    //private bool sendSensorPacket(string recipient)
+    //{
+
+
+    //    float[] ypr = { UnityEngine.Random.Range(0.0f, 10.0f), UnityEngine.Random.Range(0.0f, 10.0f), UnityEngine.Random.Range(0.0f, 10.0f) };
+    //    //s->getYPR(ypr);
+    //    return send_message(new message("sensor", recipient, "sensor",
+    //                      new sensor_packet((int)(ypr[0]),
+    //                      (int)(ypr[1]),
+    //                      (int)(ypr[2]),
+    //                      (float)Math.Ceiling(UnityEngine.Random.Range(0.0f, 50.0f)/*s->getDepth(), 2*/),
+    //                      (float)Math.Ceiling(UnityEngine.Random.Range(1.0f, 100.0f)/*s->getBattery(), 2*/),
+    //                      true/*s->getStart()*/, UnityEngine.Random.Range(0.0f, 2.0f)/*s->getDT()*/).whole).whole);
+    //}
     private bool sendSensorPacket(string recipient)
     {
         float[] ypr = { 1.0f, 0.5f, 0.6f };
@@ -231,9 +302,23 @@ public class Communicator : MonoBehaviour
                           true/*s->getStart()*/, 0.2/*s->getDT()*/).whole).whole);
     }
 
+    private bool sendThrusterPacket(string recipient)
+    {
+        //s->getYPR(ypr);
+        return send_message(new message("thruster", recipient, "thruster",
+                          new thruster_packet((int)UnityEngine.Random.Range(1.0f, 100.0f),
+                          (int)UnityEngine.Random.Range(1.0f, 100.0f),
+                          (int)UnityEngine.Random.Range(1.0f, 100.0f),
+                          (int)UnityEngine.Random.Range(1.0f, 100.0f),
+                          (int)UnityEngine.Random.Range(1.0f, 100.0f),
+                          (int)UnityEngine.Random.Range(1.0f, 100.0f)).whole).whole);
+    }
+
     private void TestSensorData()
     {
-        sendSensorPacket("Helm");
+        // send test packets every 2 seconds
+        sendSensorPacket("helm");
+        //sendThrusterPacket("helm");
     }
 
     // Use this for initialization
@@ -244,15 +329,25 @@ public class Communicator : MonoBehaviour
         TestSensorData();
     }
 
+    float elapseTime = 0;
     // Update is called once per frame
-    void Update()
+    void Update1()
     {
+        return;
+        // send test packets every two seconds
+        elapseTime += Time.deltaTime;
+        if(elapseTime >= 2.0f)
+        {
+            TestSensorData();
+            elapseTime = 0f;
+        }
+        
         if (socket == null)
         {
             return;
         }
         List<string> received;
-        
+
         received = receive_messages();
         if (received.Count > 0)
         {
@@ -279,5 +374,14 @@ public class Communicator : MonoBehaviour
                 }
             }
         }
+    }
+
+    public void OnDestroy()
+    {
+        if(socket != null)
+        { socket.Disconnect(broker_ip); socket.Close(); }
+        
+        //socket.Dispose();
+        //ctx.Dispose();
     }
 }
