@@ -8,85 +8,69 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
 
-class request_packet
+class sensor_packet
 {
-    private string JSON = "{\"action\": \"\", \"target\": \"\"}";
-    private string action;
-    private string target;
+    private int pitch;
+    int roll;
+    int yaw;
+    float depth;
+    float battery;
+    bool start_switch;
+    double dt;
+
+    string JSON = "{ \"pitch\": 0,  \"roll\": 0,  \"yaw\":  0,  \"depth\": 0,  \"battery\": 0, \"start_switch\": false, \"dt\": 0}";
     public string whole;
-    public request_packet(string raw)
-    {
+
+    public sensor_packet(string raw)
+	{
         JObject d = JObject.Parse(raw);
-
-        try
-        {
-            action = (string)d["action"];
-            target = (string)d["target"];
+		try
+		{
+			pitch = (int)d["pitch"];
+            roll = (int)d["roll"];
+            yaw = (int)d["yaw"];
+            depth = (float)d["depth"];
+            battery = (float)d["battery"];
+            start_switch = (bool)d["start_switch"];
+            dt = (double)d["dt"];
             whole = raw;
-        }
-        catch (Exception e)
-        {
-            LoggingSystem.log.Error("Request string was not structured properly!");
-        }
 
-    }
+		}
+		catch (Exception e)
+		{
+            LoggingSystem.log.Error("Sensor packet: unable to parse string.\n");
+			return;
+		}
 
-    public request_packet(string a, string t)
-    {
-        action = a;
-        target = t;
+	}
+
+    public sensor_packet(int pitch, int roll, int yaw, float depth, float battery, bool start_switch, double dt)
+	{
+        this.pitch = pitch;
+		this.roll = roll;
+		this.yaw = yaw;
+		this.depth = depth;
+		this.battery = battery;
+		this.start_switch = start_switch;
+		this.dt = dt;
         setupJSON();
+
     }
 
-    private void setupJSON()
+    void setupJSON()
     {
         JObject d = JObject.Parse(JSON);
-        d["action"] = action;
-        d["target"] = target;
+
+        d["pitch"] = pitch;
+        d["roll"] = roll;
+        d["yaw"] = yaw;
+        d["depth"] = depth;
+        d["battery"] = battery;
+        d["start_switch"] = start_switch;
+        d["dt"] = dt;
         whole = d.ToString();
-        //StringBuffer buffer;
-        //Writer<StringBuffer> writer(buffer);
-        //d.Accept(writer);
-        //whole = buffer.GetString();
     }
 }
-
-class reply_packet
-{
-    private string JSON = "{\"action\": \"\", \"target\": \"\"}";
-    public string action;
-    public string whole;
-    public string target;
-    public reply_packet(string raw)
-    {
-        JObject d = JObject.Parse(raw);
-
-        try
-        {
-            action = (string)d["action"];
-            target = (string)d["target"];
-            whole = raw;
-        }
-        catch (Exception e)
-        {
-            LoggingSystem.log.Error("Reply string was not structured properly!");
-        }
-    }
-    private void setupJSON()
-    {
-        JObject d = JObject.Parse(JSON);
-        d["action"] = action;
-        d["target"] = target;
-        whole = d.ToString();
-    }
-    public reply_packet(string a, string t)
-    {
-        action = a;
-        target = t;
-        setupJSON();
-    }
-};
-
 class message
 {
     public string JSON = "{\"sender\": \"\", \"recipient\": \"\",\"mtype\": \"\", \"value\": \"\"}";
@@ -137,16 +121,18 @@ public class Communicator : MonoBehaviour
 {
     private int sndbuf;
     private int hwm;
-    private string initPortPub;
-    private string initPortSub;
-    private string pubAddress;
-    private string subAddress;
+    //private string initPortPub;
+    //private string initPortSub;
+    //private string pubAddress;
+    //private string subAddress;
     [SerializeField]
-    private string moduleName;
+    private string module_name;
+    private string broker_ip;
     public static JObject settings;
     private NetMQContext ctx;
-    NetMQ.Sockets.PublisherSocket pub;
-    NetMQ.Sockets.SubscriberSocket sub;
+    //NetMQ.Sockets.PublisherSocket pub;
+    //NetMQ.Sockets.SubscriberSocket sub;
+    NetMQ.Sockets.DealerSocket socket;
     List<string> messages;
 
     // The communicator handles requesting the module be added to the
@@ -156,203 +142,61 @@ public class Communicator : MonoBehaviour
     {
         if (module_name == "")
             return;
-        this.moduleName = module_name;
+        this.module_name = module_name;
 
         // load settings file
         string path = "Assets/settings/modules/broker.json";
         string jsonString = File.ReadAllText(path);
         settings = JObject.Parse(jsonString);
-        //JsonTextReader settings = new JsonTextReader(new StringReader(jsonString));
-        //JsonReader settings = new JsonReader()
-        //char buf[4096];
+
+        LoggingSystem.log.Info("starting communicator for module: " + module_name);
 
         // load settings
         try
         {
-            string initp, inits;
-            initp = (string)settings["initportp"];//.GetString(); //reverse of broker
-            inits = (string)settings["initports"];//.GetString(); //reverse of broker
+            //string initp, inits;
+            broker_ip = (string)settings["broker_ip"];
+            LoggingSystem.log.Info("broker_ip " + broker_ip);
+            //initPortPub = (string)settings["initportp"];
+            //initPortSub = (string)settings["initports"];
             sndbuf = (int)settings["sndbuf"];//GetInt();
             hwm = (int)settings["hwm"];//.GetInt();
-            initPortPub = initp;// (char*)malloc(sizeof(char) * strlen(initp.c_str()));
-            initPortSub = inits;// (char*)malloc(sizeof(char) * strlen(inits.c_str()));
-
-            //strcpy(initPortPub, initp.c_str());
-            //strcpy(initPortSub, inits.c_str());
+            LoggingSystem.log.Info("sndbuf: " + sndbuf);
         }
         catch (Exception e)
         {
-            LoggingSystem.log.Error(e.Message);
+            LoggingSystem.log.Warn(e.Message);
         }
-
-        bool pubSetup = false;
-        bool subSetup = false;
-
 
         // Start zmq context
         ctx = NetMQContext.Create();
-        pub = ctx.CreatePublisherSocket();
-        {
-            // code in here. exit this block to dispose the context,
-            // only when communication is no longer required
-            // setting initial ports.
-            pub.Options.SendBuffer = sndbuf; //setsockopt(ZMQ_SNDBUF, &sndbuf, sizeof(sndbuf));
-            pub.Options.SendHighWatermark = hwm; //(ZMQ_SNDHWM, &hwm, sizeof(hwm));
-
-            // Attempt to bind to the initial module publisher port.
-            // If this fails it means that another module is attempting to register
-            // with the broker and should be completed soon. Therefore this
-            // will repeat until the bind succeeds.
-            while (true)
-            {
-                try
-                {
-                    pub.Bind(initPortPub);
-                    break;
-                }
-                catch (Exception e)
-                {
-                    LoggingSystem.log.Error(e.Message);
-                }
-                System.Threading.Thread.Sleep(1000);
-                //yield return new WaitForSeconds(100.0f);//usleep(100000);
-            }
-
-            try
-            {
-                sub = ctx.CreateSubscriberSocket();
-                {
-                    // Set up initial subscriber and connect to initial subscriber port.
-                    // Connect shouldn't fail since multiple sockets can connect to a publisher.
-                    //sub->setsockopt(ZMQ_SUBSCRIBE, "", 0);
-                    // subscribe all
-                    sub.Subscribe("");
-                    sub.Options.ReceiveBuffer = sndbuf;// setsockopt(ZMQ_RCVBUF, &sndbuf, sizeof(sndbuf));
-                    sub.Options.ReceiveHighWatermark = hwm;// sub->setsockopt(ZMQ_RCVHWM, &hwm, sizeof(hwm));
-                    sub.Connect(initPortSub);// sub->connect(initPortSub);
-
-                    // Initialize the message that will be sent to the broker
-                    // asking to register the current module
-                    request_packet newPorts = new request_packet("add", module_name);
-                    //reply *rep;
-
-                    // Request pub and sub ports from the broker.
-                    // The broker will send out two reply packets containing
-                    // the ports.
-                    // This will repeat until both the ports are recieved.
-                    string temp = "";
-                    while (!pubSetup || !subSetup)
-                    {
-                        try
-                        {
-                            //s_send(*pub, newPorts->whole.c_str());
-                            pub.SendFrame(newPorts.whole);
-                            //sub.SendFrame(newPorts.whole);
-                            //yield return new WaitForSeconds(100.0f);// usleep(100000);
-                            System.Threading.Thread.Sleep(100);
-                            // s_recv is non-blocking and returns an empty string if no message is recieved.
-                            bool ret = sub.TryReceiveFrameString(out temp); //s_recv(*sub);
-                            if (ret && temp != "")
-                            {
-                                // If a message is recieved this will parse it into a reply packet.
-                                reply_packet rep = new reply_packet(temp);
-
-                                // rep.action should contain the module name and the type of port in rep.target
-                                string str = rep.action.ToString();
-
-                                string[] strs = str.Split(" ".ToCharArray());
-                                // The first half of the string should be the module name
-                                //  strtok(str, " ");
-                                if (strs.Length > 1 && strs[0] == module_name)
-                                {
-                                    // Store the returned address
-                                    if (strs[1] == "pub" && !pubSetup)
-                                    {
-                                        pubAddress = rep.target;
-                                        pubSetup = true;
-                                    }
-                                    else if (strs[1] == "sub" && !subSetup)
-                                    {
-                                        subAddress = rep.target;
-                                        subSetup = true;
-                                    }
-                                }
-                            }
-                        }
-                        catch (Exception e)
-                        {
-                            // nothing should happen, will just keep trying.
-                            LoggingSystem.log.Error(e.Message);
-                        }
-
-                    }
-
-                    // Our initial ports must be unbound and disconnected before setting up
-                    // our new sockets
-                    // This will also allow other modules to bind to the publisher port; until
-                    // this happens no other modules can communicate with the broker.
-                    //pub->unbind(initPortPub);
-                    //pub->bind(pubAddress.c_str());
-
-                    sub.Disconnect(initPortSub);
-                    sub.Connect(subAddress);
-
-                    //request reqM = request("clearing", "socket");
-                    message newMsg = new message(module_name, module_name, "request", "");
-                    System.Threading.Thread.Sleep(100);
-                    send_message(newMsg.whole);
-                    send_message(newMsg.whole);
-
-                    System.Threading.Thread.Sleep(100);
-                    receive_messages();
-                }
-            }
-            catch (Exception e)
-            {
-                LoggingSystem.log.Error(e.Message);
-            }
-        }
+        socket = ctx.CreateDealerSocket();
+        socket.Options.SendBuffer = sndbuf; //setsockopt(ZMQ_SNDBUF, &sndbuf, sizeof(sndbuf));
+        socket.Options.SendHighWatermark = hwm; //(ZMQ_SNDHWM, &hwm, sizeof(hwm));
+        socket.Options.Identity = System.Text.Encoding.ASCII.GetBytes(module_name);
+        socket.Connect(broker_ip);
+        LoggingSystem.log.Info("Module conneted");
     }
 
-    void OnDestory()
-    {
-        closeCom();
-    }
-
-    // Tell the broker to remove this module from it's records
-    // The module is not using the initial pub/sub ports at this point
-    // so were using a base message with "broker" set as the recipient
-    // to inform the broker of the module closing.
-    private void closeCom()
-    {
-        message msg = new message(moduleName, "broker", "request", "");
-
-        // Send it multiple times to make sure the broker gets it
-        // This step may not be necessary
-        pub.SendFrame(msg.whole);
-    }
     // Recieves all messages sent to this module as raw string.
     public List<string> receive_messages()
     {
         List<string> messagesv = new List<string>();
 
         // If socket is not setup return nothing.
-        if (sub == null) return null;
+        if (socket == null) return null;
 
         string message; //zmq::message_t message;
-        try
+        while(true)
         {
-            bool ret = sub.TryReceiveFrameString(out message);  //recv(&message, ZMQ_DONTWAIT);
+            bool ret = socket.TryReceiveFrameString(out message);  //recv(&message, ZMQ_DONTWAIT);
             // If there are multiple messages keep getting them
-            while (!message.Equals(""))
+            if (message.Equals(""))
             {
-                messagesv.Add(message);
-                sub.TryReceiveFrameString(out message);
+                break;
             }
-        }
-        catch (Exception e)
-        {
-            LoggingSystem.log.Error(e.Message);
+            else
+                messagesv.Add(message);
         }
 
         // store for helper function use
@@ -365,24 +209,45 @@ public class Communicator : MonoBehaviour
     // Send message as raw string
     private bool send_message(string msg)
     {
-        return pub.TrySendFrame(msg);// s_send(*pub, msg);
+        LoggingSystem.log.Info("Sending message: " + msg);
+        return socket.TrySendFrame(msg);
     }
 
     private bool send_message(message msg)
     {
-        return pub.TrySendFrame(msg.whole); //s_send(*pub, msg.whole);
+        LoggingSystem.log.Info("Sending message: " + msg.whole);
+        return socket.TrySendFrame(msg.whole);
+    }
+    private bool sendSensorPacket(string recipient)
+    {
+        float[] ypr = { 1.0f, 0.5f, 0.6f };
+        //s->getYPR(ypr);
+        return send_message(new message(name, recipient, "sensor",
+                          new sensor_packet((int)(ypr[1]),
+                          (int)(ypr[2]),
+                          (int)(ypr[0]),
+                          (float)Math.Ceiling(5.0/*s->getDepth(), 2*/),
+                          (float)Math.Ceiling(1.0/*s->getBattery(), 2*/),
+                          true/*s->getStart()*/, 0.2/*s->getDT()*/).whole).whole);
+    }
+
+    private void TestSensorData()
+    {
+        sendSensorPacket("Helm");
     }
 
     // Use this for initialization
     void Start()
     {
         ForceDotNet.Force();
-        Initialize(moduleName);
+        Initialize(module_name);
+        TestSensorData();
     }
 
     // Update is called once per frame
     void Update()
     {
+        return;
         List<string> received;
         received = receive_messages();
         if (received.Count > 0)
