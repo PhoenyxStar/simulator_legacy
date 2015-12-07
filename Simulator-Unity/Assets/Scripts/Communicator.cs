@@ -275,32 +275,30 @@ public class Communicator : MonoBehaviour
         LoggingSystem.log.Info("Sending message: " + msg.whole);
         return socket.TrySendFrame(msg.whole);
     }
-    //private bool sendSensorPacket(string recipient)
-    //{
-
-
-    //    float[] ypr = { UnityEngine.Random.Range(0.0f, 10.0f), UnityEngine.Random.Range(0.0f, 10.0f), UnityEngine.Random.Range(0.0f, 10.0f) };
-    //    //s->getYPR(ypr);
-    //    return send_message(new message("sensor", recipient, "sensor",
-    //                      new sensor_packet((int)(ypr[0]),
-    //                      (int)(ypr[1]),
-    //                      (int)(ypr[2]),
-    //                      (float)Math.Ceiling(UnityEngine.Random.Range(0.0f, 50.0f)/*s->getDepth(), 2*/),
-    //                      (float)Math.Ceiling(UnityEngine.Random.Range(1.0f, 100.0f)/*s->getBattery(), 2*/),
-    //                      true/*s->getStart()*/, UnityEngine.Random.Range(0.0f, 2.0f)/*s->getDT()*/).whole).whole);
-    //}
     private bool sendSensorPacket(string recipient)
     {
-        float[] ypr = { 1.0f, 0.5f, 0.6f };
+        float[] ypr = { UnityEngine.Random.Range(0.0f, 100.0f), UnityEngine.Random.Range(0.0f, 100.0f), UnityEngine.Random.Range(0.0f, 100.0f) };
         //s->getYPR(ypr);
-        return send_message(new message(name, recipient, "sensor",
-                          new sensor_packet((int)(ypr[1]),
+        return send_message(new message("sensor", recipient, "sensor",
+                          new sensor_packet((int)(ypr[0]),
+                          (int)(ypr[1]),
                           (int)(ypr[2]),
-                          (int)(ypr[0]),
-                          (float)Math.Ceiling(5.0/*s->getDepth(), 2*/),
-                          (float)Math.Ceiling(1.0/*s->getBattery(), 2*/),
-                          true/*s->getStart()*/, 0.2/*s->getDT()*/).whole).whole);
+                          (float)Math.Ceiling(UnityEngine.Random.Range(0.0f, 50.0f)/*s->getDepth(), 2*/),
+                          (float)Math.Ceiling(UnityEngine.Random.Range(1.0f, 100.0f)/*s->getBattery(), 2*/),
+                          true/*s->getStart()*/, UnityEngine.Random.Range(0.0f, 2.0f)/*s->getDT()*/).whole).whole);
     }
+    //private bool sendSensorPacket(string recipient)
+    //{
+    //    float[] ypr = { 64.0f, 15.5f, 20.6f };
+    //    //s->getYPR(ypr);
+    //    return send_message(new message("sensor", recipient, "sensor",
+    //                      new sensor_packet((int)(ypr[1]),
+    //                      (int)(ypr[2]),
+    //                      (int)(ypr[0]),
+    //                      (float)Math.Ceiling(5.0/*s->getDepth(), 2*/),
+    //                      (float)Math.Ceiling(1.0/*s->getBattery(), 2*/),
+    //                      true/*s->getStart()*/, 0.2/*s->getDT()*/).whole).whole);
+    //}
 
     private bool sendThrusterPacket(string recipient)
     {
@@ -318,7 +316,7 @@ public class Communicator : MonoBehaviour
     {
         // send test packets every 2 seconds
         sendSensorPacket("helm");
-        //sendThrusterPacket("helm");
+        sendThrusterPacket("helm");
     }
 
     // Use this for initialization
@@ -331,9 +329,8 @@ public class Communicator : MonoBehaviour
 
     float elapseTime = 0;
     // Update is called once per frame
-    void Update1()
+    void Update()
     {
-        return;
         // send test packets every two seconds
         elapseTime += Time.deltaTime;
         if(elapseTime >= 2.0f)
