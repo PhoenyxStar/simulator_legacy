@@ -105,12 +105,12 @@ class thruster_packet
         setupJSON();
     }
     string JSON = "{ \"xa\": \"\", \"xb\": \"\", \"ya\": \"\", \"yb\": \"\", \"za\": \"\", \"zb\": \"\"}";
-    int xa;
-    int xb;
-    int ya;
-    int yb;
-    int za;
-    int zb;
+    public int xa;
+    public int xb;
+    public int ya;
+    public int yb;
+    public int za;
+    public int zb;
     public string whole;
     
     void setupJSON()
