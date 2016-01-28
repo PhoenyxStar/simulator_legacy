@@ -16,15 +16,25 @@ public class SubPhysics : MonoBehaviour {
     // Update is called once per frame
     void Update () {
 
+
+        /*
         float roll = Input.GetAxis("JoyAxisX");
         float pitch = Input.GetAxis("JoyAxisY");
         float yaw = Input.GetAxis("JoyAxisZ");
         float vert = Input.GetAxis("JoyAxisA");
         float hori = Input.GetAxis("JoyAxisB");
         float forw = Input.GetAxis("JoyAxisC");
+        */
+        thruster_packet pack = new thruster_packet(0, 0, 0, 0, 0, 0);
 
+        float roll = pack.za + pack.zb;
+        float pitch = pack.ya + pack.yb;
+        float yaw = pack.xa + pack.xb;
+        float vert = pack.za + pack.zb;
+        float hori = pack.xa + pack.xb;
+        float forw = pack.ya + pack.yb;
 
-        Vector3 force = new Vector3(hori * COEF,-vert*COEF, forw*COEF);
+        Vector3 force = new Vector3(hori * COEF, vert*COEF, forw*COEF);
         Vector3 torq = new Vector3(pitch*COEF, yaw*COEF, roll*COEF);
         rb.AddRelativeForce(force);
         rb.AddRelativeTorque(torq);
