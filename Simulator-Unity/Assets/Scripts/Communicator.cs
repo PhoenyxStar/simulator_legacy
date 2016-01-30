@@ -8,7 +8,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
 
-class sensor_packet
+public class sensor_packet
 {
     private int pitch;
     int roll;
@@ -72,7 +72,7 @@ class sensor_packet
     }
 }
 
-class thruster_packet
+public class thruster_packet
 {
     public thruster_packet(string raw)
     {
@@ -128,7 +128,7 @@ class thruster_packet
     thruster_packet(int a) { setupJSON(); }
 };
 
-class message
+public class message
 {
     public string JSON = "{\"sender\": \"\", \"recipient\": \"\",\"mtype\": \"\", \"value\": \"\"}";
     private string sender;
@@ -264,13 +264,13 @@ public class Communicator : MonoBehaviour
     }
 
     // Send message as raw string
-    private bool send_message(string msg)
+    public bool send_message(string msg)
     {
         LoggingSystem.log.Info("Sending message: " + msg);
         return socket.TrySendFrame(msg);
     }
 
-    private bool send_message(message msg)
+    public bool send_message(message msg)
     {
         LoggingSystem.log.Info("Sending message: " + msg.whole);
         return socket.TrySendFrame(msg.whole);
