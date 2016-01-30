@@ -3,7 +3,7 @@ using System.Collections;
 
 public class SubPhysics : MonoBehaviour {
     Rigidbody rb;
-    int COEF = 2;
+    int COEF = 3;
     string Joystick;
     // Use this for initialization
     void Start () {
@@ -16,7 +16,6 @@ public class SubPhysics : MonoBehaviour {
     // Update is called once per frame
     void Update () {
 
-
         /*
         float roll = Input.GetAxis("JoyAxisX");
         float pitch = Input.GetAxis("JoyAxisY");
@@ -27,18 +26,49 @@ public class SubPhysics : MonoBehaviour {
         */
         thruster_packet pack = new thruster_packet(0, 0, 0, 0, 0, 0);
 
-        float roll = pack.za + pack.zb;
-        float pitch = pack.ya + pack.yb;
-        float yaw = pack.xa + pack.xb;
-        float vert = pack.za + pack.zb;
-        float hori = pack.xa + pack.xb;
-        float forw = pack.ya + pack.yb;
+        float port = pack.za;
+        float star = pack.zb;
+        float front = pack.xa;
+        float back = pack.xb;
+        float top = pack.ya;
+        float bot = pack.yb;
+        if (rb.name == "RT")
+        {
+            rb.AddRelativeForce(new Vector3(0, 0, back));
+        }
+        if (rb.name == "FT")
+        {
+            rb.AddRelativeForce(new Vector3(0, 0, front));
+        }
+        if (rb.name == "PT")
+        {
+            rb.AddRelativeForce(new Vector3(0, 0, port));
+        }
+        if (rb.name == "ST")
+        {
+            rb.AddRelativeForce(new Vector3(0, 0, star));
+        }
+        if (rb.name == "TT")
+        {
+            rb.AddRelativeForce(new Vector3(0, 0, top));
+        }
+        if (rb.name == "BT")
+        {
+            rb.AddRelativeForce(new Vector3(0, 0, bot));
+        }
 
-        Vector3 force = new Vector3(hori * COEF, vert*COEF, forw*COEF);
-        Vector3 torq = new Vector3(pitch*COEF, yaw*COEF, roll*COEF);
-        rb.AddRelativeForce(force);
-        rb.AddRelativeTorque(torq);
-        
+        //Vector3 force = new Vector3(1, 0, 0);
+        //rb.AddForce(force);
+        //rb.AddRelativeForce(force);
+        //rb.AddRelativeTorque(force);
+        //rb.AddTorque(force);
+
+        //Vector3 force = new Vector3(hori * COEF, vert*COEF, forw*COEF);
+        //Vector3 torq = new Vector3(pitch*COEF, yaw*COEF, roll*COEF);
+
+        //rb.AddRelativeForce(force);
+        //rb.AddRelativeTorque(torq);
+
         //Quaternion target = Quaternion.Euler(y, x, 0);
         //transform.rotation = Quaternion.Slerp(transform.rotation, target, Time.deltaTime * smooth);
 
