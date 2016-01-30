@@ -1,18 +1,24 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System;
+using System.Collections.Generic;
 
 public class SubPhysics : MonoBehaviour {
     Rigidbody rb;
     int COEF = 3;
     string Joystick;
+
+    Communicator comm = new Communicator();
+
     // Use this for initialization
     void Start () {
         rb = GetComponent<Rigidbody>();
         rb.drag = 0.75f;
         rb.angularDrag = 0.75f;
+        comm.Initialize("thruster");
+
 
     }
-
     // Update is called once per frame
     void Update () {
 
@@ -24,14 +30,39 @@ public class SubPhysics : MonoBehaviour {
         float hori = Input.GetAxis("JoyAxisB");
         float forw = Input.GetAxis("JoyAxisC");
         */
-        thruster_packet pack = new thruster_packet(0, 0, 0, 0, 0, 0);
 
-        float port = pack.za;
-        float star = pack.zb;
-        float front = pack.xa;
-        float back = pack.xb;
-        float top = pack.ya;
-        float bot = pack.yb;
+
+
+        thruster_packet tp;
+        List<string> received;
+        float port = 0f;
+        float star = 0f;
+        float front = 0f;
+        float back = 0f;
+        float top = 0f;
+        float bot = 0f;
+        received = comm.receive_messages();
+        foreach(string x in received)
+        { LoggingSystem.log.Info(x); }
+        if (received.Count > 0)
+        {
+            for (int i = 0; i < received.Count; ++i)
+            {
+                // send every thruster packet received
+                message parsed_msg = new message(received[i]);
+                if (parsed_msg.mtype == "thruster")
+                {
+                    tp = new thruster_packet(parsed_msg.whole);
+                    port = tp.za;
+                    star = tp.zb;
+                    front = tp.xa;
+                    back = tp.xb;
+                    top = tp.ya;
+                    bot = tp.yb;
+                }
+            }
+        }
+
         if (rb.name == "RT")
         {
             rb.AddRelativeForce(new Vector3(0, 0, back));
