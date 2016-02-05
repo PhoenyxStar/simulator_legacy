@@ -5,6 +5,12 @@ using System.Collections.Generic;
 
 public class SubPhysics : MonoBehaviour {
     Rigidbody rb;
+    Rigidbody rt;
+    Rigidbody ft;
+    Rigidbody tt;
+    Rigidbody bt;
+    Rigidbody pt;
+    Rigidbody st;
     int COEF = 3;
     string Joystick;
 
@@ -13,6 +19,13 @@ public class SubPhysics : MonoBehaviour {
     // Use this for initialization
     void Start () {
         rb = GetComponent<Rigidbody>();
+        rt = GameObject.Find("RT").GetComponent<Rigidbody>();
+        ft = GameObject.Find("FT").GetComponent<Rigidbody>();
+        tt = GameObject.Find("TT").GetComponent<Rigidbody>();
+        bt = GameObject.Find("BT").GetComponent<Rigidbody>();
+        pt = GameObject.Find("PT").GetComponent<Rigidbody>();
+        st = GameObject.Find("ST").GetComponent<Rigidbody>();
+
         rb.drag = 0.75f;
         rb.angularDrag = 0.75f;
         comm.Initialize("thruster");
@@ -53,16 +66,24 @@ public class SubPhysics : MonoBehaviour {
                 if (parsed_msg.mtype == "thruster")
                 {
                     tp = new thruster_packet(parsed_msg.whole);
-                    port = tp.za;
-                    star = tp.zb;
-                    front = tp.xa;
-                    back = tp.xb;
-                    top = tp.ya;
-                    bot = tp.yb;
+					port = (float)tp.za;
+					star = (float)tp.zb;
+					front = (float)tp.xa;
+					back = (float)tp.xb;
+					top = (float)tp.ya;
+					bot = (float)tp.yb;
                 }
             }
         }
 
+
+        rt.AddRelativeForce(new Vector3(0, 0, back));
+        ft.AddRelativeForce(new Vector3(0, 0, front));
+        pt.AddRelativeForce(new Vector3(0, 0, port));
+        st.AddRelativeForce(new Vector3(0, 0, star));
+        tt.AddRelativeForce(new Vector3(0, 0, top));
+        bt.AddRelativeForce(new Vector3(0, 0, bot));
+        /*
         if (rb.name == "RT")
         {
             rb.AddRelativeForce(new Vector3(0, 0, back));
@@ -87,7 +108,7 @@ public class SubPhysics : MonoBehaviour {
         {
             rb.AddRelativeForce(new Vector3(0, 0, bot));
         }
-
+        */
         //Vector3 force = new Vector3(1, 0, 0);
         //rb.AddForce(force);
         //rb.AddRelativeForce(force);

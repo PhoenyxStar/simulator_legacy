@@ -7,6 +7,7 @@ using AsyncIO;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 
 public class sensor_packet
 {
@@ -79,12 +80,12 @@ public class thruster_packet
         JObject d = JObject.Parse(raw);
         try
         {
-            xa = (int)d["xa"];
-            xb = (int)d["xb"];
-            ya = (int)d["ya"];
-            yb = (int)d["yb"];
-            za = (int)d["za"];
-            zb = (int)d["zb"];
+			xa = (double)d["value"]["xa"];
+			xb = (double)d["value"]["xb"];
+			ya = (double)d["value"]["ya"];
+			yb = (double)d["value"]["yb"];
+			za = (double)d["value"]["za"];
+			zb = (double)d["value"]["zb"];
             whole = d.ToString();
 
         }
@@ -94,7 +95,7 @@ public class thruster_packet
             return;
         }
     }
-    public thruster_packet(int xa, int xb, int ya, int yb, int za, int zb)
+	public thruster_packet(double xa, double xb, double ya, double yb, double za, double zb)
     {
         this.xa = xa;
         this.xb = xb;
@@ -105,12 +106,12 @@ public class thruster_packet
         setupJSON();
     }
     string JSON = "{ \"xa\": \"\", \"xb\": \"\", \"ya\": \"\", \"yb\": \"\", \"za\": \"\", \"zb\": \"\"}";
-    public int xa;
-    public int xb;
-    public int ya;
-    public int yb;
-    public int za;
-    public int zb;
+    public double xa;
+	public double xb;
+	public double ya;
+	public double yb;
+	public double za;
+	public double zb;
     public string whole;
     
     void setupJSON()
@@ -147,6 +148,9 @@ public class message
             value = (string)d["value"];
             mtype = (string)d["mtype"];
             whole = raw;
+			whole = whole.Replace(@"\", @"");
+			whole = whole.Replace(@"""{", @"{");
+			whole = whole.Replace(@"}""", @"}");
         }
         catch (Exception e)
         {
