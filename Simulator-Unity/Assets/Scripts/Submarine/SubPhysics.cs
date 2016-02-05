@@ -65,7 +65,7 @@ public class SubPhysics : MonoBehaviour {
                 message parsed_msg = new message(received[i]);
                 if (parsed_msg.mtype == "thruster")
                 {
-                    tp = new thruster_packet(parsed_msg.whole);
+                    tp = new thruster_packet(parsed_msg.value);
                     port = tp.za;
                     star = tp.zb;
                     front = tp.xa;
