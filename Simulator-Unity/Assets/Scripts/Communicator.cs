@@ -371,7 +371,7 @@ public class Communicator : MonoBehaviour
         elapseTime += Time.deltaTime;
         if(elapseTime >= 2.0f)
         {
-            TestSensorData();
+            //TestSensorData();
             elapseTime = 0f;
         }
         

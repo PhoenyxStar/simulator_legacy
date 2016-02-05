@@ -4,7 +4,7 @@ using System.Collections;
 public class Sensors : MonoBehaviour
 {
 
-    private GameObject Sub = GameObject.Find("Sub");
+    private GameObject Sub;
 
     private Vector3 velocity;
     private Vector3 lastVelocity;
@@ -12,6 +12,9 @@ public class Sensors : MonoBehaviour
     private Vector3 acceleration;
     private Vector3 magneticField;
     private Vector3 angularVelocity;
+
+    Communicator communicator; 
+    private string[] messageRecipients;
 
     public double Depth
     {
@@ -53,33 +56,41 @@ public class Sensors : MonoBehaviour
     // Use this for initialization
     void Start()
     {
+         Sub = GameObject.Find("Submarine");
+
         velocity = new Vector3(0, 0, 0);
         lastVelocity = new Vector3(0, 0, 0);
         depth = 0;
         acceleration = new Vector3(0, 0, 0);
         magneticField = new Vector3(0, 0, 0);
         angularVelocity = new Vector3(0, 0, 0);
+
+        communicator = new Communicator();
+        communicator.Initialize("sensor");
+        messageRecipients = new string[] { "helm" };
     }
 
     // Update is called once per frame
-    void LastUpdate()
+    void Update()
     {
         UpdateDepth();
         UpdateVelocity();
         UpdateAcceleration();
         UpdateMagneticField();
         UpdateAngularVelocity();
+        
+        SendSensorMessage();
     }
 
     void UpdateDepth()
     {
-        GameObject water = GameObject.Find("WaterBasicDaytime");
+        GameObject water = GameObject.Find("WaterTop");
 
         // TODO: Figure out how Unity water works. Is this correct for its top? 
         double waterTop = ((Transform)water.GetComponent("Transform")).position.y;
         double subCenter = ((Transform)Sub.GetComponent("Transform")).position.y;
 
-        depth = waterTop - subCenter;
+        depth = subCenter - waterTop;
     }
 
     void UpdateVelocity()
@@ -166,10 +177,25 @@ public class Sensors : MonoBehaviour
     public double GetBatteryOutput()
     {
         // TODO: Check sub's actual voltage
-        // Assuming 24 V
-        double voltage = 24;
+        // Assuming 12 V
+        double voltage = 12;
         return voltage / (3.3 / (double)1024 * 7.5);
     }
 
     // TODO: Mission Start Switch
+    // TODO: Remove hard-coded start switch value in "SendSensorMessage()"
+
+    public void SendSensorMessage()
+    {
+        // "dt" is time since last message
+        sensor_packet sensorPacket = new sensor_packet((int)AngularVelocity.y, (int)AngularVelocity.x, (int)AngularVelocity.z,
+            (float)Depth, (float)GetBatteryOutput(), true, Time.unscaledDeltaTime);
+
+        // Send a sensorPacket to each recipient
+        foreach (string recipient in messageRecipients)
+        {
+            message msg = new message("sensor", recipient, "sensor", sensorPacket.whole);
+            communicator.send_message(msg);
+        }
+    }
 }
