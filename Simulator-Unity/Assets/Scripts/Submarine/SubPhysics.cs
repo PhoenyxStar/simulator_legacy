@@ -2,6 +2,8 @@
 using System.Collections;
 using System;
 using System.Collections.Generic;
+using Newtonsoft.Json.Linq;
+using System.IO;
 
 public class SubPhysics : MonoBehaviour {
     Rigidbody rb;
@@ -14,7 +16,7 @@ public class SubPhysics : MonoBehaviour {
     int COEF = 3;
     string Joystick;
 
-    Communicator comm = new Communicator();
+    //Communicator comm = new Communicator();
 
     // Use this for initialization
     void Start () {
@@ -28,12 +30,12 @@ public class SubPhysics : MonoBehaviour {
 
         rb.drag = 0.75f;
         rb.angularDrag = 0.75f;
-        comm.Initialize("thruster");
+        //comm.Initialize("thruster");
 
 
     }
     // Update is called once per frame
-    void Update () {
+    void Update() {
 
         /*
         float roll = Input.GetAxis("JoyAxisX");
@@ -54,8 +56,41 @@ public class SubPhysics : MonoBehaviour {
         float back = 0f;
         float top = 0f;
         float bot = 0f;
-        received = comm.receive_messages();
-        foreach(string x in received)
+        //received = comm.receive_messages();
+        string path = "Assets/settings/modules/thruster.json";
+        string jsonString = File.ReadAllText(path);
+        //File.ReadAllLines(path);
+        //JObject thrust = JObject.Parse(jsonString);
+        //LoggingSystem.log.Info(jsonString);
+        try {
+            JObject thrust = JObject.Parse(jsonString);
+            string temp = (string)thrust["value"];
+
+            JObject jtemp = JObject.Parse(temp);
+            front = (int)jtemp["xa"];
+            port = (int)jtemp["za"];
+            star = (int)jtemp["zb"];
+            back = (int)jtemp["xb"];
+            top = (int)jtemp["ya"];
+            bot = (int)jtemp["yb"];
+        }
+        catch (Exception e)
+        {
+            LoggingSystem.log.Error("Thruster packet: unable to parse string.\n");
+            return;
+        }
+        /*
+        tp = new thruster_packet(jsonString);
+        port = tp.za;
+        star = tp.zb;
+        front = tp.xa;
+        back = tp.xb;
+        top = tp.ya;
+        bot = tp.yb;
+        */
+
+        /*
+        foreach (string x in received)
         { LoggingSystem.log.Info(x); }
         if (received.Count > 0)
         {
@@ -74,13 +109,13 @@ public class SubPhysics : MonoBehaviour {
                     bot = tp.yb;
                 }
             }
-        }
+        }*/
 
 
         rt.AddRelativeForce(new Vector3(0, 0, back));
         ft.AddRelativeForce(new Vector3(0, 0, front));
-        pt.AddRelativeForce(new Vector3(0, 0, port));
-        st.AddRelativeForce(new Vector3(0, 0, star));
+        pt.AddRelativeForce(new Vector3(0, port, 0));
+        st.AddRelativeForce(new Vector3(0, star, 0));
         tt.AddRelativeForce(new Vector3(0, 0, top));
         bt.AddRelativeForce(new Vector3(0, 0, bot));
         /*
