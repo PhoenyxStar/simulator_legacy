@@ -11,15 +11,15 @@ using System.Text.RegularExpressions;
 
 public class sensor_packet
 {
-    private int pitch;
-    int roll;
-    int yaw;
-    float depth;
-    float battery;
-    bool start_switch;
-    double dt;
+	public int pitch;
+	public int roll;
+	public int yaw;
+	public float depth;
+	public float battery;
+	public bool start_switch;
+	public double dt;
 
-    string JSON = "{ \"pitch\": 0,  \"roll\": 0,  \"yaw\":  0,  \"depth\": 0,  \"battery\": 0, \"start_switch\": false, \"dt\": 0}";
+	public string JSON = "{ \"pitch\": 0,  \"roll\": 0,  \"yaw\":  0,  \"depth\": 0,  \"battery\": 0, \"start_switch\": false, \"dt\": 0}";
     public string whole;
 
     public sensor_packet(string raw)
@@ -80,12 +80,12 @@ public class thruster_packet
         JObject d = JObject.Parse(raw);
         try
         {
-			xa = (double)d["value"]["xa"];
-			xb = (double)d["value"]["xb"];
-			ya = (double)d["value"]["ya"];
-			yb = (double)d["value"]["yb"];
-			za = (double)d["value"]["za"];
-			zb = (double)d["value"]["zb"];
+			xa = (double)d["xa"];
+			xb = (double)d["xb"];
+			ya = (double)d["ya"];
+			yb = (double)d["yb"];
+			za = (double)d["za"];
+			zb = (double)d["zb"];
             whole = d.ToString();
 
         }
@@ -132,11 +132,11 @@ public class thruster_packet
 public class message
 {
     public string JSON = "{\"sender\": \"\", \"recipient\": \"\",\"mtype\": \"\", \"value\": \"\"}";
-    private string sender;
-    private string recipient;
+    public string sender;
+	public string recipient;
     public string whole;
     public string mtype;
-    private string value;
+	public string value;
     public message(string raw)
     {
         JObject d = JObject.Parse(raw);
@@ -148,9 +148,9 @@ public class message
             value = (string)d["value"];
             mtype = (string)d["mtype"];
             whole = raw;
-			whole = whole.Replace(@"\", @"");
-			whole = whole.Replace(@"""{", @"{");
-			whole = whole.Replace(@"}""", @"}");
+//			whole = whole.Replace(@"\", @"");
+//			whole = whole.Replace(@"""{", @"{");
+//			whole = whole.Replace(@"}""", @"}");
         }
         catch (Exception e)
         {

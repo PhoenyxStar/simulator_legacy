@@ -11,7 +11,8 @@ public class SubPhysics : MonoBehaviour {
     Rigidbody bt;
     Rigidbody pt;
     Rigidbody st;
-    int COEF = 3;
+	[SerializeField]
+    float COEF = 1/50f;
     string Joystick;
 
     Communicator comm = new Communicator();
@@ -65,7 +66,7 @@ public class SubPhysics : MonoBehaviour {
                 message parsed_msg = new message(received[i]);
                 if (parsed_msg.mtype == "thruster")
                 {
-                    tp = new thruster_packet(parsed_msg.whole);
+                    tp = new thruster_packet(parsed_msg.value);
 					port = (float)tp.za;
 					star = (float)tp.zb;
 					front = (float)tp.xa;
@@ -77,12 +78,12 @@ public class SubPhysics : MonoBehaviour {
         }
 
 
-        rt.AddRelativeForce(new Vector3(0, 0, back));
-        ft.AddRelativeForce(new Vector3(0, 0, front));
-        pt.AddRelativeForce(new Vector3(0, 0, port));
-        st.AddRelativeForce(new Vector3(0, 0, star));
-        tt.AddRelativeForce(new Vector3(0, 0, top));
-        bt.AddRelativeForce(new Vector3(0, 0, bot));
+		rt.AddForce(new Vector3(0, 0, back*COEF));
+		ft.AddForce(new Vector3(0, 0, front*COEF));
+		pt.AddForce(new Vector3(0, 0, port*COEF));
+		st.AddForce(new Vector3(0, 0, star*COEF));
+		tt.AddForce(new Vector3(0, 0, top*COEF));
+		bt.AddForce(new Vector3(0, 0, bot*COEF));
         /*
         if (rb.name == "RT")
         {
