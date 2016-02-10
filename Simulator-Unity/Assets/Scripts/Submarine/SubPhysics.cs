@@ -5,13 +5,19 @@ using System.Collections.Generic;
 
 public class SubPhysics : MonoBehaviour {
     Rigidbody rb;
-    Rigidbody rt;
-    Rigidbody ft;
-    Rigidbody tt;
-    Rigidbody bt;
-    Rigidbody pt;
-    Rigidbody st;
-	[SerializeField]
+    //Rigidbody rt;
+    //Rigidbody ft;
+    //Rigidbody tt;
+    //Rigidbody bt;
+    //Rigidbody pt;
+    //Rigidbody st;
+    float port = 0f;
+    float star = 0f;
+    float front = 0f;
+    float back = 0f;
+    float top = 0f;
+    float bot = 0f;
+    [SerializeField]
     float COEF = 1/50f;
     string Joystick;
 
@@ -19,18 +25,21 @@ public class SubPhysics : MonoBehaviour {
 
     // Use this for initialization
     void Start () {
-        rb = GetComponent<Rigidbody>();
-        rt = GameObject.Find("RT").GetComponent<Rigidbody>();
-        ft = GameObject.Find("FT").GetComponent<Rigidbody>();
-        tt = GameObject.Find("TT").GetComponent<Rigidbody>();
-        bt = GameObject.Find("BT").GetComponent<Rigidbody>();
-        pt = GameObject.Find("PT").GetComponent<Rigidbody>();
-        st = GameObject.Find("ST").GetComponent<Rigidbody>();
+        LoggingSystem.log.Info("Starting SubPhysics");
+        GameObject body = GameObject.Find("SubBody");
+        //Rigidbody rb = (Rigidbody)body.GetComponent("Rigidbody");
+        rb = body.GetComponent<Rigidbody>();
+        //rt = GameObject.Find("RT").GetComponent<Rigidbody>();
+        //ft = GameObject.Find("FT").GetComponent<Rigidbody>();
+        //tt = GameObject.Find("TT").GetComponent<Rigidbody>();
+        //bt = GameObject.Find("BT").GetComponent<Rigidbody>();
+        //pt = GameObject.Find("PT").GetComponent<Rigidbody>();
+        //st = GameObject.Find("ST").GetComponent<Rigidbody>();
 
         rb.drag = 0.75f;
         rb.angularDrag = 0.75f;
         comm.Initialize("thruster");
-
+        
 
     }
     // Update is called once per frame
@@ -45,16 +54,8 @@ public class SubPhysics : MonoBehaviour {
         float forw = Input.GetAxis("JoyAxisC");
         */
 
-
-
         thruster_packet tp;
         List<string> received;
-        float port = 0f;
-        float star = 0f;
-        float front = 0f;
-        float back = 0f;
-        float top = 0f;
-        float bot = 0f;
         received = comm.receive_messages();
         foreach(string x in received)
         { LoggingSystem.log.Info(x); }
@@ -67,23 +68,57 @@ public class SubPhysics : MonoBehaviour {
                 if (parsed_msg.mtype == "thruster")
                 {
                     tp = new thruster_packet(parsed_msg.value);
-					port = (float)tp.za;
-					star = (float)tp.zb;
-					front = (float)tp.xa;
-					back = (float)tp.xb;
-					top = (float)tp.ya;
-					bot = (float)tp.yb;
+                    port = (float)tp.za;
+                    star = (float)tp.zb;
+                    front = (float)tp.xa;
+                    back = (float)tp.xb;
+                    top = (float)tp.ya;
+                    bot = (float)tp.yb;
+
+                    //LoggingSystem.log.Info (port);
+                    //LoggingSystem.log.Info (star);
+                    //LoggingSystem.log.Info (front);
+                    //LoggingSystem.log.Info (back);
+                    //LoggingSystem.log.Info (top);
+                    //LoggingSystem.log.Info (bot);
                 }
             }
         }
+        /*
+        rt.AddRelativeForce(new Vector3(0, 0, back*COEF));
+        ft.AddRelativeForce(new Vector3(0, 0, front*COEF));
+        pt.AddRelativeForce(new Vector3(0, port*COEF, 0));
+        st.AddRelativeForce(new Vector3(0, star*COEF, 0));
+        tt.AddRelativeForce(new Vector3(0, 0, top*COEF));
+        bt.AddRelativeForce(new Vector3(0, 0, bot*COEF));
+        */
+        Vector3 rt_pos = new Vector3(0, 0, (float)-0.4);
+        Vector3 ft_pos = new Vector3(0, 0, (float)0.3);
+        Vector3 pt_pos = new Vector3((float)-0.2, 0, 0);
+        Vector3 st_pos = new Vector3((float)0.2, 0, 0);
+        Vector3 tt_pos = new Vector3(0, (float)0.2, 0);
+        Vector3 bt_pos = new Vector3(0, (float)-0.2, 0);
 
+        Vector3 rt_pos_world = rb.transform.position - rt_pos;
+        Vector3 ft_pos_world = rb.transform.position - ft_pos;
+        Vector3 pt_pos_world = rb.transform.position - pt_pos;
+        Vector3 st_pos_world = rb.transform.position - st_pos;
+        Vector3 tt_pos_world = rb.transform.position - tt_pos;
+        Vector3 bt_pos_world = rb.transform.position - bt_pos;
 
-		rt.AddForce(new Vector3(0, 0, back*COEF));
-		ft.AddForce(new Vector3(0, 0, front*COEF));
-		pt.AddForce(new Vector3(0, 0, port*COEF));
-		st.AddForce(new Vector3(0, 0, star*COEF));
-		tt.AddForce(new Vector3(0, 0, top*COEF));
-		bt.AddForce(new Vector3(0, 0, bot*COEF));
+        Vector3 rt_force = new Vector3((float)(1.0*back*COEF), 0, 0);
+        Vector3 ft_force = new Vector3((float)(1.0*front*COEF), 0, 0);
+        Vector3 pt_force = new Vector3(0, (float)(1.0*port*COEF), 0);
+        Vector3 st_force = new Vector3(0, (float)(1.0*star*COEF), 0);
+        Vector3 tt_force = new Vector3(0, 0, (float)(1.0*top*COEF));
+        Vector3 bt_force = new Vector3(0, 0, (float)(1.0*bot*COEF));
+
+        rb.AddForceAtPosition(rt_force, rt_pos_world);
+        rb.AddForceAtPosition(ft_force, ft_pos_world);
+        rb.AddForceAtPosition(pt_force, pt_pos_world);
+        rb.AddForceAtPosition(st_force, st_pos_world);
+        rb.AddForceAtPosition(tt_force, tt_pos_world);
+        rb.AddForceAtPosition(bt_force, bt_pos_world);
         /*
         if (rb.name == "RT")
         {

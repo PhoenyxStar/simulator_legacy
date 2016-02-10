@@ -19,7 +19,7 @@ public class sensor_packet
 	public bool start_switch;
 	public double dt;
 
-	public string JSON = "{ \"pitch\": 0,  \"roll\": 0,  \"yaw\":  0,  \"depth\": 0,  \"battery\": 0, \"start_switch\": false, \"dt\": 0}";
+	public string JSON = "{\"pitch\":0, \"roll\":0, \"yaw\":0, \"depth\":0, \"battery\":0, \"start_switch\":false, \"dt\":0}";
     public string whole;
 
     public sensor_packet(string raw)
@@ -69,7 +69,7 @@ public class sensor_packet
         d["battery"] = battery;
         d["start_switch"] = start_switch;
         d["dt"] = dt;
-        whole = d.ToString();
+		whole = d.ToString(Formatting.None);
     }
 }
 
@@ -124,7 +124,7 @@ public class thruster_packet
         d["yb"] = yb;
         d["za"] = za;
         d["zb"] = zb;
-        whole = d.ToString();
+        whole = d.ToString(Formatting.None);
     }
     thruster_packet(int a) { setupJSON(); }
 };
@@ -173,7 +173,7 @@ public class message
         d["recipient"] = recipient;
         d["mtype"] = mtype;
         d["value"] = value;
-        whole = d.ToString();
+		whole = d.ToString(Formatting.None);
     }
 
 };
@@ -279,7 +279,6 @@ public class Communicator : MonoBehaviour
         {
             return false;
         }
-        LoggingSystem.log.Info("Sending message: " + msg);
         return socket.TrySendFrame(msg);
     }
 
@@ -289,7 +288,6 @@ public class Communicator : MonoBehaviour
         {
             return false;
         }
-        LoggingSystem.log.Info("Sending message: " + msg.whole);
         return socket.TrySendFrame(msg.whole);
     }
     private bool sendSensorPacket(string recipient)
@@ -355,8 +353,8 @@ public class Communicator : MonoBehaviour
         {
             return;
         }
-        Initialize(module_name);
-        TestSensorData();
+        //Initialize(module_name);
+        //TestSensorData();
     }
 
     float elapseTime = 0;

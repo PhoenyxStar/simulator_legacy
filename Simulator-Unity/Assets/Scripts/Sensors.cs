@@ -56,7 +56,7 @@ public class Sensors : MonoBehaviour
     // Use this for initialization
     void Start()
     {
-         Sub = GameObject.Find("Submarine");
+        Sub = GameObject.Find("Submarine");
 
         velocity = new Vector3(0, 0, 0);
         lastVelocity = new Vector3(0, 0, 0);
@@ -187,8 +187,13 @@ public class Sensors : MonoBehaviour
 
     public void SendSensorMessage()
     {
+        GameObject body = GameObject.Find("Submarine");
+		Rigidbody rb = (Rigidbody)body.GetComponent("Rigidbody");
+		Quaternion orientation = rb.rotation;
+		Vector3 yrp = orientation.eulerAngles;
+
         // "dt" is time since last message
-        sensor_packet sensorPacket = new sensor_packet((int)AngularVelocity.y, (int)AngularVelocity.x, (int)AngularVelocity.z,
+		sensor_packet sensorPacket = new sensor_packet((int)yrp.z, (int)yrp.x, (int)yrp.y,
             (float)Depth, (float)GetBatteryOutput(), true, Time.unscaledDeltaTime);
 
         // Send a sensorPacket to each recipient
