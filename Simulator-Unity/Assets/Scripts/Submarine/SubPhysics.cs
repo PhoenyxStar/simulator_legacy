@@ -16,7 +16,7 @@ public class SubPhysics : MonoBehaviour {
     int COEF = 1/125;
     string Joystick;
 
-   // Communicator comm = new Communicator();
+    Communicator comm = new Communicator();
 
     // Use this for initialization
     void Start () {
@@ -30,7 +30,7 @@ public class SubPhysics : MonoBehaviour {
         rb.centerOfMass = new Vector3(0,0,-.25f);
         rb.drag = 0.75f;
         rb.angularDrag = 0.75f;
-        //comm.Initialize("thruster");
+        comm.Initialize("thruster");
         rb.SetDensity(.97f);
 
     }
@@ -46,20 +46,27 @@ public class SubPhysics : MonoBehaviour {
         float back = 0f;
         float top = 0f;
         float bot = 0f;
-        //received = comm.receive_messages();
-        string path = "Assets/settings/modules/thruster.json";
-        string jsonString = File.ReadAllText(path);
-        try {
-            JObject thrust = JObject.Parse(jsonString);
-            string temp = (string)thrust["value"];
-
-            JObject jtemp = JObject.Parse(temp);
-            front = (int)jtemp["xa"];
-            port = (int)jtemp["za"];
-            star = (int)jtemp["zb"];
-            back = (int)jtemp["xb"];
-            top = (int)jtemp["ya"];
-            bot = (int)jtemp["yb"];
+        received = comm.receive_messages();
+        foreach (string x in received)
+        { LoggingSystem.log.Info(x);
+        }
+        if (received.Count > 0)
+        {
+            for (int i = 0; i < received.Count; ++i)
+            {
+                // send every thruster packet received
+                message parsed_msg = new message(received[i]);
+                if (parsed_msg.mtype == "thruster")
+                {
+                    tp = new thruster_packet(parsed_msg.value);
+                    port = (float)tp.za;
+                    star = (float)tp.zb;
+                    front = (float)tp.xa;
+                    back = (float)tp.xb;
+                    top = (float)tp.ya;
+                    bot = (float)tp.yb;
+                }
+            }
         }
         catch (Exception e)
         {
@@ -74,16 +81,6 @@ public class SubPhysics : MonoBehaviour {
         st.AddRelativeForce(new Vector3(0, star*COEF, 0));
         tt.AddRelativeForce(new Vector3(0, 0, top*COEF));
         bt.AddRelativeForce(new Vector3(0, 0, bot*COEF));
-        if (Input.GetKeyDown(KeyCode.C))
-        {
-            Vector3 force = new Vector3(0, 5, 0);
-            rt.AddRelativeForce(force);
-        }
-        if (Input.GetKeyDown(KeyCode.V))
-        {
-            Vector3 force = new Vector3(0, -5, 0);
-            rt.AddRelativeForce(force);
-        }
     }
 
 
