@@ -68,11 +68,6 @@ public class SubPhysics : MonoBehaviour {
                 }
             }
         }
-        catch (Exception e)
-        {
-            LoggingSystem.log.Error("Thruster packet: unable to parse string.\n");
-            return;
-        }
 
 
         rt.AddRelativeForce(new Vector3(0, back*COEF, 0));
