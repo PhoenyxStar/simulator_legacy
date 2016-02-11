@@ -13,10 +13,10 @@ public class SubPhysics : MonoBehaviour {
     Rigidbody bt;
     Rigidbody pt;
     Rigidbody st;
-    int COEF = 3;
+    int COEF = 1/125;
     string Joystick;
 
-    //Communicator comm = new Communicator();
+   // Communicator comm = new Communicator();
 
     // Use this for initialization
     void Start () {
@@ -27,25 +27,15 @@ public class SubPhysics : MonoBehaviour {
         bt = GameObject.Find("BT").GetComponent<Rigidbody>();
         pt = GameObject.Find("PT").GetComponent<Rigidbody>();
         st = GameObject.Find("ST").GetComponent<Rigidbody>();
-
+        rb.centerOfMass = new Vector3(0,0,-.25f);
         rb.drag = 0.75f;
         rb.angularDrag = 0.75f;
         //comm.Initialize("thruster");
-
+        rb.SetDensity(.97f);
 
     }
     // Update is called once per frame
     void Update() {
-
-        /*
-        float roll = Input.GetAxis("JoyAxisX");
-        float pitch = Input.GetAxis("JoyAxisY");
-        float yaw = Input.GetAxis("JoyAxisZ");
-        float vert = Input.GetAxis("JoyAxisA");
-        float hori = Input.GetAxis("JoyAxisB");
-        float forw = Input.GetAxis("JoyAxisC");
-        */
-
 
 
         thruster_packet tp;
@@ -59,9 +49,6 @@ public class SubPhysics : MonoBehaviour {
         //received = comm.receive_messages();
         string path = "Assets/settings/modules/thruster.json";
         string jsonString = File.ReadAllText(path);
-        //File.ReadAllLines(path);
-        //JObject thrust = JObject.Parse(jsonString);
-        //LoggingSystem.log.Info(jsonString);
         try {
             JObject thrust = JObject.Parse(jsonString);
             string temp = (string)thrust["value"];
@@ -79,150 +66,24 @@ public class SubPhysics : MonoBehaviour {
             LoggingSystem.log.Error("Thruster packet: unable to parse string.\n");
             return;
         }
-        /*
-        tp = new thruster_packet(jsonString);
-        port = tp.za;
-        star = tp.zb;
-        front = tp.xa;
-        back = tp.xb;
-        top = tp.ya;
-        bot = tp.yb;
-        */
 
-        /*
-        foreach (string x in received)
-        { LoggingSystem.log.Info(x); }
-        if (received.Count > 0)
+
+        rt.AddRelativeForce(new Vector3(0, back*COEF, 0));
+        ft.AddRelativeForce(new Vector3(0, front*COEF, 0));
+        pt.AddRelativeForce(new Vector3(0, port*COEF, 0));
+        st.AddRelativeForce(new Vector3(0, star*COEF, 0));
+        tt.AddRelativeForce(new Vector3(0, 0, top*COEF));
+        bt.AddRelativeForce(new Vector3(0, 0, bot*COEF));
+        if (Input.GetKeyDown(KeyCode.C))
         {
-            for (int i = 0; i < received.Count; ++i)
-            {
-                // send every thruster packet received
-                message parsed_msg = new message(received[i]);
-                if (parsed_msg.mtype == "thruster")
-                {
-                    tp = new thruster_packet(parsed_msg.value);
-                    port = tp.za;
-                    star = tp.zb;
-                    front = tp.xa;
-                    back = tp.xb;
-                    top = tp.ya;
-                    bot = tp.yb;
-                }
-            }
-        }*/
-
-
-        rt.AddRelativeForce(new Vector3(0, 0, back));
-        ft.AddRelativeForce(new Vector3(0, 0, front));
-        pt.AddRelativeForce(new Vector3(0, port, 0));
-        st.AddRelativeForce(new Vector3(0, star, 0));
-        tt.AddRelativeForce(new Vector3(0, 0, top));
-        bt.AddRelativeForce(new Vector3(0, 0, bot));
-        /*
-        if (rb.name == "RT")
-        {
-            rb.AddRelativeForce(new Vector3(0, 0, back));
+            Vector3 force = new Vector3(0, 5, 0);
+            rt.AddRelativeForce(force);
         }
-        if (rb.name == "FT")
+        if (Input.GetKeyDown(KeyCode.V))
         {
-            rb.AddRelativeForce(new Vector3(0, 0, front));
+            Vector3 force = new Vector3(0, -5, 0);
+            rt.AddRelativeForce(force);
         }
-        if (rb.name == "PT")
-        {
-            rb.AddRelativeForce(new Vector3(0, 0, port));
-        }
-        if (rb.name == "ST")
-        {
-            rb.AddRelativeForce(new Vector3(0, 0, star));
-        }
-        if (rb.name == "TT")
-        {
-            rb.AddRelativeForce(new Vector3(0, 0, top));
-        }
-        if (rb.name == "BT")
-        {
-            rb.AddRelativeForce(new Vector3(0, 0, bot));
-        }
-        */
-        //Vector3 force = new Vector3(1, 0, 0);
-        //rb.AddForce(force);
-        //rb.AddRelativeForce(force);
-        //rb.AddRelativeTorque(force);
-        //rb.AddTorque(force);
-
-        //Vector3 force = new Vector3(hori * COEF, vert*COEF, forw*COEF);
-        //Vector3 torq = new Vector3(pitch*COEF, yaw*COEF, roll*COEF);
-
-        //rb.AddRelativeForce(force);
-        //rb.AddRelativeTorque(torq);
-
-        //Quaternion target = Quaternion.Euler(y, x, 0);
-        //transform.rotation = Quaternion.Slerp(transform.rotation, target, Time.deltaTime * smooth);
-
-
-
-        /*
-        if (Input.GetKeyDown(KeyCode.R))
-         {
-             Vector3 force = new Vector3(COEF, 0, 0);
-             rb.AddRelativeTorque(force);
-
-         }
-        else if (Input.GetKeyDown(KeyCode.F))
-         {
-             Vector3 force = new Vector3(-COEF, 0, 0);
-             rb.AddRelativeTorque(force);
-         }
-         if (Input.GetKeyDown(KeyCode.T))
-         {
-             Vector3 force = new Vector3(0, COEF, 0);
-             rb.AddRelativeTorque(force);
-         }
-         if (Input.GetKeyDown(KeyCode.G))
-         {
-             Vector3 force = new Vector3(0, -COEF, 0);
-             rb.AddRelativeTorque(force);
-         }
-         if (Input.GetKeyDown(KeyCode.Y))
-         {
-             Vector3 force = new Vector3(0, 0, COEF);
-             rb.AddRelativeTorque(force);
-         }
-         if (Input.GetKeyDown(KeyCode.H))
-         {
-             Vector3 force = new Vector3(0, 0, -COEF);
-             rb.AddRelativeTorque(force);
-         }
-         if (Input.GetKeyDown(KeyCode.N))
-         {
-             Vector3 force = new Vector3(COEF, 0, 0);
-             rb.AddRelativeForce(force);
-         }
-         if (Input.GetKeyDown(KeyCode.M))
-         {
-             Vector3 force = new Vector3(-COEF, 0, 0);
-             rb.AddRelativeForce(force);
-         }
-         if (Input.GetKeyDown(KeyCode.V))
-         {
-             Vector3 force = new Vector3(0, COEF, 0);
-             rb.AddRelativeForce(force);
-         }
-         if (Input.GetKeyDown(KeyCode.B))
-         {
-             Vector3 force = new Vector3(0, -COEF, 0);
-             rb.AddRelativeForce(force);
-         }
-         if (Input.GetKeyDown(KeyCode.X))
-         {
-             Vector3 force = new Vector3(0, 0, COEF);
-             rb.AddRelativeForce(force);
-         }
-         if (Input.GetKeyDown(KeyCode.C))
-         {
-             Vector3 force = new Vector3(0, 0, -COEF);
-             rb.AddRelativeForce(force);
-         }*/
     }
 
 
