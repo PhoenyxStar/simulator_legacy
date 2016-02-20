@@ -27,11 +27,13 @@ public class SubPhysics : MonoBehaviour {
         bt = GameObject.Find("BT").GetComponent<Rigidbody>();
         pt = GameObject.Find("PT").GetComponent<Rigidbody>();
         st = GameObject.Find("ST").GetComponent<Rigidbody>();
-        rb.centerOfMass = new Vector3(0,0,-.25f);
-        rb.drag = 0.75f;
-        rb.angularDrag = 0.75f;
+        rb.centerOfMass += new Vector3(0,0,-.01f);
+        rb.drag = 0.9f;
+        rb.angularDrag = 0.9f;
         comm.Initialize("thruster");
         rb.SetDensity(.97f);
+        rb.useGravity = true;
+        Physics.gravity = new Vector3(0, .3f, 0);
 
     }
     // Update is called once per frame
@@ -48,11 +50,12 @@ public class SubPhysics : MonoBehaviour {
         float bot = 0f;
         received = comm.receive_messages();
         foreach (string x in received)
-        { LoggingSystem.log.Info(x);
-        }
-        if (received.Count > 0)
         {
-            for (int i = 0; i < received.Count; ++i)
+            loggingsystem.log.info(x);
+        }
+        if (received.count > 0)
+        {
+            for (int i = 0; i < received.count; ++i)
             {
                 // send every thruster packet received
                 message parsed_msg = new message(received[i]);
