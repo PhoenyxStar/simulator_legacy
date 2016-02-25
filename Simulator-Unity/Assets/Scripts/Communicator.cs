@@ -7,18 +7,19 @@ using AsyncIO;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 
 public class sensor_packet
 {
-    public int pitch;
-    public int roll;
-    public int yaw;
-    public float depth;
-    public float battery;
-    public bool start_switch;
-    public double dt;
+	public int pitch;
+	public int roll;
+	public int yaw;
+	public float depth;
+	public float battery;
+	public bool start_switch;
+	public double dt;
 
-    string JSON = "{ \"pitch\": 0,  \"roll\": 0,  \"yaw\":  0,  \"depth\": 0,  \"battery\": 0, \"start_switch\": false, \"dt\": 0}";
+	public string JSON = "{\"pitch\":0, \"roll\":0, \"yaw\":0, \"depth\":0, \"battery\":0, \"start_switch\":false, \"dt\":0}";
     public string whole;
 
     public sensor_packet(string raw)
@@ -68,7 +69,7 @@ public class sensor_packet
         d["battery"] = battery;
         d["start_switch"] = start_switch;
         d["dt"] = dt;
-        whole = d.ToString();
+		whole = d.ToString(Formatting.None);
     }
 }
 
@@ -79,12 +80,12 @@ public class thruster_packet
         JObject d = JObject.Parse(raw);
         try
         {
-            xa = (int)d["xa"];
-            xb = (int)d["xb"];
-            ya = (int)d["ya"];
-            yb = (int)d["yb"];
-            za = (int)d["za"];
-            zb = (int)d["zb"];
+			xa = (double)d["xa"];
+			xb = (double)d["xb"];
+			ya = (double)d["ya"];
+			yb = (double)d["yb"];
+			za = (double)d["za"];
+			zb = (double)d["zb"];
             whole = d.ToString();
 
         }
@@ -94,7 +95,7 @@ public class thruster_packet
             return;
         }
     }
-    public thruster_packet(int xa, int xb, int ya, int yb, int za, int zb)
+	public thruster_packet(double xa, double xb, double ya, double yb, double za, double zb)
     {
         this.xa = xa;
         this.xb = xb;
@@ -105,12 +106,12 @@ public class thruster_packet
         setupJSON();
     }
     string JSON = "{ \"xa\": \"\", \"xb\": \"\", \"ya\": \"\", \"yb\": \"\", \"za\": \"\", \"zb\": \"\"}";
-    public int xa;
-    public int xb;
-    public int ya;
-    public int yb;
-    public int za;
-    public int zb;
+    public double xa;
+	public double xb;
+	public double ya;
+	public double yb;
+	public double za;
+	public double zb;
     public string whole;
     
     void setupJSON()
@@ -123,7 +124,7 @@ public class thruster_packet
         d["yb"] = yb;
         d["za"] = za;
         d["zb"] = zb;
-        whole = d.ToString();
+        whole = d.ToString(Formatting.None);
     }
     thruster_packet(int a) { setupJSON(); }
 };
@@ -132,10 +133,11 @@ public class message
 {
     public string JSON = "{\"sender\": \"\", \"recipient\": \"\",\"mtype\": \"\", \"value\": \"\"}";
     public string sender;
-    public string recipient;
+	public string recipient;
     public string whole;
     public string mtype;
-    public string value;
+	public string value;
+
     public message(string raw)
     {
         JObject d = JObject.Parse(raw);
@@ -147,6 +149,9 @@ public class message
             value = (string)d["value"];
             mtype = (string)d["mtype"];
             whole = raw;
+//			whole = whole.Replace(@"\", @"");
+//			whole = whole.Replace(@"""{", @"{");
+//			whole = whole.Replace(@"}""", @"}");
         }
         catch (Exception e)
         {
@@ -169,7 +174,7 @@ public class message
         d["recipient"] = recipient;
         d["mtype"] = mtype;
         d["value"] = value;
-        whole = d.ToString();
+		whole = d.ToString(Formatting.None);
     }
 
 };
@@ -197,8 +202,9 @@ public class Communicator : MonoBehaviour
     // Sending and recieving messages is also handled here.
     public void Initialize(string module_name)
     {
-        if (module_name == "")
-            return;
+        //if (!GlobalManager.Instance.enableConnection || module_name == "")
+            //return;
+        ForceDotNet.Force();
         this.module_name = module_name;
 
         // load settings file
@@ -238,6 +244,10 @@ public class Communicator : MonoBehaviour
     // Recieves all messages sent to this module as raw string.
     public List<string> receive_messages()
     {
+        //if (!GlobalManager.Instance.enableConnection)
+        //{
+            //return null;
+        //}
         List<string> messagesv = new List<string>();
 
         // If socket is not setup return nothing.
@@ -266,17 +276,27 @@ public class Communicator : MonoBehaviour
     // Send message as raw string
     public bool send_message(string msg)
     {
-        LoggingSystem.log.Info("Sending message: " + msg);
+        //if (!GlobalManager.Instance.enableConnection)
+        //{
+            //return false;
+        //}
         return socket.TrySendFrame(msg);
     }
 
     public bool send_message(message msg)
     {
-        LoggingSystem.log.Info("Sending message: " + msg.whole);
+        //if (!GlobalManager.Instance.enableConnection)
+        //{
+            //return false;
+        //}
         return socket.TrySendFrame(msg.whole);
     }
     private bool sendSensorPacket(string recipient)
     {
+        //if (!GlobalManager.Instance.enableConnection)
+        //{
+            //return false;
+        //}
         float[] ypr = { UnityEngine.Random.Range(0.0f, 100.0f), UnityEngine.Random.Range(0.0f, 100.0f), UnityEngine.Random.Range(0.0f, 100.0f) };
         //s->getYPR(ypr);
         return send_message(new message("sensor", recipient, "sensor",
@@ -302,6 +322,10 @@ public class Communicator : MonoBehaviour
 
     private bool sendThrusterPacket(string recipient)
     {
+        //if (!GlobalManager.Instance.enableConnection)
+        //{
+            //return false;
+        //}
         //s->getYPR(ypr);
         return send_message(new message("thruster", recipient, "thruster",
                           new thruster_packet((int)UnityEngine.Random.Range(1.0f, 100.0f),
@@ -314,6 +338,10 @@ public class Communicator : MonoBehaviour
 
     private void TestSensorData()
     {
+        //if (!GlobalManager.Instance.enableConnection)
+        //{
+            //return;
+        //}
         // send test packets every 2 seconds
         sendSensorPacket("helm");
         sendThrusterPacket("helm");
@@ -322,20 +350,27 @@ public class Communicator : MonoBehaviour
     // Use this for initialization
     void Start()
     {
-        ForceDotNet.Force();
-        Initialize(module_name);
-        TestSensorData();
+        //if (!GlobalManager.Instance.enableConnection)
+        //{
+            //return;
+        //}
+        //Initialize(module_name);
+        //TestSensorData();
     }
 
     float elapseTime = 0;
     // Update is called once per frame
     void Update()
     {
+        //if (!GlobalManager.Instance.enableConnection)
+        //{
+            //return;
+        //}
         // send test packets every two seconds
         elapseTime += Time.deltaTime;
         if(elapseTime >= 2.0f)
         {
-            TestSensorData();
+            //TestSensorData();
             elapseTime = 0f;
         }
         
