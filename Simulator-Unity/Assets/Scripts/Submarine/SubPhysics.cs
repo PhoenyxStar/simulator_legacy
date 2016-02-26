@@ -27,62 +27,63 @@ public class SubPhysics : MonoBehaviour {
 
     // Use this for initialization
     void Start () {
-        GameObject body = GameObject.Find("SubBody");
+		GameObject body = GameObject.Find ("SubBody");
 
-        rb = GetComponent<Rigidbody>();
-        rt = GameObject.Find("RT").GetComponent<Rigidbody>();
-        ft = GameObject.Find("FT").GetComponent<Rigidbody>();
-        tt = GameObject.Find("TT").GetComponent<Rigidbody>();
-        bt = GameObject.Find("BT").GetComponent<Rigidbody>();
-        pt = GameObject.Find("PT").GetComponent<Rigidbody>();
-        st = GameObject.Find("ST").GetComponent<Rigidbody>();
+		rb = GetComponent<Rigidbody> ();
+		rt = GameObject.Find ("RT").GetComponent<Rigidbody> ();
+		ft = GameObject.Find ("FT").GetComponent<Rigidbody> ();
+		tt = GameObject.Find ("TT").GetComponent<Rigidbody> ();
+		bt = GameObject.Find ("BT").GetComponent<Rigidbody> ();
+		pt = GameObject.Find ("PT").GetComponent<Rigidbody> ();
+		st = GameObject.Find ("ST").GetComponent<Rigidbody> ();
 
-        rb.centerOfMass += new Vector3(0,0,-.01f);
-        rb.drag = 0.9f;
-        rb.angularDrag = 0.9f;
-        rb.SetDensity(1.0f);
-        rb.useGravity = true;
-        Physics.gravity = new Vector3(0, 0, 0);
+		rb.centerOfMass += new Vector3 (0, 0, -.01f);
+		rb.drag = 0.9f;
+		rb.angularDrag = 0.9f;
+		rb.SetDensity (1.0f);
+		rb.useGravity = true;
+		Physics.gravity = new Vector3 (0, 0, 0);
 
-        comm = new Communicator();
-        comm.Initialize("thruster");
+		if (GlobalManager.Instance.enableConnection) {
+			comm = new Communicator ();
+			comm.Initialize ("thruster");
+		}
 
         LoggingSystem.log.Info("Starting SubPhysics");
     }
 
     // Update is called once per frame
     void Update () {
-        thruster_packet tp;
-        List<string> received;
-        received = comm.receive_messages();
-        foreach (string x in received)
-        {
-            LoggingSystem.log.Info(x);
-        }
-        if (received.Count > 0)
-        {
-            for (int i = 0; i < received.Count; ++i)
-            {
-                // send every thruster packet received
-                message parsed_msg = new message(received[i]);
-                if (parsed_msg.mtype == "thruster")
-                {
-                    tp = new thruster_packet(parsed_msg.value);
-                    port = (float)tp.za;
-                    star = (float)tp.zb;
-                    front = (float)tp.xa;
-                    back = (float)tp.xb;
-                    top = (float)tp.ya;
-                    bot = (float)tp.yb;
-                    //LoggingSystem.log.Info (port);
-                    //LoggingSystem.log.Info (star);
-                    //LoggingSystem.log.Info (front);
-                    //LoggingSystem.log.Info (back);
-                    //LoggingSystem.log.Info (top);
-                    //LoggingSystem.log.Info (bot);
-                }
-            }
-        }
+		if (GlobalManager.Instance.enableConnection) {
+			thruster_packet tp;
+			List<string> received;
+
+			received = comm.receive_messages ();
+			foreach (string x in received) {
+				LoggingSystem.log.Info (x);
+			}
+			if (received.Count > 0) {
+				for (int i = 0; i < received.Count; ++i) {
+					// send every thruster packet received
+					message parsed_msg = new message (received [i]);
+					if (parsed_msg.mtype == "thruster") {
+						tp = new thruster_packet (parsed_msg.value);
+						port = (float)tp.za;
+						star = (float)tp.zb;
+						front = (float)tp.xa;
+						back = (float)tp.xb;
+						top = (float)tp.ya;
+						bot = (float)tp.yb;
+						//LoggingSystem.log.Info (port);
+						//LoggingSystem.log.Info (star);
+						//LoggingSystem.log.Info (front);
+						//LoggingSystem.log.Info (back);
+						//LoggingSystem.log.Info (top);
+						//LoggingSystem.log.Info (bot);
+					}
+				}
+			}
+		}
 
         //rt.AddRelativeForce(new Vector3(0, 0, back*COEF));
         //ft.AddRelativeForce(new Vector3(0, 0, front*COEF));
