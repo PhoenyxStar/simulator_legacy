@@ -2,15 +2,17 @@
 using System.Collections;
 using System;
 using System.Collections.Generic;
+using Newtonsoft.Json.Linq;
+using System.IO;
 
 public class SubPhysics : MonoBehaviour {
     Rigidbody rb;
-    //Rigidbody rt;
-    //Rigidbody ft;
-    //Rigidbody tt;
-    //Rigidbody bt;
-    //Rigidbody pt;
-    //Rigidbody st;
+    Rigidbody rt;
+    Rigidbody ft;
+    Rigidbody tt;
+    Rigidbody bt;
+    Rigidbody pt;
+    Rigidbody st;
     float port = 0f;
     float star = 0f;
     float front = 0f;
@@ -21,44 +23,42 @@ public class SubPhysics : MonoBehaviour {
     float COEF = 1/50f;
     string Joystick;
 
-    Communicator comm = new Communicator();
+    Communicator comm;
 
     // Use this for initialization
     void Start () {
-        LoggingSystem.log.Info("Starting SubPhysics");
         GameObject body = GameObject.Find("SubBody");
-        //Rigidbody rb = (Rigidbody)body.GetComponent("Rigidbody");
-        rb = body.GetComponent<Rigidbody>();
-        //rt = GameObject.Find("RT").GetComponent<Rigidbody>();
-        //ft = GameObject.Find("FT").GetComponent<Rigidbody>();
-        //tt = GameObject.Find("TT").GetComponent<Rigidbody>();
-        //bt = GameObject.Find("BT").GetComponent<Rigidbody>();
-        //pt = GameObject.Find("PT").GetComponent<Rigidbody>();
-        //st = GameObject.Find("ST").GetComponent<Rigidbody>();
 
-        rb.drag = 0.75f;
-        rb.angularDrag = 0.75f;
+        rb = GetComponent<Rigidbody>();
+        rt = GameObject.Find("RT").GetComponent<Rigidbody>();
+        ft = GameObject.Find("FT").GetComponent<Rigidbody>();
+        tt = GameObject.Find("TT").GetComponent<Rigidbody>();
+        bt = GameObject.Find("BT").GetComponent<Rigidbody>();
+        pt = GameObject.Find("PT").GetComponent<Rigidbody>();
+        st = GameObject.Find("ST").GetComponent<Rigidbody>();
+
+        rb.centerOfMass += new Vector3(0,0,-.01f);
+        rb.drag = 0.9f;
+        rb.angularDrag = 0.9f;
+        rb.SetDensity(1.0f);
+        rb.useGravity = true;
+        Physics.gravity = new Vector3(0, 0, 0);
+
+        comm = new Communicator();
         comm.Initialize("thruster");
-        
 
+        LoggingSystem.log.Info("Starting SubPhysics");
     }
+
     // Update is called once per frame
     void Update () {
-
-        /*
-        float roll = Input.GetAxis("JoyAxisX");
-        float pitch = Input.GetAxis("JoyAxisY");
-        float yaw = Input.GetAxis("JoyAxisZ");
-        float vert = Input.GetAxis("JoyAxisA");
-        float hori = Input.GetAxis("JoyAxisB");
-        float forw = Input.GetAxis("JoyAxisC");
-        */
-
         thruster_packet tp;
         List<string> received;
         received = comm.receive_messages();
-        foreach(string x in received)
-        { LoggingSystem.log.Info(x); }
+        foreach (string x in received)
+        {
+            LoggingSystem.log.Info(x);
+        }
         if (received.Count > 0)
         {
             for (int i = 0; i < received.Count; ++i)
@@ -74,7 +74,6 @@ public class SubPhysics : MonoBehaviour {
                     back = (float)tp.xb;
                     top = (float)tp.ya;
                     bot = (float)tp.yb;
-
                     //LoggingSystem.log.Info (port);
                     //LoggingSystem.log.Info (star);
                     //LoggingSystem.log.Info (front);
@@ -84,14 +83,14 @@ public class SubPhysics : MonoBehaviour {
                 }
             }
         }
-        /*
-        rt.AddRelativeForce(new Vector3(0, 0, back*COEF));
-        ft.AddRelativeForce(new Vector3(0, 0, front*COEF));
-        pt.AddRelativeForce(new Vector3(0, port*COEF, 0));
-        st.AddRelativeForce(new Vector3(0, star*COEF, 0));
-        tt.AddRelativeForce(new Vector3(0, 0, top*COEF));
-        bt.AddRelativeForce(new Vector3(0, 0, bot*COEF));
-        */
+
+        //rt.AddRelativeForce(new Vector3(0, 0, back*COEF));
+        //ft.AddRelativeForce(new Vector3(0, 0, front*COEF));
+        //pt.AddRelativeForce(new Vector3(0, port*COEF, 0));
+        //st.AddRelativeForce(new Vector3(0, star*COEF, 0));
+        //tt.AddRelativeForce(new Vector3(0, 0, top*COEF));
+        //bt.AddRelativeForce(new Vector3(0, 0, bot*COEF));
+
         Vector3 rt_pos = new Vector3(0, 0, (float)-0.4);
         Vector3 ft_pos = new Vector3(0, 0, (float)0.3);
         Vector3 pt_pos = new Vector3((float)-0.2, 0, 0);
@@ -99,12 +98,27 @@ public class SubPhysics : MonoBehaviour {
         Vector3 tt_pos = new Vector3(0, (float)0.2, 0);
         Vector3 bt_pos = new Vector3(0, (float)-0.2, 0);
 
+        rt_pos = rb.transform.localRotation * rt_pos;
+        ft_pos = rb.transform.localRotation * ft_pos;
+        pt_pos = rb.transform.localRotation * pt_pos;
+        st_pos = rb.transform.localRotation * st_pos;
+        tt_pos = rb.transform.localRotation * tt_pos;
+        bt_pos = rb.transform.localRotation * bt_pos;
+
         Vector3 rt_pos_world = rb.transform.position - rt_pos;
         Vector3 ft_pos_world = rb.transform.position - ft_pos;
         Vector3 pt_pos_world = rb.transform.position - pt_pos;
         Vector3 st_pos_world = rb.transform.position - st_pos;
         Vector3 tt_pos_world = rb.transform.position - tt_pos;
         Vector3 bt_pos_world = rb.transform.position - bt_pos;
+
+        //LoggingSystem.log.Info("Thruster Positions:");
+        //LoggingSystem.log.Info("RT: " + rt_pos_world);
+        //LoggingSystem.log.Info("FT: " + ft_pos_world);
+        //LoggingSystem.log.Info("PT: " + pt_pos_world);
+        //LoggingSystem.log.Info("ST: " + st_pos_world);
+        //LoggingSystem.log.Info("TT: " + tt_pos_world);
+        //LoggingSystem.log.Info("BT: " + bt_pos_world);
 
         Vector3 rt_force = new Vector3((float)(1.0*back*COEF), 0, 0);
         Vector3 ft_force = new Vector3((float)(1.0*front*COEF), 0, 0);
@@ -119,6 +133,7 @@ public class SubPhysics : MonoBehaviour {
         rb.AddForceAtPosition(st_force, st_pos_world);
         rb.AddForceAtPosition(tt_force, tt_pos_world);
         rb.AddForceAtPosition(bt_force, bt_pos_world);
+
         /*
         if (rb.name == "RT")
         {
@@ -159,8 +174,6 @@ public class SubPhysics : MonoBehaviour {
 
         //Quaternion target = Quaternion.Euler(y, x, 0);
         //transform.rotation = Quaternion.Slerp(transform.rotation, target, Time.deltaTime * smooth);
-
-
 
         /*
         if (Input.GetKeyDown(KeyCode.R))
@@ -225,7 +238,4 @@ public class SubPhysics : MonoBehaviour {
              rb.AddRelativeForce(force);
          }*/
     }
-
-
-
 }

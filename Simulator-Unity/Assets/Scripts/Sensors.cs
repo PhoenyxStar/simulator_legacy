@@ -56,7 +56,7 @@ public class Sensors : MonoBehaviour
     // Use this for initialization
     void Start()
     {
-        Sub = GameObject.Find("Submarine");
+        Sub = GameObject.Find("SubBody");
 
         velocity = new Vector3(0, 0, 0);
         lastVelocity = new Vector3(0, 0, 0);
@@ -85,17 +85,18 @@ public class Sensors : MonoBehaviour
     void UpdateDepth()
     {
         GameObject water = GameObject.Find("WaterTop");
+		Rigidbody rb = GetComponent<Rigidbody>();
 
         // TODO: Figure out how Unity water works. Is this correct for its top? 
         double waterTop = ((Transform)water.GetComponent("Transform")).position.y;
-        double subCenter = ((Transform)Sub.GetComponent("Transform")).position.y;
+        double subCenter = rb.position.y;
 
         depth = subCenter - waterTop;
     }
 
     void UpdateVelocity()
     {
-        Rigidbody rb = (Rigidbody)Sub.GetComponent("Rigidbody");
+		Rigidbody rb = GetComponent<Rigidbody>();
         lastVelocity = velocity;
         velocity = rb.velocity;
     }
@@ -116,7 +117,7 @@ public class Sensors : MonoBehaviour
 
     void UpdateAngularVelocity()
     {
-        Rigidbody rb = (Rigidbody)Sub.GetComponent("Rigidbody");
+		Rigidbody rb = GetComponent<Rigidbody>();
         angularVelocity = rb.angularVelocity;
     }
 
@@ -187,13 +188,13 @@ public class Sensors : MonoBehaviour
 
     public void SendSensorMessage()
     {
-        GameObject body = GameObject.Find("Submarine");
-		Rigidbody rb = (Rigidbody)body.GetComponent("Rigidbody");
+        GameObject body = GameObject.Find("SubBody");
+		Rigidbody rb = GetComponent<Rigidbody>();
 		Quaternion orientation = rb.rotation;
 		Vector3 yrp = orientation.eulerAngles;
 
         // "dt" is time since last message
-		sensor_packet sensorPacket = new sensor_packet((int)yrp.z, (int)yrp.x, (int)yrp.y,
+		sensor_packet sensorPacket = new sensor_packet((int)yrp.x, (int)yrp.z, (int)yrp.y,
             (float)Depth, (float)GetBatteryOutput(), true, Time.unscaledDeltaTime);
 
         // Send a sensorPacket to each recipient

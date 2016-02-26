@@ -137,6 +137,7 @@ public class message
     public string whole;
     public string mtype;
 	public string value;
+
     public message(string raw)
     {
         JObject d = JObject.Parse(raw);
@@ -201,8 +202,8 @@ public class Communicator : MonoBehaviour
     // Sending and recieving messages is also handled here.
     public void Initialize(string module_name)
     {
-        if (!GlobalManager.Instance.enableConnection || module_name == "")
-            return;
+        //if (!GlobalManager.Instance.enableConnection || module_name == "")
+            //return;
         ForceDotNet.Force();
         this.module_name = module_name;
 
@@ -243,10 +244,10 @@ public class Communicator : MonoBehaviour
     // Recieves all messages sent to this module as raw string.
     public List<string> receive_messages()
     {
-        if (!GlobalManager.Instance.enableConnection)
-        {
-            return null;
-        }
+        //if (!GlobalManager.Instance.enableConnection)
+        //{
+            //return null;
+        //}
         List<string> messagesv = new List<string>();
 
         // If socket is not setup return nothing.
@@ -275,27 +276,27 @@ public class Communicator : MonoBehaviour
     // Send message as raw string
     public bool send_message(string msg)
     {
-        if (!GlobalManager.Instance.enableConnection)
-        {
-            return false;
-        }
+        //if (!GlobalManager.Instance.enableConnection)
+        //{
+            //return false;
+        //}
         return socket.TrySendFrame(msg);
     }
 
     public bool send_message(message msg)
     {
-        if (!GlobalManager.Instance.enableConnection)
-        {
-            return false;
-        }
+        //if (!GlobalManager.Instance.enableConnection)
+        //{
+            //return false;
+        //}
         return socket.TrySendFrame(msg.whole);
     }
     private bool sendSensorPacket(string recipient)
     {
-        if (!GlobalManager.Instance.enableConnection)
-        {
-            return false;
-        }
+        //if (!GlobalManager.Instance.enableConnection)
+        //{
+            //return false;
+        //}
         float[] ypr = { UnityEngine.Random.Range(0.0f, 100.0f), UnityEngine.Random.Range(0.0f, 100.0f), UnityEngine.Random.Range(0.0f, 100.0f) };
         //s->getYPR(ypr);
         return send_message(new message("sensor", recipient, "sensor",
@@ -321,10 +322,10 @@ public class Communicator : MonoBehaviour
 
     private bool sendThrusterPacket(string recipient)
     {
-        if (!GlobalManager.Instance.enableConnection)
-        {
-            return false;
-        }
+        //if (!GlobalManager.Instance.enableConnection)
+        //{
+            //return false;
+        //}
         //s->getYPR(ypr);
         return send_message(new message("thruster", recipient, "thruster",
                           new thruster_packet((int)UnityEngine.Random.Range(1.0f, 100.0f),
@@ -337,10 +338,10 @@ public class Communicator : MonoBehaviour
 
     private void TestSensorData()
     {
-        if (!GlobalManager.Instance.enableConnection)
-        {
-            return;
-        }
+        //if (!GlobalManager.Instance.enableConnection)
+        //{
+            //return;
+        //}
         // send test packets every 2 seconds
         sendSensorPacket("helm");
         sendThrusterPacket("helm");
@@ -349,10 +350,10 @@ public class Communicator : MonoBehaviour
     // Use this for initialization
     void Start()
     {
-        if (!GlobalManager.Instance.enableConnection)
-        {
-            return;
-        }
+        //if (!GlobalManager.Instance.enableConnection)
+        //{
+            //return;
+        //}
         //Initialize(module_name);
         //TestSensorData();
     }
@@ -361,10 +362,10 @@ public class Communicator : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (!GlobalManager.Instance.enableConnection)
-        {
-            return;
-        }
+        //if (!GlobalManager.Instance.enableConnection)
+        //{
+            //return;
+        //}
         // send test packets every two seconds
         elapseTime += Time.deltaTime;
         if(elapseTime >= 2.0f)
