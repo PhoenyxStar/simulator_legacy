@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 
 public class UnderWater : MonoBehaviour
 {
@@ -13,6 +14,7 @@ public class UnderWater : MonoBehaviour
     /// defaultSkybox/noSkybox: currently not doing any actual changes to light shading, this is a good feature for the future if time permits.
     /// lightControl: a boolean control that would be utilized if plans for lighting ever come to light.... (sorry).
     /// old/new __ Green/Blue/Alpha: these values are tracked through the GUI event system and Update method to maintain the fogColor.
+    /// Slider objects represent the slider bars on the GUI for fogDensity, blueColor, and greenColor.
     /// </summary>
     public float underwaterLevel = 16;
 
@@ -22,10 +24,11 @@ public class UnderWater : MonoBehaviour
     private Material defaultSkybox;
     private Material noSkybox;
     private bool lightControl;
+    public Slider fogSlider, blueSlider, greenSlider;
 
     // relating to colors.
-    private float oldBlue, oldGreen, oldAlpha;
-    private float newBlue, newGreen, newAlpha;
+    private float oldBlue, oldGreen;
+    private float newBlue, newGreen;
 
     #endregion
 
@@ -39,10 +42,13 @@ public class UnderWater : MonoBehaviour
         fogDensity = RenderSettings.fogDensity;
         Material defaultSkybox = RenderSettings.skybox;
         Material noSkybox = RenderSettings.skybox;
-        oldGreen = 0.4f; oldBlue = 0.7f; oldAlpha = 1.0f;
-        newGreen = 0.4f; newBlue = 0.7f; newAlpha = 1.0f;
+        oldGreen = 0.4f; oldBlue = 0.7f;
+        newGreen = 0.4f; newBlue = 0.7f;
         //Set the background color
-        GetComponent<Camera>().backgroundColor = new Color(0, oldGreen, oldBlue, oldAlpha);
+        GetComponent<Camera>().backgroundColor = new Color(0, oldGreen, oldBlue, 0);
+        fogSlider = fogSlider.GetComponent<Slider>();
+        blueSlider = blueSlider.GetComponent<Slider>();
+        greenSlider = greenSlider.GetComponent<Slider>();
     }
 
     #endregion
@@ -52,7 +58,7 @@ public class UnderWater : MonoBehaviour
     void Update()
     {
         RenderSettings.fog = true;
-        RenderSettings.fogColor = new Color(0.0f, newGreen, newBlue, newAlpha);
+        RenderSettings.fogColor = new Color(0.0f, newGreen, newBlue, 0.0f);
         RenderSettings.fogDensity = fogDensity;
         RenderSettings.skybox = noSkybox;
     }
@@ -118,18 +124,6 @@ public class UnderWater : MonoBehaviour
     }
 
     /// <summary>
-    /// The AlphaSlider is responsible for modifying the internal private alpha values.
-    /// This value is changed based on the event ValueChanged attached to the controlling slider.
-    /// </summary>
-    /// <param name="alphaValue">from the AlphaSlider.value property</param>
-    public void AdjustAlphaValue(float alphaValue)
-    {
-        // the old colors are constantly being modified through the event system, these color changes are not seen 
-        // until the new___ colors are set to these modified values. As Update() calls for the new___ colors.
-        oldAlpha = alphaValue;
-    }
-
-    /// <summary>
     /// When the user selects the Apply Blue/Green/Alpha button, the event fires to apply the internal
     /// private color values, and create the appropriate color settings to the fogColor.
     /// </summary>
@@ -139,8 +133,43 @@ public class UnderWater : MonoBehaviour
         // until the new___ colors are set to these modified values. As Update() calls for the new___ colors.
         newBlue = oldBlue;
         newGreen = oldGreen;
-        newAlpha = oldAlpha;
 
+        Update();
+    }
+
+    /// <summary>
+    /// PresetClicks:
+    /// Sets the fogDensity, newBlue, and newGreen to a pre configured setting
+    /// </summary>
+    public void Preset1Click()
+    {
+        fogDensity = fogSlider.value = 0.15f;
+        newBlue = blueSlider.value = 0.5f;
+        newGreen = greenSlider.value = 0.45f;
+        Update();
+    }
+    
+    public void Preset2Click()
+    {
+        fogDensity = fogSlider.value = 0.3321429f;
+        newBlue = blueSlider.value = 1.8f;
+        newGreen = greenSlider.value = 0.6785714f;
+        Update();
+    }
+
+    public void Preset3Click()
+    {
+        fogDensity = fogSlider.value = 0.4839286f;
+        newBlue = blueSlider.value = 1.357143f;
+        newGreen = greenSlider.value = 0.2642857f;
+        Update();
+    }
+
+    public void Preset4Click()
+    {
+        fogDensity = fogSlider.value = 1.0f;
+        newBlue = blueSlider.value = 0.2f;
+        newGreen = greenSlider.value = 0.08571429f;
         Update();
     }
 
