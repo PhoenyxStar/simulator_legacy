@@ -3,7 +3,7 @@ using System.Collections;
 
 public class GlobalManager {
     private static GlobalManager _instance; 
-    public bool enableConnection = false;
+    public bool enableConnection = true;
 
 	public static GlobalManager Instance
 	{

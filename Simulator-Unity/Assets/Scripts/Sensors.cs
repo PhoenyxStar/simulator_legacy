@@ -1,10 +1,16 @@
 ﻿using UnityEngine;
 using System.Collections;
 
+// NOTE: 
+// Pitch Range: -90 - 90
+// Roll Range: -180 - 180
+// Yaw Range: -180 - 180
+
 public class Sensors : MonoBehaviour
 {
 
     private GameObject Sub;
+    private Rigidbody rb;
 
     private Vector3 velocity;
     private Vector3 lastVelocity;
@@ -12,6 +18,9 @@ public class Sensors : MonoBehaviour
     private Vector3 acceleration;
     private Vector3 magneticField;
     private Vector3 angularVelocity;
+    private float _Yaw;
+    private float _Pitch;
+    private float _Roll;
 
     Communicator communicator; 
     private string[] messageRecipients;
@@ -56,7 +65,8 @@ public class Sensors : MonoBehaviour
     // Use this for initialization
     void Start()
     {
-        Sub = GameObject.Find("SubBody");
+        Sub = GameObject.Find("SubCenter");
+		rb = Sub.GetComponent<Rigidbody>();
 
         velocity = new Vector3(0, 0, 0);
         lastVelocity = new Vector3(0, 0, 0);
@@ -68,7 +78,7 @@ public class Sensors : MonoBehaviour
 		if (GlobalManager.Instance.enableConnection) {
 			communicator = new Communicator ();
 			communicator.Initialize ("sensor");
-			messageRecipients = new string[] { "control" };
+			messageRecipients = new string[] { "control", "ai" };
 		}
     }
 
@@ -80,6 +90,7 @@ public class Sensors : MonoBehaviour
 		UpdateAcceleration ();
 		UpdateMagneticField ();
 		UpdateAngularVelocity ();
+        UpdateYPR();
 		if (GlobalManager.Instance.enableConnection) {
 			SendSensorMessage ();
 		}
@@ -88,7 +99,6 @@ public class Sensors : MonoBehaviour
     void UpdateDepth()
     {
         GameObject water = GameObject.Find("WaterTop");
-		Rigidbody rb = GetComponent<Rigidbody>();
 
         // TODO: Figure out how Unity water works. Is this correct for its top? 
         double waterTop = ((Transform)water.GetComponent("Transform")).position.y;
@@ -99,7 +109,6 @@ public class Sensors : MonoBehaviour
 
     void UpdateVelocity()
     {
-		Rigidbody rb = GetComponent<Rigidbody>();
         lastVelocity = velocity;
         velocity = rb.velocity;
     }
@@ -120,7 +129,6 @@ public class Sensors : MonoBehaviour
 
     void UpdateAngularVelocity()
     {
-		Rigidbody rb = GetComponent<Rigidbody>();
         angularVelocity = rb.angularVelocity;
     }
 
@@ -191,15 +199,18 @@ public class Sensors : MonoBehaviour
 
     public void SendSensorMessage()
     {
-        GameObject body = GameObject.Find("SubBody");
-		Rigidbody rb = GetComponent<Rigidbody>();
-		Quaternion orientation = rb.rotation;
-		Vector3 yrp = orientation.eulerAngles;
-
         // "dt" is time since last message
-		sensor_packet sensorPacket = new sensor_packet((int)yrp.x, (int)yrp.z, (int)yrp.y,
-            (float)Depth, (float)GetBatteryOutput(), true, Time.unscaledDeltaTime);
+		sensor_packet sensorPacket = new sensor_packet(
+                (int)(this.Pitch),
+                (int)(this.Roll),
+                (int)(this.Yaw),
+                (float)Depth, 
+                (float)GetBatteryOutput(), 
+                true, 
+                Time.unscaledDeltaTime);
 
+        LoggingSystem.log.Info(sensorPacket.whole);
+        LoggingSystem.log.Info("----------------");
         // Send a sensorPacket to each recipient
         foreach (string recipient in messageRecipients)
         {
@@ -207,4 +218,58 @@ public class Sensors : MonoBehaviour
             communicator.send_message(msg);
         }
     }
+
+    public void UpdateYPR()
+    {
+        Vector3 sub_forward = rb.transform.forward;
+        Vector3 sub_up = rb.transform.up;
+        Vector3 sub_right = rb.transform.right;
+
+        Vector3 ref_forward = Vector3.forward;
+        Vector3 ref_up = Vector3.up;
+        Vector3 ref_right = Vector3.right;
+
+        //DisplayVector(sub_right, Color.red);
+        //DisplayVector(ref_right, Color.red);
+        //DisplayVector(sub_forward, Color.white);
+        //DisplayVector(ref_forward, Color.white);
+
+        Vector3 vec = new Vector3();
+        float yaw = Mathf.Atan2(sub_forward.x, sub_forward.z);
+
+        vec.x =  sub_forward.x*Mathf.Cos(-yaw) + sub_forward.z*Mathf.Sin(-yaw);
+        vec.y =  sub_forward.y;
+        vec.z = -sub_forward.x*Mathf.Sin(-yaw) + sub_forward.z*Mathf.Cos(-yaw);
+
+        //DisplayVector(vec, Color.white);
+
+        float pitch = Mathf.Atan2(vec.y, vec.z);
+
+        vec.x =  sub_right.x*Mathf.Cos(-yaw) + sub_right.z*Mathf.Sin(-yaw);
+        vec.y =  sub_right.y;
+        vec.z = -sub_right.x*Mathf.Sin(-yaw) + sub_right.z*Mathf.Cos(-yaw);
+
+        //DisplayVector(vec, Color.red);
+
+        float roll = Mathf.Atan2(vec.y, vec.x);
+
+        _Yaw = ToDegrees(yaw);
+        _Pitch = ToDegrees(pitch);
+        _Roll = ToDegrees(roll); // Roll may be reversed. Need to check.
+    }
+
+    public void DisplayVector(Vector3 vec, Color c)
+    {
+        Debug.DrawLine(rb.transform.position, rb.transform.position + vec, c);
+    }
+
+    public float ToRadians(float theta) { return Mathf.Deg2Rad * theta; }
+
+    public float ToDegrees(float theta) { return Mathf.Rad2Deg * theta; }
+
+    public float Yaw { get { return _Yaw; } }
+
+    public float Pitch { get { return _Pitch; } }
+
+    public float Roll { get { return _Roll; } }
 }
