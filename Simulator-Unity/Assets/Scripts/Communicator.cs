@@ -179,7 +179,7 @@ public class message
 
 };
 
-public class Communicator : MonoBehaviour
+public class Communicator
 {
     private int sndbuf;
     private int hwm;
@@ -191,11 +191,22 @@ public class Communicator : MonoBehaviour
     private string module_name;
     private string broker_ip;
     public static JObject settings;
-    private NetMQContext ctx;
+    public static int num_instance = 0; // how many communicator instances have been created
     //NetMQ.Sockets.PublisherSocket pub;
     //NetMQ.Sockets.SubscriberSocket sub;
     NetMQ.Sockets.DealerSocket socket;
     List<string> messages = new List<string>();
+
+    public Communicator()
+    {
+        // increase instance number
+        num_instance++;
+    }
+    ~Communicator()
+    {
+        // decrease instance number
+        num_instance--;
+    }
 
     // The communicator handles requesting the module be added to the
     // broker and sets up the modules pub and sub sockets.
@@ -219,6 +230,12 @@ public class Communicator : MonoBehaviour
         {
             //string initp, inits;
             broker_ip = (string)settings["broker_ip"];
+            //GlobalManager.Instance.BrokerIP = broker_ip;
+            // use global setting ip if exist
+            if(GlobalManager.Instance.BrokerIP != null && GlobalManager.Instance.BrokerIP.Length > 10)
+            {
+                broker_ip = GlobalManager.Instance.BrokerIP;
+            }
             LoggingSystem.log.Info("broker_ip " + broker_ip);
             //initPortPub = (string)settings["initportp"];
             //initPortSub = (string)settings["initports"];
@@ -232,13 +249,17 @@ public class Communicator : MonoBehaviour
         }
 
         // Start zmq context
-        ctx = NetMQContext.Create();
-        socket = ctx.CreateDealerSocket();
+        socket = new NetMQ.Sockets.DealerSocket();
         socket.Options.SendBuffer = sndbuf; //setsockopt(ZMQ_SNDBUF, &sndbuf, sizeof(sndbuf));
         socket.Options.SendHighWatermark = hwm; //(ZMQ_SNDHWM, &hwm, sizeof(hwm));
         socket.Options.Identity = System.Text.Encoding.ASCII.GetBytes(module_name);
         socket.Connect(broker_ip);
         LoggingSystem.log.Info("Module conneted");
+    }
+
+    public void ConnectBroker()
+    {
+        socket.Connect(broker_ip);
     }
 
     // Recieves all messages sent to this module as raw string.

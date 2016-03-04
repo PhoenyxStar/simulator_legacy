@@ -65,11 +65,16 @@ public class Sensors : MonoBehaviour
         magneticField = new Vector3(0, 0, 0);
         angularVelocity = new Vector3(0, 0, 0);
 
-		if (GlobalManager.Instance.enableConnection) {
-			communicator = new Communicator ();
-			communicator.Initialize ("sensor");
-			messageRecipients = new string[] { "control" };
-		}
+		//if (GlobalManager.Instance.enableConnection) {
+  //          InitCommnicator();
+  //      }
+    }
+
+    public void InitCommunicator()
+    {
+        communicator = new Communicator();
+        communicator.Initialize("sensor");
+        messageRecipients = new string[] { "control" };
     }
 
     // Update is called once per frame
@@ -81,6 +86,11 @@ public class Sensors : MonoBehaviour
 		UpdateMagneticField ();
 		UpdateAngularVelocity ();
 		if (GlobalManager.Instance.enableConnection) {
+            // communicator is disabled at the beginning and enabled after running
+            if (communicator == null)
+            {
+                InitCommunicator();
+            }
 			SendSensorMessage ();
 		}
     }

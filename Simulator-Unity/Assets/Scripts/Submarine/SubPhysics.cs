@@ -44,17 +44,27 @@ public class SubPhysics : MonoBehaviour {
 		rb.useGravity = true;
 		Physics.gravity = new Vector3 (0, 0, 0);
 
-		if (GlobalManager.Instance.enableConnection) {
-			comm = new Communicator ();
-			comm.Initialize ("thruster");
-		}
+		//if (GlobalManager.Instance.enableConnection) {
+  //          InitCommunicator();
+  //      }
 
         LoggingSystem.log.Info("Starting SubPhysics");
+    }
+
+    public void InitCommunicator()
+    {
+        comm = new Communicator();
+        comm.Initialize("thruster");
     }
 
     // Update is called once per frame
     void Update () {
 		if (GlobalManager.Instance.enableConnection) {
+
+            if (comm == null)
+            {
+                InitCommunicator();
+            }
 			thruster_packet tp;
 			List<string> received;
 
