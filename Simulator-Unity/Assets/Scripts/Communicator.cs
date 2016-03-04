@@ -217,7 +217,8 @@ public class Communicator
             //return;
         ForceDotNet.Force();
         this.module_name = module_name;
-
+        // clear it first(disconnect the formel connection)
+        OnDestroy();
         // load settings file
         string path = "Assets/settings/modules/broker.json";
         string jsonString = File.ReadAllText(path);

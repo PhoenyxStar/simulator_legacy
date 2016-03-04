@@ -4,65 +4,6 @@
         <name>NetMQ</name>
     </assembly>
     <members>
-        <member name="T:NetMQ.Blob">
-            <summary>
-            Class Blob serves to hold a byte-array buffer and methods for creating and accessing it.
-            Use NetMQFrame instead; Blob is still present simply for backward compatibility.
-            </summary>
-        </member>
-        <member name="M:NetMQ.Blob.#ctor(System.Byte[],System.Int32)">
-            <summary>
-            Create a new Blob object containing the given data, and with a data-buffer of the given size.
-            </summary>
-            <param name="data">the byte-array of data for this Blob to contain</param>
-            <param name="size">the length in bytes to allocate to the data buffer</param>
-        </member>
-        <member name="M:NetMQ.Blob.#ctor(System.Int32)">
-            <summary>
-            Create a new Blob object with a data-buffer of the given size.
-            </summary>
-            <param name="size">the length in bytes to allocate to the data buffer</param>
-        </member>
-        <member name="M:NetMQ.Blob.Put(System.Int32,System.Byte)">
-            <summary>
-            Put the given byte into the data buffer at the indicated position.
-            </summary>
-            <param name="pos">the (zero-based) index of the data buffer to put the byte into</param>
-            <param name="b">the byte to write into the buffer</param>
-            <returns>a reference to this Blob so that other method-calls may be chained</returns>
-        </member>
-        <member name="M:NetMQ.Blob.Put(System.Int32,System.Byte[],System.Int32)">
-            <summary>
-            Put the given byte into the data buffer at the indicated position.
-            </summary>
-            <param name="pos">the (zero-based) index of the data buffer to put the byte into</param>
-            <param name="data">the byte-array data to write into the data buffer</param>
-            <param name="count">how many bytes of data to write into the data buffer</param>
-            <returns>a reference to this Blob so that other method-calls may be chained</returns>
-        </member>
-        <member name="P:NetMQ.Blob.Size">
-            <summary>
-            Get the length of the data-buffer (the number of bytes in the array).
-            </summary>
-        </member>
-        <member name="P:NetMQ.Blob.Data">
-            <summary>
-            Get the data buffer contained by this Blob, as a byte-array.
-            </summary>
-        </member>
-        <member name="M:NetMQ.Blob.Equals(System.Object)">
-            <summary>
-            Return true if this Blob is equal to the given object.
-            </summary>
-            <param name="t">the other object to compare against</param>
-            <returns>true if equal</returns>
-        </member>
-        <member name="M:NetMQ.Blob.GetHashCode">
-            <summary>
-            Return an integer hash-code to use to uniquely identify this Blob object.
-            </summary>
-            <returns>the hash-code</returns>
-        </member>
         <member name="T:NetMQ.IBufferPool">
             <summary>
             The IBufferPool interface specifies two methods: Take, and Return.
@@ -481,7 +422,7 @@
             associated with the NetMQ library. This contains the sockets, and manages interaction
             between them.
             </summary>
-            <remarks>Internal analog of the public <see cref="T:NetMQ.NetMQContext"/> class.</remarks>
+            <remarks>Internal analog of the public <see cref="!:NetMQContext"/> class.</remarks>
         </member>
         <member name="T:NetMQ.Core.Ctx.Endpoint">
             <summary>
@@ -908,7 +849,7 @@
         </member>
         <member name="M:NetMQ.Core.Mailbox.Send(NetMQ.Core.Command)">
             <summary>
-            Send the given Command out accross the command-pipe.
+            Send the given Command out across the command-pipe.
             </summary>
             <param name="cmd">the Command to send</param>
         </member>
@@ -1015,11 +956,6 @@
             The default value is -1, which indicates no limit.
             </summary>
         </member>
-        <member name="P:NetMQ.Core.Options.Maxmsgsize">
-            <summary>
-            Get or set the maximum size of message to handle.
-            </summary>
-        </member>
         <member name="P:NetMQ.Core.Options.MulticastHops">
             <summary>
             Sets the time-to-live field in every multicast packet sent.
@@ -1035,6 +971,7 @@
             <summary>
             If true, router socket accepts non-zmq tcp connections
             The default value is false, except the Stream ctor initialises this to true.
+            Setting this to true changes RecvIdentity to false.
             </summary>
         </member>
         <member name="P:NetMQ.Core.Options.RecvIdentity">
@@ -1084,15 +1021,19 @@
             The default value is 1000.
             </summary>
         </member>
+        <member name="P:NetMQ.Core.Options.SendLowWatermark">
+            <summary>
+            The low-water mark for message transmission.
+            </summary>
+        </member>
+        <member name="P:NetMQ.Core.Options.ReceiveLowWatermark">
+            <summary>
+            The low-water mark for message reception.
+            </summary>
+        </member>
         <member name="P:NetMQ.Core.Options.SendTimeout">
             <summary>
             Get or set the timeout for send operations for this socket.
-            The default value is -1, which means no timeout.
-            </summary>
-        </member>
-        <member name="P:NetMQ.Core.Options.ReceiveTimeout">
-            <summary>
-            Get or set the timeout for receive operations for this socket.
             The default value is -1, which means no timeout.
             </summary>
         </member>
@@ -1677,6 +1618,11 @@
             The pipe we are currently writing to.
             </summary>
         </member>
+        <member name="F:NetMQ.Core.Patterns.Router.m_currentIn">
+            <summary>
+            The pipe we are currently reading from.
+            </summary>
+        </member>
         <member name="F:NetMQ.Core.Patterns.Router.m_moreOut">
             <summary>
             If true, more outgoing message parts are expected.
@@ -1692,6 +1638,16 @@
             <summary>
             If true, report EHOSTUNREACH to the caller instead of silently dropping 
             the message targeting an unknown peer.
+            </summary>
+        </member>
+        <member name="F:NetMQ.Core.Patterns.Router.m_rawSocket">
+            <summary>
+            If true, router socket accepts non-zmq tcp connections
+            </summary>
+        </member>
+        <member name="F:NetMQ.Core.Patterns.Router.m_handover">
+            <summary>
+            When enabled new router connections with same identity take over old ones
             </summary>
         </member>
         <member name="M:NetMQ.Core.Patterns.Router.#ctor(NetMQ.Core.Ctx,System.Int32,System.Int32)">
@@ -1839,7 +1795,6 @@
             <param name="optionValue">the value to set the option to</param>
             <returns><c>true</c> if successful</returns>
             <exception cref="T:NetMQ.InvalidException">optionValue must be a String or a byte-array.</exception>
-            <exception cref="T:NetMQ.AgainException">XSend must return true.</exception>
         </member>
         <member name="M:NetMQ.Core.Patterns.Sub.XSend(NetMQ.Msg@)">
             <summary>
@@ -2356,21 +2311,23 @@
             Identity of the writer. Used uniquely by the reader side.
             </summary>
         </member>
-        <member name="M:NetMQ.Core.Pipe.#ctor(NetMQ.Core.ZObject,NetMQ.Core.YPipe{NetMQ.Msg},NetMQ.Core.YPipe{NetMQ.Msg},System.Int32,System.Int32,System.Boolean)">
+        <member name="M:NetMQ.Core.Pipe.#ctor(NetMQ.Core.ZObject,NetMQ.Core.YPipe{NetMQ.Msg},NetMQ.Core.YPipe{NetMQ.Msg},System.Int32,System.Int32,System.Int32,System.Boolean)">
             <summary>
             Create a new Pipe object with the given parent, and inbound and outbound YPipes.
             </summary>
             <remarks>
-            Constructor is private as pipe can only be created using <see cref="M:NetMQ.Core.Pipe.PipePair(NetMQ.Core.ZObject[],System.Int32[],System.Boolean[])"/> method.
+            Constructor is private as pipe can only be created using <see cref="M:NetMQ.Core.Pipe.PipePair(NetMQ.Core.ZObject[],System.Int32[],System.Int32[],System.Boolean[])"/> method.
             </remarks>
         </member>
-        <member name="M:NetMQ.Core.Pipe.PipePair(NetMQ.Core.ZObject[],System.Int32[],System.Boolean[])">
+        <member name="M:NetMQ.Core.Pipe.PipePair(NetMQ.Core.ZObject[],System.Int32[],System.Int32[],System.Boolean[])">
             <summary>
             Create a pipe pair for bi-directional transfer of messages.
             </summary>
             <param name="parents">The parents.</param>
             <param name="highWaterMarks">First HWM is for messages passed from first pipe to the second pipe.
             Second HWM is for messages passed from second pipe to the first pipe.</param>
+            <param name="lowWaterMarks">First LWM is for messages passed from first pipe to the second pipe.
+            Second LWM is for messages passed from second pipe to the first pipe.</param>
             <param name="delays">Delay specifies how the pipe behaves when the peer terminates. If true
             pipe receives all the pending messages before terminating, otherwise it
             terminates straight away.</param>
@@ -2378,7 +2335,7 @@
         </member>
         <member name="M:NetMQ.Core.Pipe.SetPeer(NetMQ.Core.Pipe)">
             <summary>
-            <see cref="M:NetMQ.Core.Pipe.PipePair(NetMQ.Core.ZObject[],System.Int32[],System.Boolean[])"/> uses this function to let us know about the peer pipe object.
+            <see cref="M:NetMQ.Core.Pipe.PipePair(NetMQ.Core.ZObject[],System.Int32[],System.Int32[],System.Boolean[])"/> uses this function to let us know about the peer pipe object.
             </summary>
             <param name="peer">The peer to be assigned.</param>
         </member>
@@ -2453,11 +2410,12 @@
             <param name="delay">if set to <c>true</c>, the pending messages will be processed
             before actual shutdown. </param>
         </member>
-        <member name="M:NetMQ.Core.Pipe.ComputeLowWatermark(System.Int32)">
+        <member name="M:NetMQ.Core.Pipe.ComputeLowWatermark(System.Int32,System.Int32)">
             <summary>
             Compute an appropriate low watermark from the given high-watermark.
             </summary>
             <param name="highWatermark">the given high-watermark value to compute it from</param>
+            <param name="predefinedLowWatermark">predefined low watermark value coming from configuration</param>
             <returns>the computed low-watermark</returns>
         </member>
         <member name="M:NetMQ.Core.Pipe.Delimit">
@@ -2731,7 +2689,7 @@
         </member>
         <member name="M:NetMQ.Core.SessionBase.ProcessPlug">
             <summary>
-            Process the Plug-request by setting this SessionBase as teh handler for the io-object
+            Process the Plug-request by setting this SessionBase as the handler for the io-object
             and starting connecting (without waiting).
             </summary>
         </member>
@@ -3353,7 +3311,7 @@
             </summary>
             <param name="endian">an Endianness to specify which byte-ordering to use to interpret the source bytes</param>
             <param name="i">the index position beyond the offset to start reading the bytes</param>
-            <returns>an unsigend long that is read from the bytes of the buffer</returns>
+            <returns>an unsigned long that is read from the bytes of the buffer</returns>
         </member>
         <member name="M:NetMQ.Core.Transports.ByteArraySegment.GetInteger(NetMQ.Endianness,System.Int32)">
             <summary>
@@ -3673,6 +3631,18 @@
             <param name="id">an integer used to identify the timer (not used here)</param>
             <exception cref="T:System.NotSupportedException">This operation is not supported on the PgmListener class.</exception>
         </member>
+        <member name="F:NetMQ.Core.Transports.Pgm.PgmSender.ReconnectTimerId">
+            <summary>
+            ID of the timer used to delay the reconnection. Value is 1.
+            </summary>
+        </member>
+        <member name="M:NetMQ.Core.Transports.Pgm.PgmSender.TimerEvent(System.Int32)">
+            <summary>
+            This would be called when a timer expires, although here it only throws a NotSupportedException.
+            </summary>
+            <param name="id">an integer used to identify the timer (not used here)</param>
+            <exception cref="T:System.NotImplementedException">This method must not be called on instances of PgmSender.</exception>
+        </member>
         <member name="M:NetMQ.Core.Transports.Pgm.PgmSender.OutCompleted(System.Net.Sockets.SocketError,System.Int32)">
             <summary>
             This method is called when a message Send operation has been completed.
@@ -3681,19 +3651,19 @@
             <param name="bytesTransferred">the number of bytes that were transferred</param>
             <exception cref="T:NetMQ.NetMQException">A non-recoverable socket error occurred.</exception>
         </member>
+        <member name="M:NetMQ.Core.Transports.Pgm.PgmSender.GetNewReconnectIvl">
+            <summary>
+            Internal function to return a reconnect back-off delay.
+            Will modify the current_reconnect_ivl used for next call
+            Returns the currently used interval
+            </summary>
+        </member>
         <member name="M:NetMQ.Core.Transports.Pgm.PgmSender.InCompleted(System.Net.Sockets.SocketError,System.Int32)">
             <summary>
             This method would be called when a message receive operation has been completed, although here it only throws a NotSupportedException.
             </summary>
             <param name="socketError">a SocketError value that indicates whether Success or an error occurred</param>
             <param name="bytesTransferred">the number of bytes that were transferred</param>
-            <exception cref="T:System.NotImplementedException">This method must not be called on instances of PgmSender.</exception>
-        </member>
-        <member name="M:NetMQ.Core.Transports.Pgm.PgmSender.TimerEvent(System.Int32)">
-            <summary>
-            This would be called when a timer expires, although here it only throws a NotSupportedException.
-            </summary>
-            <param name="id">an integer used to identify the timer (not used here)</param>
             <exception cref="T:System.NotImplementedException">This method must not be called on instances of PgmSender.</exception>
         </member>
         <member name="T:NetMQ.Core.Transports.Pgm.PgmSession.State">
@@ -4779,7 +4749,7 @@
         </member>
         <member name="F:NetMQ.Core.ZmqSocketOption.MaxMessageSize">
             <summary>
-            The upper limit to to the size for inbound messages.
+            The upper limit to the size for inbound messages.
             -1 (the default value) means no limit.
             </summary>
             <remarks>
@@ -4803,11 +4773,6 @@
             The time-to-live (maximum number of hops) that outbound multicast packets
             are allowed to propagate.
             The default value of 1 means that the multicast packets don't leave the local network.
-            </summary>
-        </member>
-        <member name="F:NetMQ.Core.ZmqSocketOption.ReceiveTimeout">
-            <summary>
-            Specifies the amount of time after which a synchronous receive call will time out.
             </summary>
         </member>
         <member name="F:NetMQ.Core.ZmqSocketOption.SendTimeout">
@@ -4835,6 +4800,13 @@
             If the TCP host is ANY, indicated by a *, then the returned address
             will be 0.0.0.0 (for IPv4).
             </remarks>
+        </member>
+        <member name="F:NetMQ.Core.ZmqSocketOption.RouterMandatory">
+            <summary>
+            Sets the RouterSocket behavior when an unroutable message is encountered.
+            A value of 0 is the default and discards the message silently when it cannot be routed.
+            A value of 1 returns an EHOSTUNREACH error code if the message cannot be routed.
+            </summary>
         </member>
         <member name="F:NetMQ.Core.ZmqSocketOption.TcpKeepalive">
             <summary>
@@ -4880,6 +4852,11 @@
             The default is false.
             </summary>
         </member>
+        <member name="F:NetMQ.Core.ZmqSocketOption.RouterRawSocket">
+            <summary>
+            If true, router socket accepts non-zmq tcp connections
+            </summary>
+        </member>
         <member name="F:NetMQ.Core.ZmqSocketOption.XPublisherWelcomeMessage">
             <summary>
             This is an XPublisher-socket welcome-message.
@@ -4889,6 +4866,25 @@
             <summary>
             This applies only to XPub sockets.
             If true, enable broadcast option on XPublishers
+            </summary>
+        </member>
+        <member name="F:NetMQ.Core.ZmqSocketOption.SendLowWatermark">
+            <summary>
+            The low-water mark for message transmission. This is the number of messages that should be processed
+            before transmission is unblocked (in case it was blocked by reaching high-watermark). The default value is 
+            calculated using relevant high-watermark (HWM): HWM > 2048 ? HWM - 1024 : (HWM + 1) / 2
+            </summary>
+        </member>
+        <member name="F:NetMQ.Core.ZmqSocketOption.ReceiveLowWatermark">
+            <summary>
+            The low-water mark for message reception. This is the number of messages that should be processed 
+            before reception is unblocked (in case it was blocked by reaching high-watermark). The default value is 
+            calculated using relevant high-watermark (HWM): HWM > 2048 ? HWM - 1024 : (HWM + 1) / 2
+            </summary>
+        </member>
+        <member name="F:NetMQ.Core.ZmqSocketOption.RouterHandover">
+            <summary>
+            When enabled new router connections with same identity take over old ones
             </summary>
         </member>
         <member name="F:NetMQ.Core.ZmqSocketOption.Endian">
@@ -5134,11 +5130,6 @@
             The connection is still in progress.
             </summary>
         </member>
-        <member name="F:NetMQ.ErrorCode.InProgres">
-            <summary>
-            The connection is still in progress.
-            </summary>
-        </member>
         <member name="F:NetMQ.ErrorCode.ProtocolNotSupported">
             <summary>
             The requested transport protocol is not supported.
@@ -5241,173 +5232,6 @@
             Too many sockets for this process.
             </summary>
         </member>
-        <member name="F:NetMQ.ErrorCode.ENOENT">
-            <summary>
-            The provided endpoint is not connected.
-            </summary>
-        </member>
-        <member name="F:NetMQ.ErrorCode.EINTR">
-            <summary>
-            The operation was interrupted by a signal.
-            </summary>
-        </member>
-        <member name="F:NetMQ.ErrorCode.EACCESS">
-            <summary>
-            Permission denied
-            </summary>
-        </member>
-        <member name="F:NetMQ.ErrorCode.EFAULT">
-            <summary>
-            The provided context is invalid.
-            </summary>
-        </member>
-        <member name="F:NetMQ.ErrorCode.EINVAL">
-            <summary>
-            The endpoint supplied is invalid.
-            </summary>
-        </member>
-        <member name="F:NetMQ.ErrorCode.EAGAIN">
-            <summary>
-            Non-blocking mode was requested and the message cannot be sent at the moment.
-            </summary>
-        </member>
-        <member name="F:NetMQ.ErrorCode.EINPROGRESS">
-            <summary>
-            The connection is still in progress.
-            </summary>
-        </member>
-        <member name="F:NetMQ.ErrorCode.EPROTONOSUPPORT">
-            <summary>
-            The requested transport protocol is not supported.
-            </summary>
-        </member>
-        <member name="F:NetMQ.ErrorCode.ENOTSUP">
-            <summary>
-            That operation is not supported by this socket type.
-            </summary>
-        </member>
-        <member name="F:NetMQ.ErrorCode.EADDRINUSE">
-            <summary>
-            The requested address is already in use.
-            </summary>
-        </member>
-        <member name="F:NetMQ.ErrorCode.EADDRNOTAVAIL">
-            <summary>
-            The requested address was not available.
-            For Bind operations, that can mean the address was not local.
-            </summary>
-        </member>
-        <member name="F:NetMQ.ErrorCode.ENETDOWN">
-            <summary>
-            The network appears to be down.
-            </summary>
-        </member>
-        <member name="F:NetMQ.ErrorCode.ENOBUFS">
-            <summary>
-            There is not enough buffer space for the requested operation.
-            </summary>
-        </member>
-        <member name="F:NetMQ.ErrorCode.EISCONN">
-            <summary>
-            Unused
-            </summary>
-        </member>
-        <member name="F:NetMQ.ErrorCode.ENOTCONN">
-            <summary>
-            The socket is not connected.
-            </summary>
-        </member>
-        <member name="F:NetMQ.ErrorCode.ECONNREFUSED">
-            <summary>
-            The connection was refused.
-            </summary>
-        </member>
-        <member name="F:NetMQ.ErrorCode.EHOSTUNREACH">
-            <summary>
-            The host is not reachable.
-            </summary>
-        </member>
-        <member name="F:NetMQ.ErrorCode.ZMQ_HAUSNUMERO">
-            <summary>
-            This is the value chosen for beginning the range of 0MQ error codes.
-            </summary>
-        </member>
-        <member name="F:NetMQ.ErrorCode.ENOTSOCK">
-            <summary>
-            The provided socket was invalid.
-            </summary>
-        </member>
-        <member name="F:NetMQ.ErrorCode.EMSGSIZE">
-            <summary>
-            The message is too long.
-            </summary>
-        </member>
-        <member name="F:NetMQ.ErrorCode.EAFNOSUPPORT">
-            <summary>
-            The address family is not supported by this protocol.
-            </summary>
-        </member>
-        <member name="F:NetMQ.ErrorCode.ENETUNREACH">
-            <summary>
-            The network is apparently not reachable.
-            </summary>
-        </member>
-        <member name="F:NetMQ.ErrorCode.ECONNABORTED">
-            <summary>
-            The connection-attempt has apparently been aborted.
-            </summary>
-        </member>
-        <member name="F:NetMQ.ErrorCode.ECONNRESET">
-            <summary>
-            The connection has apparently been reset.
-            </summary>
-        </member>
-        <member name="F:NetMQ.ErrorCode.ETIMEDOUT">
-            <summary>
-            The operation timed-out.
-            </summary>
-        </member>
-        <member name="F:NetMQ.ErrorCode.ENETRESET">
-            <summary>
-            The network was reset.
-            </summary>
-        </member>
-        <member name="F:NetMQ.ErrorCode.EFSM">
-            <summary>
-            The operation cannot be performed on this socket at the moment due
-            to the socket not being in the appropriate state.
-            </summary>
-        </member>
-        <member name="F:NetMQ.ErrorCode.ENOCOMPATPROTO">
-            <summary>
-            The requested transport protocol is not compatible with the socket type.
-            </summary>
-        </member>
-        <member name="F:NetMQ.ErrorCode.ETERM">
-            <summary>
-            The context associated with the specified socket has already been terminated.
-            </summary>
-        </member>
-        <member name="F:NetMQ.ErrorCode.EMTHREAD">
-            <summary>
-            No I/O thread is available to accomplish this task.
-            </summary>
-        </member>
-        <member name="F:NetMQ.ErrorCode.EIOEXC">
-            <summary>
-            Unused
-            </summary>
-        </member>
-        <member name="F:NetMQ.ErrorCode.ESOCKET">
-            <summary>
-            Unused
-            </summary>
-        </member>
-        <member name="F:NetMQ.ErrorCode.EMFILE">
-            <summary>
-            Too many sockets for this process.
-            </summary>
-        </member>
         <member name="T:NetMQ.EventDelegator`1">
             <summary>
             Facilitates a pattern whereby an event may be decorated with logic that transforms its arguments.
@@ -5488,37 +5312,6 @@
             Defines a socket from which message data may be read.
             </summary>
         </member>
-        <member name="M:NetMQ.IReceivingSocket.Receive(NetMQ.Msg@,NetMQ.SendReceiveOptions)">
-            <summary>
-            Read message data into the given <see cref="T:NetMQ.Msg"/> object.
-            </summary>
-            <remarks>
-            If a message is available, its content will be transferred to <paramref name="msg"/> and the call will
-            return immediately.
-            <para/>
-            If no message is available, the behaviour of this method depends upon <paramref name="options"/>:
-            <list type="bullet">
-              <item>
-                <see cref="F:NetMQ.SendReceiveOptions.DontWait"/> — causes the method to immediately throw
-                <see cref="T:NetMQ.AgainException"/>.
-              </item>
-              <item>
-                <see cref="F:NetMQ.SendReceiveOptions.None"/> — blocks until the next message arrives, and cannot be
-                interrupted. This a convenient and safe when you know a message is available, such as for code
-                within a <see cref="E:NetMQ.NetMQSocket.ReceiveReady"/> callback.
-                <para/>
-                <see cref="T:NetMQ.NetMQSocket"/> objects having non-negative <see cref="P:NetMQ.SocketOptions.ReceiveTimeout"/>values
-                will timeout if a message is not received within the specified number of milliseconds.
-              </item>
-            </list>
-            </remarks>
-            <param name="msg">An object to receive the message's data into.</param>
-            <param name="options">A set of flags that control receipt. Only <see cref="F:NetMQ.SendReceiveOptions.None"/> and
-            <see cref="F:NetMQ.SendReceiveOptions.DontWait"/> have any effect. <see cref="F:NetMQ.SendReceiveOptions.SendMore"/> makes
-            no sense here and is ignored.</param>
-            <exception cref="T:NetMQ.AgainException">No message was available within the allowed timeout period. Try again.
-            </exception>
-        </member>
         <member name="M:NetMQ.IReceivingSocket.TryReceive(NetMQ.Msg@,System.TimeSpan)">
             <summary>
             Receive a message if one is available within <paramref name="timeout"/>.
@@ -5554,17 +5347,11 @@
         <member name="T:NetMQ.MsgType">
             <summary>Enumeration of possible <see cref="T:NetMQ.Msg"/> types: Uninitialised, GC, Pool, Delimiter.</summary>
         </member>
-        <member name="F:NetMQ.MsgType.Invalid">
-            <summary>The <see cref="T:NetMQ.Msg"/> has not yet been initialised.</summary>
-        </member>
         <member name="F:NetMQ.MsgType.Uninitialised">
             <summary>The <see cref="T:NetMQ.Msg"/> has not yet been initialised (default value).</summary>
         </member>
         <member name="F:NetMQ.MsgType.Empty">
             <summary>The <see cref="T:NetMQ.Msg"/> is empty.</summary>
-        </member>
-        <member name="F:NetMQ.MsgType.Min">
-            <summary>The minimum valid enum value.</summary>
         </member>
         <member name="F:NetMQ.MsgType.GC">
             <summary>The <see cref="T:NetMQ.Msg"/> data will be garbage collected when no longer needed.</summary>
@@ -5578,9 +5365,6 @@
         <member name="F:NetMQ.MsgType.Delimiter">
             <summary>The <see cref="T:NetMQ.Msg"/> is a delimiter frame and doesn't contain any data.</summary>
             <remarks>Delimiters are commonly used to mark a boundary between groups frames.</remarks>
-        </member>
-        <member name="F:NetMQ.MsgType.Max">
-            <summary>The maximum valid enum value.</summary>
         </member>
         <member name="T:NetMQ.Msg">
             <summary>
@@ -5622,7 +5406,7 @@
         <member name="P:NetMQ.Msg.IsInitialised">
             <summary>Get whether this <see cref="T:NetMQ.Msg"/> is initialised and ready for use.</summary>
             <remarks>A newly constructed <see cref="T:NetMQ.Msg"/> is uninitialised, and can be initialised via one
-            of <see cref="M:NetMQ.Msg.InitEmpty"/>, <see cref="M:NetMQ.Msg.InitDelimiter"/>, <see cref="M:NetMQ.Msg.InitGC(System.Byte[],System.Int32)"/>, <see cref="M:NetMQ.Msg.InitGC(System.Byte[],System.Int32,System.Int32)"/>, or <see cref="M:NetMQ.Msg.InitPool(System.Int32)"/>. 
+            of <see cref="M:NetMQ.Msg.InitEmpty"/>, <see cref="M:NetMQ.Msg.InitDelimiter"/>, <see cref="M:NetMQ.Msg.InitGC(System.Byte[],System.Int32)"/>, <see cref="M:NetMQ.Msg.InitGC(System.Byte[],System.Int32,System.Int32)"/>, or <see cref="M:NetMQ.Msg.InitPool(System.Int32)"/>.
             Calling <see cref="M:NetMQ.Msg.Close"/> will cause the <see cref="T:NetMQ.Msg"/> to become uninitialised again.</remarks>
             <returns><c>true</c> if the <see cref="T:NetMQ.Msg"/> is initialised, otherwise <c>false</c>.</returns>
         </member>
@@ -5667,9 +5451,6 @@
             This value will be <c>null</c> if <see cref="P:NetMQ.Msg.MsgType"/> is <see cref="F:NetMQ.MsgType.Uninitialised"/>,
             <see cref="F:NetMQ.MsgType.Empty"/> or <see cref="F:NetMQ.MsgType.Delimiter"/>.
             </remarks>
-        </member>
-        <member name="M:NetMQ.Msg.Check">
-            <summary>Get whether this <see cref="T:NetMQ.Msg"/> is initialised and ready for use.</summary>
         </member>
         <member name="M:NetMQ.Msg.InitEmpty">
             <summary>
@@ -5839,7 +5620,7 @@
             <summary>
             The Actor represents one end of a two-way pipe between 2 PairSocket(s). Where
             the actor may be passed messages, that are sent to the other end of the pipe
-            which called the "shim"
+            which is called the "shim"
             </summary>
         </member>
         <member name="F:NetMQ.NetMQActor.EndShimMessage">
@@ -5885,7 +5666,7 @@
             <summary>
             Create a new <see cref="T:NetMQ.NetMQActor"/> with the action, and state-information.
             </summary>
-            <param name="action">a <c>ShimAction</c> - delegate for the action to perfrom</param>
+            <param name="action">a <c>ShimAction</c> - delegate for the action to perform</param>
             <param name="state">the state-information - of the generic type T</param>
             <returns>the newly-created <c>NetMQActor</c></returns>
         </member>
@@ -5896,45 +5677,10 @@
             <param name="action">a <c>ShimAction</c> - delegate for the action to perform</param>
             <returns>the newly-created <c>NetMQActor</c></returns>
         </member>
-        <member name="M:NetMQ.NetMQActor.Create(NetMQ.NetMQContext,NetMQ.IShimHandler)">
-            <summary>
-            Create a new <see cref="T:NetMQ.NetMQActor"/> with the given context and shimHandler.
-            </summary>
-            <param name="context">the context for this actor to live within</param>
-            <param name="shimHandler">an <c>IShimHandler</c> that provides the Run method</param>
-            <returns>the newly-created <c>NetMQActor</c></returns>
-        </member>
-        <member name="M:NetMQ.NetMQActor.Create``1(NetMQ.NetMQContext,NetMQ.ShimAction{``0},``0)">
-            <summary>
-            Create a new <c>NetMQActor</c> with the given context, action, and state-information.
-            </summary>
-            <param name="context">the context for this actor to live within</param>
-            <param name="action">a <c>ShimAction</c> - delegate for the action to perfrom</param>
-            <param name="state">the state-information - of the generic type T</param>
-            <returns>the newly-created <c>NetMQActor</c></returns>
-        </member>
-        <member name="M:NetMQ.NetMQActor.Create(NetMQ.NetMQContext,NetMQ.ShimAction)">
-            <summary>
-            Create a new <c>NetMQActor</c> with the given context and <see cref="T:NetMQ.ShimAction"/>.
-            </summary>
-            <param name="context">the context for this actor to live within</param>
-            <param name="action">a <c>ShimAction</c> - delegate for the action to perform</param>
-            <returns>the newly-created <c>NetMQActor</c></returns>
-        </member>
         <member name="M:NetMQ.NetMQActor.RunShim">
             <summary>
             Execute the shimhandler's Run method, signal ok and then dispose of the shim.
             </summary>
-        </member>
-        <member name="M:NetMQ.NetMQActor.Send(NetMQ.Msg@,NetMQ.SendReceiveOptions)">
-            <summary>
-            Transmit the given Msg over this actor's own socket.
-            </summary>
-            <param name="msg">the <c>Msg</c> to transmit</param>
-            <param name="options">this denotes any of the DontWait and SendMore flags be set</param>
-            <exception cref="T:NetMQ.TerminatingException">The socket has been stopped.</exception>
-            <exception cref="T:NetMQ.FaultException"><paramref name="msg"/> is not initialised.</exception>
-            <exception cref="T:NetMQ.AgainException">The send operation timed out.</exception>
         </member>
         <member name="M:NetMQ.NetMQActor.TrySend(NetMQ.Msg@,System.TimeSpan,System.Boolean)">
             <summary>
@@ -5947,9 +5693,6 @@
             <returns><c>true</c> if a message was sent, otherwise <c>false</c>.</returns>
             <exception cref="T:NetMQ.TerminatingException">The socket has been stopped.</exception>
             <exception cref="T:NetMQ.FaultException"><paramref name="msg"/> is not initialised.</exception>
-        </member>
-        <member name="M:NetMQ.NetMQActor.Receive(NetMQ.Msg@,NetMQ.SendReceiveOptions)">
-            <exception cref="T:NetMQ.AgainException">The receive operation timed out.</exception>
         </member>
         <member name="M:NetMQ.NetMQActor.TryReceive(NetMQ.Msg@,System.TimeSpan)">
             <summary>
@@ -5996,30 +5739,29 @@
             Get the NetMQBeacon object that this holds.
             </summary>
         </member>
-        <member name="F:NetMQ.NetMQBeacon.SubscribeCommand">
-            <summary>
-            Command to subscribe a socket to messages that have the given topic. This is valid only for Subscriber and XSubscriber sockets.
-            </summary>
-        </member>
-        <member name="F:NetMQ.NetMQBeacon.UnsubscribeCommand">
-            <summary>
-            Command to un-subscribe a socket from messages that have the given topic. This is valid only for Subscriber and XSubscriber sockets.
-            </summary>
-        </member>
-        <member name="M:NetMQ.NetMQBeacon.#ctor(NetMQ.NetMQContext)">
-            <summary>
-            Create a new NetMQBeacon, contained within the given context.
-            </summary>
-            <param name="context">the NetMQContext to contain this new socket</param>
-        </member>
         <member name="M:NetMQ.NetMQBeacon.#ctor">
             <summary>
             Create a new NetMQBeacon.
             </summary>
         </member>
-        <member name="P:NetMQ.NetMQBeacon.Hostname">
+        <member name="P:NetMQ.NetMQBeacon.HostName">
             <summary>
-            Ip address the beacon is bind to
+            Get the host name this beacon is bound to.
+            </summary>
+            <remarks>
+            This may involve a reverse DNS lookup which can take a second or two.
+            <para/>
+            An empty string is returned if:
+            <list type="bullet">
+                <item>the beacon is not bound,</item>
+                <item>the beacon is bound to all interfaces,</item>
+                <item>an error occurred during reverse DNS lookup.</item>
+            </list>
+            </remarks>
+        </member>
+        <member name="P:NetMQ.NetMQBeacon.BoundTo">
+            <summary>
+            Get the IP address this beacon is bound to.
             </summary>
         </member>
         <member name="P:NetMQ.NetMQBeacon.NetMQ#ISocketPollable#Socket">
@@ -6034,29 +5776,26 @@
         </member>
         <member name="M:NetMQ.NetMQBeacon.ConfigureAllInterfaces(System.Int32)">
             <summary>
-            Configure beacon to bind to all interfaces
+            Configure beacon for the specified port on all interfaces.
             </summary>
-            <param name="port">Port to bind to</param>
+            <remarks>Blocks until the bind operation completes.</remarks>
+            <param name="port">The UDP port to bind to.</param>
         </member>
-        <member name="M:NetMQ.NetMQBeacon.Configure(System.Int32)">
+        <member name="M:NetMQ.NetMQBeacon.Configure(System.Int32,System.String)">
             <summary>
-            Configure beacon to bind to default interface
+            Configure beacon for the specified port and, optionally, to a specific interface.
             </summary>
-            <param name="port">Port to bind to</param>
+            <remarks>Blocks until the bind operation completes.</remarks>
+            <param name="port">The UDP port to bind to.</param>
+            <param name="interfaceName">IP address of the interface to bind to. Pass empty string (the default value) to use the default interface.</param>
         </member>
-        <member name="M:NetMQ.NetMQBeacon.Configure(System.String,System.Int32)">
-            <summary>
-            Configure beacon to bind to specific interface
-            </summary>
-            <param name="interfaceName">One of the ip address of the interface</param>
-            <param name="port">Port to bind to</param>
-        </member>
-        <member name="M:NetMQ.NetMQBeacon.Publish(System.String,System.TimeSpan)">
+        <member name="M:NetMQ.NetMQBeacon.Publish(System.String,System.TimeSpan,System.Text.Encoding)">
             <summary>
             Publish beacon immediately and continue to publish when interval elapsed
             </summary>
-            <param name="transmit">Beacon to transmit</param>
+            <param name="transmit">Beacon to transmit.</param>
             <param name="interval">Interval to transmit beacon</param>
+            <param name="encoding">Encoding for <paramref name="transmit"/>. Defaults to <see cref="P:System.Text.Encoding.UTF8"/>.</param>
         </member>
         <member name="M:NetMQ.NetMQBeacon.Publish(System.Byte[],System.TimeSpan)">
             <summary>
@@ -6065,11 +5804,12 @@
             <param name="transmit">Beacon to transmit</param>
             <param name="interval">Interval to transmit beacon</param>
         </member>
-        <member name="M:NetMQ.NetMQBeacon.Publish(System.String)">
+        <member name="M:NetMQ.NetMQBeacon.Publish(System.String,System.Text.Encoding)">
             <summary>
             Publish beacon immediately and continue to publish every second
             </summary>
             <param name="transmit">Beacon to transmit</param>
+            <param name="encoding">Encoding for <paramref name="transmit"/>. Defaults to <see cref="P:System.Text.Encoding.UTF8"/>.</param>
         </member>
         <member name="M:NetMQ.NetMQBeacon.Publish(System.Byte[])">
             <summary>
@@ -6079,13 +5819,17 @@
         </member>
         <member name="M:NetMQ.NetMQBeacon.Silence">
             <summary>
-            Stop publish messages
+            Stop publishing beacons.
             </summary>
         </member>
         <member name="M:NetMQ.NetMQBeacon.Subscribe(System.String)">
             <summary>
-            Subscribe to beacon messages, will replace last subscribe call
+            Subscribe to beacon messages that match the specified filter.
             </summary>
+            <remarks>
+            Beacons must prefix-match with <paramref name="filter"/>.
+            Any previous subscription is replaced by this one.
+            </remarks>
             <param name="filter">Beacon will be filtered by this</param>
         </member>
         <member name="M:NetMQ.NetMQBeacon.Unsubscribe">
@@ -6093,42 +5837,45 @@
             Unsubscribe to beacon messages
             </summary>
         </member>
-        <member name="M:NetMQ.NetMQBeacon.ReceiveString(System.String@)">
+        <member name="M:NetMQ.NetMQBeacon.Receive">
             <summary>
-            Blocks until a string is received. As the returning of this method is uncontrollable, it's
-            normally safer to call <see cref="M:NetMQ.NetMQBeacon.TryReceiveString(System.TimeSpan,System.String@,System.String@)"/> instead and pass a timeout.
-            </summary>
-            <param name="peerName">the name of the peer, which should come before the actual message, is written to this string</param>
-            <returns>the string that was received</returns>
-        </member>
-        <member name="M:NetMQ.NetMQBeacon.TryReceiveString(System.TimeSpan,System.String@,System.String@)">
-            <summary>
-            Attempt to receive a message from the specified peer for the specified amount of time.
-            </summary>
-            <param name="timeout">The maximum amount of time the call should wait for a message before returning.</param>
-            <param name="peerName">the name of the peer that the message comes from is written to this string</param>
-            <param name="message">the string to write the received message into</param>
-            <returns><c>true</c> if a message was received before <paramref name="timeout"/> elapsed,
-            otherwise <c>false</c>.</returns>
-        </member>
-        <member name="M:NetMQ.NetMQBeacon.Receive(System.String@)">
-            <summary>
-            Blocks until a message is received. As the returning of this method is uncontrollable, it's
-            normally safer to call <see cref="M:NetMQ.NetMQBeacon.TryReceiveString(System.TimeSpan,System.String@,System.String@)"/> instead and pass a timeout.
-            </summary>
-            <param name="peerName">the name of the peer, which should come before the actual message, is written to this string</param>
-            <returns>the byte-array of data that was received</returns>
-        </member>
-        <member name="M:NetMQ.NetMQBeacon.Dispose">
-            <summary>
-            Release any contained resources.
+            Receives the next beacon message, blocking until it arrives.
             </summary>
         </member>
-        <member name="M:NetMQ.NetMQBeacon.Dispose(System.Boolean)">
+        <member name="M:NetMQ.NetMQBeacon.TryReceive(System.TimeSpan,NetMQ.BeaconMessage@)">
             <summary>
-            Release any contained resources.
+            Receives the next beacon message if one is available before <paramref name="timeout"/> expires.
             </summary>
-            <param name="disposing">true if managed resources are to be released</param>
+            <param name="timeout">The maximum amount of time to wait for the next beacon message.</param>
+            <param name="message">The received beacon message.</param>
+            <returns><c>true</c> if a beacon message was received, otherwise <c>false</c>.</returns>
+        </member>
+        <member name="T:NetMQ.BeaconMessage">
+            <summary>
+            Contents of a message received from a beacon.
+            </summary>
+        </member>
+        <member name="P:NetMQ.BeaconMessage.Bytes">
+            <summary>
+            THe beacon content as a byte array.
+            </summary>
+        </member>
+        <member name="P:NetMQ.BeaconMessage.PeerAddress">
+            <summary>
+            The address of the peer that sent this message. Includes host name and port number.
+            </summary>
+        </member>
+        <member name="P:NetMQ.BeaconMessage.String">
+            <summary>
+            The beacon content as a string.
+            </summary>
+            <remarks>Decoded using <see cref="P:System.Text.Encoding.UTF8"/>. Other encodings may be used with <see cref="P:NetMQ.BeaconMessage.Bytes"/> directly.</remarks>
+        </member>
+        <member name="P:NetMQ.BeaconMessage.PeerHost">
+            <summary>
+            The host name of the peer that sent this message.
+            </summary>
+            <remarks>This is simply the value of <see cref="P:NetMQ.BeaconMessage.PeerAddress"/> without the port number.</remarks>
         </member>
         <member name="P:NetMQ.NetMQConfig.Linger">
             <summary>
@@ -6382,53 +6129,6 @@
             <param name="more">set this flag to true to signal that you will be immediately sending another frame (optional: default is false)</param>
             <returns><c>true</c> if a message was available, otherwise <c>false</c>.</returns>
         </member>
-        <member name="M:NetMQ.OutgoingSocketExtensions.Send(NetMQ.IOutgoingSocket,System.Byte[],System.Int32,NetMQ.SendReceiveOptions)">
-            <summary>
-            Transmit a byte-array of data over this socket.
-            </summary>
-            <param name="socket">the IOutgoingSocket to transmit on</param>
-            <param name="data">the byte-array of data to send</param>
-            <param name="length">the number of bytes to send from <paramref name="data"/>.</param>
-            <param name="options">options to control how the data is sent</param>
-        </member>
-        <member name="M:NetMQ.OutgoingSocketExtensions.Send(NetMQ.IOutgoingSocket,System.Byte[],System.Int32,System.Boolean,System.Boolean)">
-            <summary>
-            Transmit a byte-array of data over this socket.
-            </summary>
-            <param name="socket">the IOutgoingSocket to transmit on</param>
-            <param name="data">the byte-array of data to send</param>
-            <param name="length">the number of bytes to send</param>
-            <param name="dontWait">if true, return immediately without waiting for the send operation to complete (optional: default is false)</param>
-            <param name="sendMore">set this flag to true to signal that you will be immediately sending another message (optional: default is false)</param>
-        </member>
-        <member name="M:NetMQ.OutgoingSocketExtensions.Send(NetMQ.IOutgoingSocket,System.Byte[])">
-            <summary>
-            Transmit a byte-array of data over this socket.
-            </summary>
-            <param name="socket">the IOutgoingSocket to transmit on</param>
-            <param name="data">the byte-array of data to send</param>
-        </member>
-        <member name="M:NetMQ.OutgoingSocketExtensions.SendMore(NetMQ.IOutgoingSocket,System.Byte[],System.Boolean)">
-            <summary>
-            Transmit a string-message of data over this socket, while indicating that more is to come
-            (the SendMore flag is set to true).
-            </summary>
-            <param name="socket">the IOutgoingSocket to transmit on</param>
-            <param name="data">the byte-array of data to send</param>
-            <param name="dontWait">if true, return immediately without waiting for the send operation to complete (optional: default is false)</param>
-            <returns>a reference to this IOutgoingSocket so that method-calls may be chained together</returns>
-        </member>
-        <member name="M:NetMQ.OutgoingSocketExtensions.SendMore(NetMQ.IOutgoingSocket,System.Byte[],System.Int32,System.Boolean)">
-            <summary>
-            Transmit a string-message of data over this socket, while indicating that more is to come
-            (the SendMore flag is set to true).
-            </summary>
-            <param name="socket">the IOutgoingSocket to transmit on</param>
-            <param name="data">the byte-array of data to send</param>
-            <param name="length">the number of bytes to send</param>
-            <param name="dontWait">if true, return immediately without waiting for the send operation to complete (optional: default is false)</param>
-            <returns>a reference to this IOutgoingSocket so that method-calls may be chained together</returns>
-        </member>
         <member name="M:NetMQ.OutgoingSocketExtensions.SendMultipartBytes(NetMQ.IOutgoingSocket,System.Byte[][])">
             <summary>
             Send multiple frames on <paramref name="socket"/>, blocking until all frames are sent.
@@ -6445,7 +6145,7 @@
         </member>
         <member name="M:NetMQ.OutgoingSocketExtensions.TrySendMultipartBytes(NetMQ.IOutgoingSocket,System.TimeSpan,System.Byte[][])">
             <summary>
-            Attempt to transmit a mulitple frames on <paramref name="socket"/>.
+            Attempt to transmit a multiple frames on <paramref name="socket"/>.
             If frames cannot be sent within <paramref name="timeout"/>, return <c>false</c>.
             </summary>
             <param name="socket">the IOutgoingSocket to transmit on</param>
@@ -6454,7 +6154,7 @@
         </member>
         <member name="M:NetMQ.OutgoingSocketExtensions.TrySendMultipartBytes(NetMQ.IOutgoingSocket,System.TimeSpan,System.Collections.Generic.IEnumerable{System.Byte[]})">
             <summary>
-            Attempt to transmit a mulitple frames on <paramref name="socket"/>.
+            Attempt to transmit a multiple frames on <paramref name="socket"/>.
             If frames cannot be sent within <paramref name="timeout"/>, return <c>false</c>.
             </summary>
             <param name="socket">the IOutgoingSocket to transmit on</param>
@@ -6463,16 +6163,16 @@
         </member>
         <member name="M:NetMQ.OutgoingSocketExtensions.TrySendMultipartBytes(NetMQ.IOutgoingSocket,System.Byte[][])">
             <summary>
-            Attempt to transmit a mulitple frames on <paramref name="socket"/>.
-            If frames cannot be sent immediatly, return <c>false</c>.
+            Attempt to transmit a multiple frames on <paramref name="socket"/>.
+            If frames cannot be sent immediately, return <c>false</c>.
             </summary>
             <param name="socket">the IOutgoingSocket to transmit on</param>
             <param name="frames">frames to transmit</param>
         </member>
         <member name="M:NetMQ.OutgoingSocketExtensions.TrySendMultipartBytes(NetMQ.IOutgoingSocket,System.Collections.Generic.IEnumerable{System.Byte[]})">
             <summary>
-            Attempt to transmit a mulitple frames on <paramref name="socket"/>.
-            If frames cannot be sent immediatly, return <c>false</c>.
+            Attempt to transmit a multiple frames on <paramref name="socket"/>.
+            If frames cannot be sent immediately, return <c>false</c>.
             </summary>
             <param name="socket">the IOutgoingSocket to transmit on</param>
             <param name="frames">frames to transmit</param>
@@ -6515,55 +6215,6 @@
             <param name="more">set this flag to true to signal that you will be immediately sending another frame (optional: default is false)</param>
             <returns><c>true</c> if a message was available, otherwise <c>false</c>.</returns>
         </member>
-        <member name="M:NetMQ.OutgoingSocketExtensions.Send(NetMQ.IOutgoingSocket,System.String,System.Text.Encoding,NetMQ.SendReceiveOptions)">
-            <summary>
-            Transmit a string-message of data over this socket. The string will be encoded into bytes using the specified Encoding.
-            </summary>
-            <param name="socket">the IOutgoingSocket to transmit on</param>
-            <param name="message">a string containing the message to send</param>
-            <param name="encoding">the Encoding to use when converting the message-string into bytes</param>
-            <param name="options">use this to specify which of the DontWait and SendMore flags to set</param>
-        </member>
-        <member name="M:NetMQ.OutgoingSocketExtensions.Send(NetMQ.IOutgoingSocket,System.String,System.Text.Encoding,System.Boolean,System.Boolean)">
-            <summary>
-            Transmit a string-message of data over this socket. The string will be encoded into bytes using the specified Encoding.
-            </summary>
-            <param name="socket">the IOutgoingSocket to transmit on</param>
-            <param name="message">a string containing the message to send</param>
-            <param name="encoding">the Encoding to use when converting the message-string into bytes</param>
-            <param name="dontWait">if true, return immediately without waiting for the send operation to complete (optional: default is false)</param>
-            <param name="sendMore">set this flag to true to signal that you will be immediately sending another message (optional: default is false)</param>
-        </member>
-        <member name="M:NetMQ.OutgoingSocketExtensions.Send(NetMQ.IOutgoingSocket,System.String,System.Boolean,System.Boolean)">
-            <summary>
-            Transmit a string-message of data over this socket. The string will be encoded into bytes using the default Encoding (ASCII).
-            </summary>
-            <param name="socket">the IOutgoingSocket to transmit on</param>
-            <param name="message">a string containing the message to send</param>
-            <param name="dontWait">if true, return immediately without waiting for the send operation to complete (optional: default is false)</param>
-            <param name="sendMore">set this flag to true to signal that you will be immediately sending another message (optional: default is false)</param>
-        </member>
-        <member name="M:NetMQ.OutgoingSocketExtensions.SendMore(NetMQ.IOutgoingSocket,System.String,System.Boolean)">
-            <summary>
-            Transmit a string-message of data over this socket, while indicating that more is to come
-            (the SendMore flag is set to true).
-            </summary>
-            <param name="socket">the IOutgoingSocket to transmit on</param>
-            <param name="message">a string containing the message to send</param>
-            <param name="dontWait">if true, return immediately without waiting for the send operation to complete</param>
-            <returns>a reference to this IOutgoingSocket so that method-calls may be chained together</returns>
-        </member>
-        <member name="M:NetMQ.OutgoingSocketExtensions.SendMore(NetMQ.IOutgoingSocket,System.String,System.Text.Encoding,System.Boolean)">
-            <summary>
-            Transmit a string-message of data over this socket and also signal that you are sending more.
-            The string will be encoded into bytes using the specified Encoding.
-            </summary>
-            <param name="socket">the IOutgoingSocket to transmit on</param>
-            <param name="message">a string containing the message to send</param>
-            <param name="encoding">the Encoding to use when converting the message-string into bytes</param>
-            <param name="dontWait">if true, return immediately without waiting for the send operation to complete (optional: default is false)</param>
-            <returns>a reference to this IOutgoingSocket so that method-calls may be chained together</returns>
-        </member>
         <member name="M:NetMQ.OutgoingSocketExtensions.SendMultipartMessage(NetMQ.IOutgoingSocket,NetMQ.NetMQMessage)">
             <summary>
             Send multiple message on <paramref name="socket"/>, blocking until all entire message is sent.
@@ -6573,7 +6224,7 @@
         </member>
         <member name="M:NetMQ.OutgoingSocketExtensions.TrySendMultipartMessage(NetMQ.IOutgoingSocket,System.TimeSpan,NetMQ.NetMQMessage)">
             <summary>
-            Attempt to transmit a mulitple message on <paramref name="socket"/>.
+            Attempt to transmit a multiple message on <paramref name="socket"/>.
             If message cannot be sent within <paramref name="timeout"/>, return <c>false</c>.
             </summary>
             <param name="socket">the IOutgoingSocket to transmit on</param>
@@ -6582,19 +6233,11 @@
         </member>
         <member name="M:NetMQ.OutgoingSocketExtensions.TrySendMultipartMessage(NetMQ.IOutgoingSocket,NetMQ.NetMQMessage)">
             <summary>
-            Attempt to transmit a mulitple message on <paramref name="socket"/>.
-            If frames cannot be sent immediatly, return <c>false</c>.
+            Attempt to transmit a multiple message on <paramref name="socket"/>.
+            If frames cannot be sent immediately, return <c>false</c>.
             </summary>
             <param name="socket">the IOutgoingSocket to transmit on</param>
             <param name="message">message to transmit</param>
-        </member>
-        <member name="M:NetMQ.OutgoingSocketExtensions.SendMessage(NetMQ.IOutgoingSocket,NetMQ.NetMQMessage,System.Boolean)">
-            <summary>
-            Transmit a message over this socket.
-            </summary>
-            <param name="socket">the IOutgoingSocket to transmit on</param>
-            <param name="message">the NetMQMessage that contains the frames of data to send</param>
-            <param name="dontWait">if true, return immediately without waiting for the send operation to complete (optional: default is false)</param>
         </member>
         <member name="M:NetMQ.OutgoingSocketExtensions.SendFrameEmpty(NetMQ.IOutgoingSocket,System.Boolean)">
             <summary>
@@ -6671,24 +6314,6 @@
             </summary>
             <param name="socket">the IOutgoingSocket to transmit on</param>
         </member>
-        <member name="T:NetMQ.ErrorPollingException">
-            <summary>
-            ErrorPollingException is an Exception that had been used within the message-queueing system to signal polling-related errors.
-            Use one of the NetMQException-derived exception classes instead.
-            </summary>
-        </member>
-        <member name="M:NetMQ.ErrorPollingException.#ctor(System.String,NetMQ.NetMQSocket)">
-            <summary>
-            Create a new ErrorPollingException containing the given message and a reference to the given socket.
-            </summary>
-            <param name="message">the textual description of what gave rise to this exception, to be exposed as the Message property</param>
-            <param name="socket">a reference to the socket, to be exposed via the Socket property</param>
-        </member>
-        <member name="P:NetMQ.ErrorPollingException.Socket">
-            <summary>
-            Get the NetMQSocket that this exception holds a reference to.
-            </summary>
-        </member>
         <member name="T:NetMQ.NetMQFrame">
             <summary>
             Objects of class NetMQFrame serve to hold a Buffer (that consists of a byte-array containing a unit of a message-queue message)
@@ -6710,6 +6335,14 @@
             Create a new NetMQFrame containing the given byte-array data.
             </summary>
             <param name="buffer">a byte-array to hold as the frame's data</param>
+        </member>
+        <member name="M:NetMQ.NetMQFrame.#ctor(System.Byte[],System.Int32)">
+            <summary>
+            Instantiates a frame from the provided byte array, considering only the specified number of bytes.
+            </summary>
+            <remarks>This constructor may be useful to avoid copying data into a smaller array when a buffer is oversized.</remarks>
+            <param name="buffer">The content of the frame.</param>
+            <param name="length">The number bytes from <paramref name="buffer"/> to consider as part of the frame.</param>
         </member>
         <member name="M:NetMQ.NetMQFrame.#ctor(System.String)">
             <summary>
@@ -6742,7 +6375,7 @@
         <member name="P:NetMQ.NetMQFrame.Buffer">
             <summary>
             Get the underlying frame-data buffer, which is an array of bytes.
-            </summary>       
+            </summary>
         </member>
         <member name="P:NetMQ.NetMQFrame.BufferSize">
             <summary>
@@ -6861,15 +6494,6 @@
             <summary>
             Interface IOutgoingSocket mandates a Send( Msg, SendReceiveOptions ) method.
             </summary>
-        </member>
-        <member name="M:NetMQ.IOutgoingSocket.Send(NetMQ.Msg@,NetMQ.SendReceiveOptions)">
-            <summary>
-            Send the given Msg out upon this socket.
-            The message content is in the form of a byte-array that Msg contains.
-            </summary>
-            <param name="msg">the Msg struct that contains the data and the options for this transmission</param>
-            <param name="options">a SendReceiveOptions value that can specify the DontWait or SendMore bits (or None)</param>
-            <exception cref="T:NetMQ.AgainException">The send operation timed out.</exception>
         </member>
         <member name="M:NetMQ.IOutgoingSocket.TrySend(NetMQ.Msg@,System.TimeSpan,System.Boolean)">
             <summary>
@@ -7200,12 +6824,6 @@
             </summary>
             <param name="value">a 64-bit number that is to be converted into bytes and added to this message</param>
         </member>
-        <member name="M:NetMQ.NetMQMessage.Append(NetMQ.Blob)">
-            <summary>
-            Add the Data of the given Blob, as a new frame, onto this NetMQMessage.
-            </summary>
-            <param name="blob">the Blob whose data is to be added as a new frame</param>
-        </member>
         <member name="M:NetMQ.NetMQMessage.AppendEmptyFrame">
             <summary>
             Add an empty frame to this NetMQMessage.
@@ -7283,18 +6901,6 @@
             pushing all of the other frames upward in index-position.
             </remarks>
         </member>
-        <member name="M:NetMQ.NetMQMessage.Push(NetMQ.Blob)">
-            <summary>
-            Push a new frame containing the given Data of the given Blob, into the frame-stack of this NetMQMessage.
-            </summary>
-            <param name="blob">the Blob to create a new frame from</param>
-            <remarks>
-            The concept is the same as pushing an element onto a stack.
-            This creates a new frame from the given data (in this case taken from the Data property of the Blob) and inserts it into the lowest-indexed position of 
-            the collection of frames of this NetMQMessage,
-            pushing all of the other frames upward in index-position.
-            </remarks>
-        </member>
         <member name="M:NetMQ.NetMQMessage.PushEmptyFrame">
             <summary>
             Push an empty frame (a NetMQFrame.Empty) onto the frame-stack.
@@ -7363,7 +6969,7 @@
             This event occurs when at least one message may be received from the socket without blocking.
             </summary>
             <remarks>
-            This event is raised when a <see cref="T:NetMQ.NetMQSocket"/> is added to a running <see cref="T:NetMQ.Poller"/>.
+            This event is raised when a <see cref="T:NetMQ.NetMQSocket"/> is added to a running <see cref="T:NetMQ.Core.Utils.Poller"/>.
             </remarks>
         </member>
         <member name="E:NetMQ.NetMQSocket.SendReady">
@@ -7371,7 +6977,7 @@
             This event occurs when at least one message may be sent via the socket without blocking.
             </summary>
             <remarks>
-            This event is raised when a <see cref="T:NetMQ.NetMQSocket"/> is added to a running <see cref="T:NetMQ.Poller"/>.
+            This event is raised when a <see cref="T:NetMQ.NetMQSocket"/> is added to a running <see cref="T:NetMQ.Core.Utils.Poller"/>.
             </remarks>
         </member>
         <member name="E:NetMQ.NetMQSocket.EventsChanged">
@@ -7498,14 +7104,6 @@
             <param name="sender">what to use as the source of the events</param>
             <param name="events">the given PollEvents that dictates when of the two events to raise</param>
         </member>
-        <member name="M:NetMQ.NetMQSocket.Receive(NetMQ.Msg@,NetMQ.SendReceiveOptions)">
-            <summary>Receive the next message from this socket.</summary>
-            <remarks>Whether the request blocks or not is controlled by <paramref name="options"/>.</remarks>
-            <param name="msg">The Msg object to put it in</param>
-            <param name="options">Either <see cref="F:NetMQ.SendReceiveOptions.None"/>, or <see cref="F:NetMQ.SendReceiveOptions.DontWait"/>.
-            <see cref="F:NetMQ.SendReceiveOptions.SendMore"/> is ignored.</param>
-            <exception cref="T:NetMQ.AgainException">The receive operation timed out.</exception>
-        </member>
         <member name="M:NetMQ.NetMQSocket.TryReceive(NetMQ.Msg@,System.TimeSpan)">
             <summary>Attempt to receive a message for the specified amount of time.</summary>
             <param name="msg">A reference to a <see cref="T:NetMQ.Msg"/> instance into which the received message
@@ -7513,17 +7111,6 @@
             <param name="timeout">The maximum amount of time the call should wait for a message before returning.</param>
             <returns><c>true</c> if a message was received before <paramref name="timeout"/> elapsed,
             otherwise <c>false</c>.</returns>
-        </member>
-        <member name="M:NetMQ.NetMQSocket.Send(NetMQ.Msg@,NetMQ.SendReceiveOptions)">
-            <summary>
-            Send the given Msg out upon this socket.
-            The message content is in the form of a byte-array that Msg contains.
-            </summary>
-            <param name="msg">the Msg struct that contains the data and the options for this transmission</param>
-            <param name="options">a SendReceiveOptions value that can specify the DontWait or SendMore bits (or None)</param>
-            <exception cref="T:NetMQ.TerminatingException">The socket has been stopped.</exception>
-            <exception cref="T:NetMQ.FaultException"><paramref name="msg"/> is not initialised.</exception>
-            <exception cref="T:NetMQ.AgainException">The send operation timed out.</exception>
         </member>
         <member name="M:NetMQ.NetMQSocket.TrySend(NetMQ.Msg@,System.TimeSpan,System.Boolean)">
             <summary>
@@ -7535,69 +7122,12 @@
             <param name="more">Indicate if another frame is expected after this frame</param>
             <returns><c>true</c> if a message was sent, otherwise <c>false</c>.</returns>
         </member>
-        <member name="M:NetMQ.NetMQSocket.Subscribe(System.String)">
-            <summary>
-            Subscribe this socket to messages that have the given topic. This is valid only for Subscriber and XSubscriber sockets.
-            </summary>
-            <param name="topic">a string denoting the topic to subscribe to</param>
-            <remarks>
-            You subscribe a socket to a given topic when you want that socket to receive messages of that topic.
-            A topic is simply a specific prefix (in the form of a byte-array or the equivalent text).
-            This is valid only for Subscriber and XSubscriber sockets.
-            </remarks>
-        </member>
-        <member name="M:NetMQ.NetMQSocket.Subscribe(System.Byte[])">
-            <summary>
-            Subscribe this socket to messages that have the given topic. This is valid only for Subscriber and XSubscriber sockets.
-            </summary>
-            <param name="topic">a byte-array denoting the topic to subscribe to</param>
-            <remarks>
-            You subscribe a socket to a given topic when you want that socket to receive messages of that topic.
-            A topic is simply a specific prefix (in the form of a byte-array or the equivalent text).
-            This is valid only for Subscriber and XSubscriber sockets.
-            </remarks>
-        </member>
-        <member name="M:NetMQ.NetMQSocket.Unsubscribe(System.String)">
-            <summary>
-            Un-subscribe this socket from the given topic. This is valid only for Subscriber and XSubscriber sockets.
-            </summary>
-            <param name="topic">a string denoting the topic to unsubscribe from</param>
-            <remarks>
-            You un-subscribe a socket from the given topic when you no longer want that socket to receive
-            messages of that topic. A topic is simply a specific prefix (in the form of a byte-array or the equivalent text).
-            This is valid only for Subscriber and XSubscriber sockets.
-            </remarks>
-        </member>
-        <member name="M:NetMQ.NetMQSocket.Unsubscribe(System.Byte[])">
-            <summary>
-            Un-subscribe this socket from the given topic. This is valid only for Subscriber and XSubscriber sockets.
-            </summary>
-            <param name="topic">a byte-array denoting the topic to unsubscribe from</param>
-            <remarks>
-            You un-subscribe a socket from the given topic when you no longer want that socket to receive
-            messages of that topic. A topic is simply a specific prefix (in the form of a byte-array or the equivalent text).
-            This is valid only for Subscriber and XSubscriber sockets.
-            </remarks>
-        </member>
-        <member name="M:NetMQ.NetMQSocket.Monitor(System.String,NetMQ.SocketEvent)">
-            <summary>
-            Listen to the given endpoint for SocketEvent events.
-            </summary>
-            <param name="endpoint">A string denoting the endpoint to monitor</param>
-            <param name="events">The specific <see cref="T:NetMQ.SocketEvent"/> events to report on. Defaults to <see cref="F:NetMQ.SocketEvent.All"/> if ommitted.</param>
-            <exception cref="T:System.ArgumentNullException"><paramref name="endpoint"/> is <c>null</c>.</exception>
-            <exception cref="T:System.ArgumentException"><paramref name="endpoint"/> cannot be empty or whitespace.</exception>
-            <exception cref="T:System.ObjectDisposedException">This object is already disposed.</exception>
-            <exception cref="T:NetMQ.ProtocolNotSupportedException">The protocol of <paramref name="endpoint"/> is not supported.</exception>
-            <exception cref="T:NetMQ.TerminatingException">The socket has been stopped.</exception>
-            <exception cref="T:NetMQ.NetMQException">Maximum number of sockets reached.</exception>
-        </member>
         <member name="M:NetMQ.NetMQSocket.Monitor(System.String,NetMQ.SocketEvents)">
             <summary>
             Listen to the given endpoint for SocketEvent events.
             </summary>
             <param name="endpoint">A string denoting the endpoint to monitor</param>
-            <param name="events">The specific <see cref="T:NetMQ.SocketEvent"/> events to report on. Defaults to <see cref="F:NetMQ.SocketEvent.All"/> if ommitted.</param>
+            <param name="events">The specific <see cref="!:SocketEvent"/> events to report on. Defaults to <see cref="!:SocketEvent.All"/> if omitted.</param>
             <exception cref="T:System.ArgumentNullException"><paramref name="endpoint"/> is <c>null</c>.</exception>
             <exception cref="T:System.ArgumentException"><paramref name="endpoint"/> cannot be empty or whitespace.</exception>
             <exception cref="T:System.ObjectDisposedException">This object is already disposed.</exception>
@@ -7687,166 +7217,6 @@
             <summary>Closes this socket, rendering it unusable. Equivalent to calling <see cref="M:NetMQ.NetMQSocket.Close"/>.</summary>
             <param name="disposing">true if releasing managed resources</param>
         </member>
-        <member name="T:NetMQ.NetMQContext">
-            <summary>
-            NetMQContext is an old concept and is no longer needed. You can create sockets with new keyword, for example new RequestSocket();
-            Please note that when creating socket with new keyword the default value for SocketOptions.Linger is zero and not indefinitly like with context.
-            NetMQContext is the context class of the NetMQ message-queueing subsystem.
-            This contains all of the state-information for the message-queueing subsystem, and provides
-            methods for socket creation.
-            You should (ordinarily) have only one context in your application process.
-            </summary>
-            <remarks>
-            The NetMQContext is used to create all sockets. Thus, to use NetMQ you should start by calling <c>NetMQContext.Create()</c>
-            to create an instance. NetMQContext is an <c>IDisposable</c> so you can use it within a using block:
-            <code>
-            using (var context = NetMQContext.Create())
-            {
-                // Put your code in here. Exit this block to dispose the context
-                // only when communication is no longer required.
-            }
-            </code>
-            You should create and use exactly one context in your process.
-            </remarks>   
-        </member>
-        <member name="M:NetMQ.NetMQContext.Create">
-            <summary>
-            Create and return a new context.
-            </summary>
-            <returns>the new NetMQContext</returns>
-        </member>
-        <member name="P:NetMQ.NetMQContext.ThreadPoolSize">
-            <summary>
-            Get or set the number of IO Threads in the context, default is 1.
-            1 is good for most cases.
-            </summary>
-        </member>
-        <member name="P:NetMQ.NetMQContext.MaxSockets">
-            <summary>
-            Get or set the maximum number of sockets.
-            </summary>
-        </member>
-        <member name="P:NetMQ.NetMQContext.Block">
-            <summary>
-            Should context wait for all sockets before terminating?
-            </summary>
-        </member>
-        <member name="M:NetMQ.NetMQContext.CreateHandle(NetMQ.ZmqSocketType)">
-            <summary>
-            Create a socket of the given type within this context.
-            </summary>
-            <param name="socketType">a ZmqSocketType denoting which type of socket to create</param>
-            <returns>a new socket of the given type</returns>
-        </member>
-        <member name="M:NetMQ.NetMQContext.CreateSocket(NetMQ.ZmqSocketType)">
-            <summary>
-            Create and return a new socket of the given socketType.
-            </summary>
-            <param name="socketType">a ZmqSocketType indicating the type of socket to create</param>
-            <returns>a new socket - a subclass of NetMQSocket</returns>
-            <exception cref="T:System.ArgumentOutOfRangeException">The socketType must be a valid value.</exception>
-        </member>
-        <member name="M:NetMQ.NetMQContext.CreateRequestSocket">
-            <summary>
-            Create and return a new request-socket.
-            </summary>
-            <returns>the new RequestSocket</returns>
-        </member>
-        <member name="M:NetMQ.NetMQContext.CreateResponseSocket">
-            <summary>
-            Create and return a new response-socket.
-            </summary>
-            <returns>the new ResponseSocket</returns>
-        </member>
-        <member name="M:NetMQ.NetMQContext.CreateDealerSocket">
-            <summary>
-            Create and return a new dealer-socket.
-            </summary>
-            <returns>the new DealerSocket</returns>
-        </member>
-        <member name="M:NetMQ.NetMQContext.CreateRouterSocket">
-            <summary>
-            Create and return a new router-socket.
-            </summary>
-            <returns>the new RouterSocket</returns>
-        </member>
-        <member name="M:NetMQ.NetMQContext.CreateXPublisherSocket">
-            <summary>
-            Create and return a new xpublisher-socket.
-            </summary>
-            <returns>the new XPublisherSocket</returns>
-        </member>
-        <member name="M:NetMQ.NetMQContext.CreatePairSocket">
-            <summary>
-            Create and return a new pair-socket.
-            </summary>
-            <returns>the new PairSocket</returns>
-        </member>
-        <member name="M:NetMQ.NetMQContext.CreatePushSocket">
-            <summary>
-            Create and return a new push-socket.
-            </summary>
-            <returns>the new PushSocket</returns>
-        </member>
-        <member name="M:NetMQ.NetMQContext.CreatePublisherSocket">
-            <summary>
-            Create and return a new publisher-socket.
-            </summary>
-            <returns>the new PublisherSocket</returns>
-        </member>
-        <member name="M:NetMQ.NetMQContext.CreatePullSocket">
-            <summary>
-            Create and return a new pull-socket.
-            </summary>
-            <returns>the new PullSocket</returns>
-        </member>
-        <member name="M:NetMQ.NetMQContext.CreateSubscriberSocket">
-            <summary>
-            Create and return a new subscriber-socket.
-            </summary>
-            <returns>the new SubscriberSocket</returns>
-        </member>
-        <member name="M:NetMQ.NetMQContext.CreateXSubscriberSocket">
-            <summary>
-            Create and return a new xsubscriber-socket.
-            </summary>
-            <returns>the new XSubscriberSocket</returns>
-        </member>
-        <member name="M:NetMQ.NetMQContext.CreateStreamSocket">
-            <summary>
-            Create and return a new stream-socket.
-            </summary>
-            <returns>the new StreamSocket</returns>
-        </member>
-        <member name="M:NetMQ.NetMQContext.CreateMonitorSocket(System.String)">
-            <summary>
-            Create and return a new monitor-socket that monitors the given endpoint.
-            </summary>
-            <param name="endpoint">a string denoting the endpoint to be monitored</param>
-            <returns>the new NetMQMonitor</returns>
-            <exception cref="T:System.ArgumentNullException">endpoint must not be null.</exception>
-            <exception cref="T:System.ArgumentException">endpoint must not be an empty string.</exception>
-        </member>
-        <member name="M:NetMQ.NetMQContext.Terminate">
-            <summary>
-            Close (terminate) this context.
-            </summary>
-            <remarks>
-            May be safely called even if already terminated.
-            This must not be called on a context that is already closed otherwise an ObjectDisposedException is thrown.
-            </remarks>
-        </member>
-        <member name="M:NetMQ.NetMQContext.Dispose">
-            <summary>
-            Close (or terminate) this context.
-            </summary>
-        </member>
-        <member name="M:NetMQ.NetMQContext.Dispose(System.Boolean)">
-            <summary>
-            Close (or terminate) this context.
-            </summary>
-            <param name="disposing">true if releasing managed resources</param>
-        </member>
         <member name="T:NetMQ.NetMQSocketEventArgs">
             <summary>
             This subclass of EventArgs contains a NetMQSocket,
@@ -7880,259 +7250,6 @@
             Get whether at least one message may be sent by the socket without blocking.
             </summary>
         </member>
-        <member name="P:NetMQ.NetMQSocketEventArgs.ReceiveReady">
-            <summary>
-            Get whether at least one message may be received by the socket without blocking.
-            </summary>
-        </member>
-        <member name="P:NetMQ.NetMQSocketEventArgs.SendReady">
-            <summary>
-            Get whether at least one message may be sent by the socket without blocking.
-            </summary>
-        </member>
-        <member name="T:NetMQ.Poller">
-            <summary>
-            The Poller class provides for managing a set of one or more sockets and being alerted when one of them has a message
-            ready.
-            </summary>
-        </member>
-        <member name="F:NetMQ.Poller.m_sockets">
-            <summary>
-            This is the list of sockets that this Poller is listening to.
-            </summary>
-        </member>
-        <member name="F:NetMQ.Poller.m_pollinSockets">
-            <summary>
-            A Dictionary of entries each of which associates a socket with an action.
-            </summary>
-        </member>
-        <member name="F:NetMQ.Poller.m_pollact">
-            <summary>
-            An array of sockets that are active.
-            </summary>
-        </member>
-        <member name="F:NetMQ.Poller.m_timers">
-            <summary>
-            This is the list of NetMQTimers.
-            </summary>
-        </member>
-        <member name="F:NetMQ.Poller.m_zombies">
-            <summary>
-            This is used to hold the list of expired timers.
-            </summary>
-        </member>
-        <member name="F:NetMQ.Poller.m_cancel">
-            <summary>
-            Flag used to signal completion of the loop.
-            </summary>
-        </member>
-        <member name="F:NetMQ.Poller.m_switch">
-            <summary>
-            Switch indicate if the poller is on or off.
-            </summary>
-        </member>
-        <member name="F:NetMQ.Poller.m_isDirty">
-            <summary>
-            When true, this indicates that there may be fresh socket-events to be polled-for.
-            This is set true whenever a EventsChanged event is received from any of the contained sockets.
-            </summary>
-        </member>
-        <member name="F:NetMQ.Poller.m_disposed">
-            <summary>
-            This flag is used to mark this poller as disposed when the Dispose method is called,
-            to guard against further operations on this poller-object.
-            </summary>
-        </member>
-        <member name="M:NetMQ.Poller.#ctor">
-            <summary>
-            Create a new Poller object, with a default PollTimeout of 1 second.
-            </summary>
-        </member>
-        <member name="M:NetMQ.Poller.#ctor(NetMQ.ISocketPollable[])">
-            <summary>
-            Create a new Poller object with an array of sockets.
-            </summary>
-            <param name="sockets">an array of ISocketPollables to poll</param>
-            <exception cref="T:System.ArgumentNullException">sockets must not be null.</exception>
-        </member>
-        <member name="M:NetMQ.Poller.#ctor(NetMQ.NetMQTimer[])">
-            <summary>
-            Create a new Poller object with the given array of timers.
-            </summary>
-            <param name="timers">an array of NetMQTimers (must not be null) to be incorporated into this Poller</param>
-            <exception cref="T:System.ArgumentNullException">timers must not be null.</exception>
-        </member>
-        <member name="P:NetMQ.Poller.IsStarted">
-            <summary>
-            Get whether the polling has started.
-            This is set true at the beginning of the Start method, and cleared in the Stop method.
-            </summary>
-        </member>
-        <member name="P:NetMQ.Poller.PollTimeout">
-            <summary>
-            Get or set the poll timeout in milliseconds.
-            </summary>
-        </member>
-        <member name="M:NetMQ.Poller.AddPollInSocket(System.Net.Sockets.Socket,System.Action{System.Net.Sockets.Socket})">
-            <summary>
-            Add the given socket and Action to this Poller's collection of socket/actions.
-            </summary>
-            <param name="socket">the Socket to add</param>
-            <param name="callback">the Action to add</param>
-            <exception cref="T:System.ArgumentNullException">socket and callback must not be null.</exception>
-            <exception cref="T:System.ArgumentException">The socket must not have already been added to this poller.</exception>
-            <exception cref="T:System.ObjectDisposedException">This poller must not have already been disposed.</exception>
-        </member>
-        <member name="M:NetMQ.Poller.RemovePollInSocket(System.Net.Sockets.Socket)">
-            <summary>
-            Delete the given socket from this Poller's collection of socket/actions.
-            </summary>
-            <param name="socket">the Socket to remove</param>
-            <exception cref="T:System.ArgumentNullException">socket must not be null.</exception>
-            <exception cref="T:System.ObjectDisposedException">This poller must not have already been disposed.</exception>
-        </member>
-        <member name="M:NetMQ.Poller.AddSocket(NetMQ.ISocketPollable)">
-            <summary>
-            Add the given socket to this Poller's list.
-            </summary>
-            <param name="socket">the ISocketPollable to add to the list</param>
-            <exception cref="T:System.ArgumentNullException">socket must not be null.</exception>
-            <exception cref="T:System.ArgumentException">socket must not have already been added to this poller.</exception>
-            <exception cref="T:System.ObjectDisposedException">This poller must not have already been disposed.</exception>
-        </member>
-        <member name="M:NetMQ.Poller.RemoveSocket(NetMQ.ISocketPollable)">
-            <summary>
-            Delete the given socket from this Poller's list.
-            </summary>
-            <param name="socket">the ISocketPollable to remove from the list</param>
-            <exception cref="T:System.ArgumentNullException">socket must not be null.</exception>
-            <exception cref="T:System.ObjectDisposedException">This poller must not have already been disposed.</exception>
-        </member>
-        <member name="M:NetMQ.Poller.RemoveAllSockets">
-            <summary>
-             Delete all sockets from this Poller's list.
-            </summary>
-            <exception cref="T:System.ObjectDisposedException">This poller must not have already been disposed.</exception>
-        </member>
-        <member name="M:NetMQ.Poller.AddTimer(NetMQ.NetMQTimer)">
-            <summary>
-            Add the given timer to this Poller's list.
-            </summary>
-            <param name="timer">the NetMQTimer to add to the list</param>
-            <exception cref="T:System.ArgumentNullException">timer must not be null.</exception>
-            <exception cref="T:System.ObjectDisposedException">This poller must not have already been disposed.</exception>
-        </member>
-        <member name="M:NetMQ.Poller.RemoveTimer(NetMQ.NetMQTimer)">
-            <summary>
-            Delete the given timer from this Poller's list.
-            </summary>
-            <param name="timer">the NetMQTimer to remove from the list</param>
-            <exception cref="T:System.ArgumentNullException">timer must not be null.</exception>
-            <exception cref="T:System.ObjectDisposedException">This poller must not have already been disposed.</exception>
-        </member>
-        <member name="M:NetMQ.Poller.RemoveAllTimers">
-            <summary>
-            Remove all timers from this Poller's list.
-            </summary>
-            <exception cref="T:System.ObjectDisposedException">This poller must not have already been disposed.</exception>
-        </member>
-        <member name="M:NetMQ.Poller.Cancel">
-            <summary>
-            Cancel the poller job when PollTillCancelled is called
-            </summary>
-        </member>
-        <member name="M:NetMQ.Poller.CancelAndJoin">
-            <summary>
-            Cancel the poller job when PollTillCancelled is called and wait for the PollTillCancelled to complete
-            </summary>
-        </member>
-        <member name="M:NetMQ.Poller.PollOnce">
-            <summary>
-            Poll one time.
-            </summary>
-        </member>
-        <member name="M:NetMQ.Poller.PollTillCancelled">
-            <summary>
-            Poll till Cancel or CancelAndJoin is called. This is a blocking method.
-            </summary>
-        </member>
-        <member name="M:NetMQ.Poller.PollTillCancelledNonBlocking">
-            <summary>
-            The non blocking version of PollTillCancelled, starting the PollTillCancelled on new thread.
-            Will poll till Cancel or CancelAndJoin is called. This method is not blocking.
-            </summary>
-        </member>
-        <member name="M:NetMQ.Poller.Start">
-            <summary>
-            Poll till Cancel or CancelAndJoin is called. This is a blocking method.
-            </summary>
-        </member>
-        <member name="M:NetMQ.Poller.Stop(System.Boolean)">
-            <summary>
-            Stop the poller job. It may take a while until the poller is fully stopped.
-            If it doesn't stop within 20 seconds, it times-out anyway and returns.
-            </summary>
-            <param name="waitForCloseToComplete">if true, this method will block until the poller is fully stopped</param>
-        </member>
-        <member name="M:NetMQ.Poller.Stop">
-            <summary>
-            Stop the poller job. This returns after waiting for that thread to stop.
-            This is equivalent to calling CancelAndJoin.
-            </summary>
-        </member>
-        <member name="M:NetMQ.Poller.OnSocketEventsChanged(System.Object,NetMQ.NetMQSocketEventArgs)">
-            <summary>
-            Handle the EventsChanged event of any of the sockets contained within this Poller,
-            by marking this poller as "dirty" in order to reset the poll events.
-            </summary>
-            <param name="sender">the object that was the source of the event</param>
-            <param name="e">the NetMQSocketEventArgs associated with the event</param>
-        </member>
-        <member name="M:NetMQ.Poller.TicklessTimer">
-            <summary>
-            Return the soonest timeout value of all the timers in the list, or zero to indicate any of them have already elapsed.
-            The timeout is in milliseconds from now.
-            </summary>
-            <returns>the number of milliseconds before the first timer expires, or zero if one already has</returns>
-        </member>
-        <member name="M:NetMQ.Poller.PollWhile(System.Func{System.Boolean})">
-            <summary>
-            Poll as long as the given Func evaluates to true.
-            </summary>
-            <param name="condition">a Func that returns a boolean value, to evaluate on each poll-iteration to decide when to exit the loop</param>
-            <exception cref="T:System.ObjectDisposedException">This poller must not have already been disposed.</exception>
-            <exception cref="T:System.InvalidOperationException">This poller must not have already been started.</exception>
-        </member>
-        <member name="M:NetMQ.Poller.Cancel(System.Boolean)">
-            <summary>
-            Signal this poller to stop, and return immediately if waitForCloseToComplete is false,
-            block until the poller has actually stopped if waitForCloseToComplete is true.
-            </summary>
-            <param name="waitForCloseToComplete">block until the poller has actually stopped</param>
-            <exception cref="T:System.ObjectDisposedException">if this poller has already been disposed</exception>
-            <exception cref="T:System.InvalidOperationException">if this poller has not been started</exception>
-        </member>
-        <member name="M:NetMQ.Poller.ContainsSocket(NetMQ.NetMQSocket)">
-            <summary>
-            Gets whether <paramref name="socket"/> has been added to this <see cref="T:NetMQ.Poller"/>.
-            </summary>
-        </member>
-        <member name="M:NetMQ.Poller.Dispose">
-            <summary>
-            Perform any freeing, releasing or resetting of contained resources.
-            If this poller is already started, signal the polling thread to stop - and block to wait for it.
-            </summary>
-            <remarks>
-            Calling this again after the first time, does nothing.
-            </remarks>
-        </member>
-        <member name="M:NetMQ.Poller.Dispose(System.Boolean)">
-            <summary>
-            Perform any freeing, releasing or resetting of contained resources.
-            If this poller is already started, signal the polling thread to stop - and block to wait for it.
-            </summary>
-            <param name="disposing">true if releasing managed resources</param>
-        </member>
         <member name="T:NetMQ.PollEvents">
             <summary>
             This flags enum-type is simply an indication of the direction of the poll-event,
@@ -8158,15 +7275,6 @@
             Provides extension methods for the <see cref="T:NetMQ.IReceivingSocket"/> interface,
             via which messages may be received in several ways.
             </summary>
-        </member>
-        <member name="F:NetMQ.ReceivingSocketExtensions.DefaultEncoding">
-            <summary>
-            The <see cref="T:System.Text.Encoding"/> used in string related methods that do
-            not explicitly provide an encoding parameter.
-            </summary>
-        </member>
-        <member name="F:NetMQ.ReceivingSocketExtensions.InfiniteTimeout">
-            <summary>Indicates an infinite timeout for receive operations.</summary>
         </member>
         <member name="M:NetMQ.ReceivingSocketExtensions.Receive(NetMQ.IReceivingSocket,NetMQ.Msg@)">
             <summary>
@@ -8237,64 +7345,6 @@
             <param name="bytes">The content of the received message frame, or <c>null</c> if no message was available.</param>
             <returns><c>true</c> if a message was available, otherwise <c>false</c>.</returns>
         </member>
-        <member name="M:NetMQ.ReceivingSocketExtensions.Receive(NetMQ.IReceivingSocket)">
-            <summary>
-            get the data section of the available message as <c>byte[]</c>
-            </summary>
-            <param name="socket">The socket to receive from.</param>
-            <returns>The message's data as a newly allocated array of bytes.</returns>
-            <exception cref="T:NetMQ.AgainException">If <paramref name="socket"/> is a <see cref="T:NetMQ.NetMQSocket"/> and <see cref="P:NetMQ.SocketOptions.ReceiveTimeout"/> elapsed.</exception>
-        </member>
-        <member name="M:NetMQ.ReceivingSocketExtensions.Receive(NetMQ.IReceivingSocket,System.Boolean@)">
-            <summary>
-            get the data section of the available message as <c>byte[]</c>
-            </summary>
-            <param name="socket">The socket to receive from.</param>
-            <param name="hasMore"><c>true</c> when more parts of a multipart message are available</param>
-            <returns>The message's data as a newly allocated array of bytes.</returns>
-            <exception cref="T:NetMQ.AgainException">If <paramref name="socket"/> is a <see cref="T:NetMQ.NetMQSocket"/> and <see cref="P:NetMQ.SocketOptions.ReceiveTimeout"/> elapsed.</exception>
-        </member>
-        <member name="M:NetMQ.ReceivingSocketExtensions.Receive(NetMQ.IReceivingSocket,System.Boolean,System.Boolean@)">
-            <summary>
-            potentially non-blocking get the data section of the available message as <c>byte[]</c>
-            </summary>
-            <param name="socket">The socket to receive from.</param>
-            <param name="dontWait">Non-blocking if <c>true</c>, otherwise blocking.</param>
-            <param name="hasMore"><c>true</c> when more parts of a multipart message are available.</param>
-            <returns>The message's data as a newly allocated array of bytes.</returns>
-            <exception cref="T:NetMQ.AgainException">If <paramref name="socket"/> is a <see cref="T:NetMQ.NetMQSocket"/> and <see cref="P:NetMQ.SocketOptions.ReceiveTimeout"/> elapsed.</exception>
-        </member>
-        <member name="M:NetMQ.ReceivingSocketExtensions.Receive(NetMQ.IReceivingSocket,NetMQ.SendReceiveOptions)">
-            <summary>
-            get the data section of the available message as <c>byte[]</c>
-            </summary>
-            <param name="socket">The socket to receive from.</param>
-            <param name="options">a SendReceiveOptions that can specify the DontWait or SendMore flags</param>
-            <returns>The message's data as a newly allocated array of bytes.</returns>
-            <exception cref="T:NetMQ.AgainException">If <paramref name="socket"/> is a <see cref="T:NetMQ.NetMQSocket"/> and <see cref="P:NetMQ.SocketOptions.ReceiveTimeout"/> elapsed.</exception>
-        </member>
-        <member name="M:NetMQ.ReceivingSocketExtensions.Receive(NetMQ.IReceivingSocket,NetMQ.SendReceiveOptions,System.Boolean@)">
-            <summary>
-            get the data section of the available message as <c>byte[]</c>
-            </summary>
-            <param name="socket">The socket to receive from.</param>
-            <param name="options">a SendReceiveOptions which can specify the DontWait or SendMore flags (or None)</param>
-            <param name="hasMore"><c>true</c> when more parts of a multipart message are available</param>
-            <returns>The message's data as a newly allocated array of bytes.</returns>
-            <exception cref="T:NetMQ.AgainException">No message was available within the allowed timeout period. Try again.</exception>
-        </member>
-        <member name="M:NetMQ.ReceivingSocketExtensions.Receive(NetMQ.NetMQSocket,System.TimeSpan)">
-            <summary>
-            Receive the next message's data as a <see cref="T:byte[]"/>, or return <c>null</c> if no message arrives
-            within <paramref name="timeout"/>.
-            </summary>
-            <param name="socket">The socket to receive from.</param>
-            <param name="timeout">The length of time wait for an inbound message.</param>
-            <returns>The received message bytes, or <c>null</c> if no message arrived within <paramref name="timeout"/>.
-            </returns>
-            <exception cref="T:NetMQ.FaultException">The internal select operation failed.</exception>
-            <exception cref="T:NetMQ.TerminatingException"><paramref name="socket"/> has been stopped.</exception>
-        </member>
         <member name="M:NetMQ.ReceivingSocketExtensions.ReceiveMultipartBytes(NetMQ.IReceivingSocket,System.Int32)">
             <summary>
             Receive all frames of the next message from <paramref name="socket"/>, blocking until a message arrives.
@@ -8330,34 +7380,16 @@
             <param name="frames">Reference to a list for return values. If <c>null</c> a new instance will be assigned, otherwise the provided list will be cleared and populated.</param>
             <param name="expectedFrameCount">Optional initial <see cref="P:System.Collections.Generic.List`1.Capacity"/> for the returned <see cref="T:System.Collections.Generic.List`1"/>.</param>
         </member>
-        <member name="M:NetMQ.ReceivingSocketExtensions.ReceiveMessages(NetMQ.IReceivingSocket,System.Int32)">
-            <summary>Receives a list of all frames of the next message, each as an array of bytes.</summary>
-            <param name="socket">The socket to receive from.</param>
-            <param name="expectedFrameCount">Specifies the initial capacity of the <see cref="T:System.Collections.Generic.List`1"/> used
-            to buffer results. If the number of frames is known, set it here. If more frames arrive than expected,
-            an extra allocation will occur, but the result will still be correct.</param>
-            <returns>A list of all frames of the next message, each as an array of bytes.</returns>
-            <exception cref="T:NetMQ.AgainException">If <paramref name="socket"/> is a <see cref="T:NetMQ.NetMQSocket"/> and <see cref="P:NetMQ.SocketOptions.ReceiveTimeout"/> elapsed.</exception>
-        </member>
-        <member name="M:NetMQ.ReceivingSocketExtensions.ReceiveAll(NetMQ.IReceivingSocket,System.Int32)">
-            <summary>Receives a list of all frames of the next message, each as an array of bytes.</summary>
-            <param name="socket">The socket to receive from.</param>
-            <param name="expectedFrameCount">Specifies the initial capacity of the <see cref="T:System.Collections.Generic.List`1"/> used
-            to buffer results. If the number of frames is known, set it here. If more frames arrive than expected,
-            an extra allocation will occur, but the result will still be correct.</param>
-            <returns>A list of all frames of the next message, each as an array of bytes.</returns>
-            <exception cref="T:NetMQ.AgainException">If <paramref name="socket"/> is a <see cref="T:NetMQ.NetMQSocket"/> and <see cref="P:NetMQ.SocketOptions.ReceiveTimeout"/> elapsed.</exception>
-        </member>
         <member name="M:NetMQ.ReceivingSocketExtensions.ReceiveFrameString(NetMQ.IReceivingSocket)">
             <summary>
-            Receive a single frame from <paramref name="socket"/>, blocking until one arrives, and decode as a string using <see cref="F:NetMQ.ReceivingSocketExtensions.DefaultEncoding"/>.
+            Receive a single frame from <paramref name="socket"/>, blocking until one arrives, and decode as a string using <see cref="F:NetMQ.SendReceiveConstants.DefaultEncoding"/>.
             </summary>
             <param name="socket">The socket to receive from.</param>
             <returns>The content of the received message frame as a string.</returns>
         </member>
         <member name="M:NetMQ.ReceivingSocketExtensions.ReceiveFrameString(NetMQ.IReceivingSocket,System.Boolean@)">
             <summary>
-            Receive a single frame from <paramref name="socket"/>, blocking until one arrives, and decode as a string using <see cref="F:NetMQ.ReceivingSocketExtensions.DefaultEncoding"/>.
+            Receive a single frame from <paramref name="socket"/>, blocking until one arrives, and decode as a string using <see cref="F:NetMQ.SendReceiveConstants.DefaultEncoding"/>.
             Indicate whether further frames exist via <paramref name="more"/>.
             </summary>
             <param name="socket">The socket to receive from.</param>
@@ -8384,7 +7416,7 @@
         </member>
         <member name="M:NetMQ.ReceivingSocketExtensions.TryReceiveFrameString(NetMQ.IReceivingSocket,System.String@)">
             <summary>
-            Attempt to receive a single frame from <paramref name="socket"/>, and decode as a string using <see cref="F:NetMQ.ReceivingSocketExtensions.DefaultEncoding"/>.
+            Attempt to receive a single frame from <paramref name="socket"/>, and decode as a string using <see cref="F:NetMQ.SendReceiveConstants.DefaultEncoding"/>.
             If no message is immediately available, return <c>false</c>.
             </summary>
             <param name="socket">The socket to receive from.</param>
@@ -8393,7 +7425,7 @@
         </member>
         <member name="M:NetMQ.ReceivingSocketExtensions.TryReceiveFrameString(NetMQ.IReceivingSocket,System.String@,System.Boolean@)">
             <summary>
-            Attempt to receive a single frame from <paramref name="socket"/>, and decode as a string using <see cref="F:NetMQ.ReceivingSocketExtensions.DefaultEncoding"/>.
+            Attempt to receive a single frame from <paramref name="socket"/>, and decode as a string using <see cref="F:NetMQ.SendReceiveConstants.DefaultEncoding"/>.
             If no message is immediately available, return <c>false</c>.
             </summary>
             <param name="socket">The socket to receive from.</param>
@@ -8424,7 +7456,7 @@
         </member>
         <member name="M:NetMQ.ReceivingSocketExtensions.TryReceiveFrameString(NetMQ.IReceivingSocket,System.TimeSpan,System.String@)">
             <summary>
-            Attempt to receive a single frame from <paramref name="socket"/>, and decode as a string using <see cref="F:NetMQ.ReceivingSocketExtensions.DefaultEncoding"/>.
+            Attempt to receive a single frame from <paramref name="socket"/>, and decode as a string using <see cref="F:NetMQ.SendReceiveConstants.DefaultEncoding"/>.
             If no message is available within <paramref name="timeout"/>, return <c>false</c>.
             </summary>
             <param name="socket">The socket to receive from.</param>
@@ -8434,7 +7466,7 @@
         </member>
         <member name="M:NetMQ.ReceivingSocketExtensions.TryReceiveFrameString(NetMQ.IReceivingSocket,System.TimeSpan,System.String@,System.Boolean@)">
             <summary>
-            Attempt to receive a single frame from <paramref name="socket"/>, and decode as a string using <see cref="F:NetMQ.ReceivingSocketExtensions.DefaultEncoding"/>.
+            Attempt to receive a single frame from <paramref name="socket"/>, and decode as a string using <see cref="F:NetMQ.SendReceiveConstants.DefaultEncoding"/>.
             If no message is available within <paramref name="timeout"/>, return <c>false</c>.
             </summary>
             <param name="socket">The socket to receive from.</param>
@@ -8466,163 +7498,9 @@
             <param name="more"><c>true</c> if another frame of the same message follows, otherwise <c>false</c>.</param>
             <returns><c>true</c> if a message was available, otherwise <c>false</c>.</returns>
         </member>
-        <member name="M:NetMQ.ReceivingSocketExtensions.ReceiveString(NetMQ.IReceivingSocket,System.Text.Encoding,NetMQ.SendReceiveOptions,System.Boolean@)">
-            <summary>
-            Read an available message, extract the data which is converted to a string using <paramref name="encoding"/>,
-            and inform of the availability of more messages via <paramref name="hasMore"/>.
-            </summary>
-            <param name="socket">The socket to receive from.</param>
-            <param name="encoding">the Encoding to use</param>
-            <param name="options">a SendReceiveOptions value that can specify the DontWait or SendMore flags</param>
-            <param name="hasMore">true if more messages are available, false otherwise</param>
-            <returns>the message data encoded as a string</returns>
-            <exception cref="T:System.ArgumentNullException">encoding must not be null.</exception>
-            <exception cref="T:NetMQ.AgainException">No message was available within the allowed timeout period. Try again.
-            </exception>
-        </member>
-        <member name="M:NetMQ.ReceivingSocketExtensions.ReceiveString(NetMQ.IReceivingSocket,NetMQ.SendReceiveOptions,System.Boolean@)">
-            <summary>
-            Read an available message, extract the data which is converted to a string using
-            <see cref="P:System.Text.Encoding.ASCII"/>, and inform of the availability of more messages via
-            <paramref name="hasMore"/>.
-            </summary>
-            <param name="socket">The socket to receive from.</param>
-            <param name="options">a SendReceiveOptions value that can specify the DontWait or SendMore flags</param>
-            <param name="hasMore">true if more messages are available, false otherwise</param>
-            <returns>the message data encoded as a string - using the ASCII-encoding</returns>
-            <exception cref="T:NetMQ.AgainException">If <paramref name="socket"/> is a <see cref="T:NetMQ.NetMQSocket"/> and
-            <see cref="P:NetMQ.SocketOptions.ReceiveTimeout"/> elapsed.</exception>
-        </member>
-        <member name="M:NetMQ.ReceivingSocketExtensions.ReceiveString(NetMQ.IReceivingSocket,NetMQ.SendReceiveOptions)">
-            <summary>
-            Read an available message, and extract the data which is converted to a string using
-            <see cref="P:System.Text.Encoding.ASCII"/>.
-            </summary>
-            <param name="socket">The socket to receive from.</param>
-            <param name="options">a SendReceiveOptions value that can specify the DontWait or SendMore flags</param>
-            <returns>the message data encoded a a string using the ASCII-encoding</returns>
-            <exception cref="T:NetMQ.AgainException">If <paramref name="socket"/> is a <see cref="T:NetMQ.NetMQSocket"/> and
-            <see cref="P:NetMQ.SocketOptions.ReceiveTimeout"/> elapsed.</exception>
-        </member>
-        <member name="M:NetMQ.ReceivingSocketExtensions.ReceiveString(NetMQ.IReceivingSocket,System.Text.Encoding,NetMQ.SendReceiveOptions)">
-            <summary>
-            reads an available message and extracts the data which is converted to a string using
-            <paramref name="encoding"/>.
-            </summary>
-            <param name="socket">The socket to receive from.</param>
-            <param name="encoding">the encoding to use</param>
-            <param name="options">a SendReceiveOptions value that can specify the DontWait or SendMore flags</param>
-            <returns>the message data encoded as a string</returns>
-            <exception cref="T:NetMQ.AgainException">If <paramref name="socket"/> is a <see cref="T:NetMQ.NetMQSocket"/> and
-            <see cref="P:NetMQ.SocketOptions.ReceiveTimeout"/> elapsed.</exception>
-        </member>
-        <member name="M:NetMQ.ReceivingSocketExtensions.ReceiveString(NetMQ.IReceivingSocket,System.Boolean,System.Boolean@)">
-            <summary>
-            non-blocking reads an available message and extracts the data which is converted to a string using
-            <see cref="P:System.Text.Encoding.ASCII"/> as encoding and informs about the availability of more messages via
-            <paramref name="hasMore"/>.
-            </summary>
-            <param name="socket">The socket to receive from.</param>
-            <param name="dontWait">if true the method is non-blocking</param>
-            <param name="hasMore">true if more messages are available, false otherwise</param>
-            <returns>the ASCII string representation of the data of the message</returns>
-            <exception cref="T:NetMQ.AgainException">If <paramref name="socket"/> is a <see cref="T:NetMQ.NetMQSocket"/> and
-            <see cref="P:NetMQ.SocketOptions.ReceiveTimeout"/> elapsed.</exception>
-        </member>
-        <member name="M:NetMQ.ReceivingSocketExtensions.ReceiveString(NetMQ.IReceivingSocket,System.Text.Encoding,System.Boolean,System.Boolean@)">
-            <summary>
-            non-blocking reads an available message and extracts the data which is converted to a string using
-            <paramref name="encoding"/> and informs about the availability of more messages via
-            <paramref name="hasMore"/>.
-            </summary>
-            <param name="socket">The socket to receive from.</param>
-            <param name="encoding">the encoding to use for the string representation</param>
-            <param name="dontWait">if true the method is non-blocking</param>
-            <param name="hasMore">true if more messages are available, false otherwise</param>
-            <returns>the ASCII string representation of the data of the message</returns>
-            <exception cref="T:NetMQ.AgainException">If <paramref name="socket"/> is a <see cref="T:NetMQ.NetMQSocket"/> and
-            <see cref="P:NetMQ.SocketOptions.ReceiveTimeout"/> elapsed.</exception>
-        </member>
-        <member name="M:NetMQ.ReceivingSocketExtensions.ReceiveString(NetMQ.IReceivingSocket,System.Boolean@)">
-            <summary>
-            reads an available message and extracts the data which is converted to a string using
-            <see cref="P:System.Text.Encoding.ASCII"/> as encoding and informs about the availability of more messages via
-            <paramref name="hasMore"/>.
-            </summary>
-            <param name="socket">The socket to receive from.</param>
-            <param name="hasMore">true if more messages are available, false otherwise</param>
-            <returns>the ASCII string representation of the data of the message</returns>
-            <exception cref="T:NetMQ.AgainException">If <paramref name="socket"/> is a <see cref="T:NetMQ.NetMQSocket"/> and
-            <see cref="P:NetMQ.SocketOptions.ReceiveTimeout"/> elapsed.</exception>
-        </member>
-        <member name="M:NetMQ.ReceivingSocketExtensions.ReceiveString(NetMQ.IReceivingSocket,System.Text.Encoding,System.Boolean@)">
-            <summary>
-            reads an available message and extracts the data which is converted to a string using
-            <paramref name="encoding"/> and informs about the availability of more messages via
-            <paramref name="hasMore"/>.
-            </summary>
-            <param name="socket">The socket to receive from.</param>
-            <param name="encoding">the encoding to use for the string representation</param>
-            <param name="hasMore">true if more messages are available, false otherwise</param>
-            <returns>the string representation of the encoded data of the message</returns>
-            <exception cref="T:NetMQ.AgainException">If <paramref name="socket"/> is a <see cref="T:NetMQ.NetMQSocket"/> and
-            <see cref="P:NetMQ.SocketOptions.ReceiveTimeout"/> elapsed.</exception>
-        </member>
-        <member name="M:NetMQ.ReceivingSocketExtensions.ReceiveString(NetMQ.IReceivingSocket,System.Text.Encoding)">
-            <summary>
-            reads an available message and extracts the data which is converted to a string using
-            <paramref name="encoding"/>.
-            </summary>
-            <param name="socket">The socket to receive from.</param>
-            <param name="encoding">the encoding to use for the string representation</param>
-            <returns>the string representation of the encoded data of the message</returns>
-            <exception cref="T:NetMQ.AgainException">If <paramref name="socket"/> is a <see cref="T:NetMQ.NetMQSocket"/> and
-            <see cref="P:NetMQ.SocketOptions.ReceiveTimeout"/> elapsed.</exception>
-        </member>
-        <member name="M:NetMQ.ReceivingSocketExtensions.ReceiveString(NetMQ.IReceivingSocket)">
-            <summary>
-            reads an available message and extracts the data which is converted to a string using
-            <see cref="P:System.Text.Encoding.ASCII"/>.
-            </summary>
-            <param name="socket">The socket to receive from.</param>
-            <returns>the ASCII string representation of the data of the message</returns>
-            <exception cref="T:NetMQ.AgainException">If <paramref name="socket"/> is a <see cref="T:NetMQ.NetMQSocket"/> and
-            <see cref="P:NetMQ.SocketOptions.ReceiveTimeout"/> elapsed.</exception>
-        </member>
-        <member name="M:NetMQ.ReceivingSocketExtensions.ReceiveString(NetMQ.NetMQSocket,System.TimeSpan)">
-            <summary>
-            Receive a message if available within <paramref name="timeout"/>.
-            </summary>
-            <param name="socket">The socket to receive from.</param>
-            <param name="timeout">the time span to wait for a message to receive</param>
-            <returns>
-            The <see cref="P:System.Text.Encoding.ASCII"/> string representation of the data of the message or
-            <c>null</c> if no message arrives within <paramref name="timeout"/>.
-            </returns>
-            <exception cref="T:NetMQ.AgainException">If <paramref name="socket"/> is a <see cref="T:NetMQ.NetMQSocket"/> and
-            <see cref="P:NetMQ.SocketOptions.ReceiveTimeout"/> elapsed.</exception>
-            <exception cref="T:NetMQ.FaultException">The internal select operation failed.</exception>
-            <exception cref="T:NetMQ.TerminatingException">The socket has been stopped.</exception>
-        </member>
-        <member name="M:NetMQ.ReceivingSocketExtensions.ReceiveString(NetMQ.NetMQSocket,System.Text.Encoding,System.TimeSpan)">
-            <summary>
-            Receive a message if available within <paramref name="timeout"/>.
-            </summary>
-            <param name="socket">The socket to receive from.</param>
-            <param name="encoding">the encoding to use for the string representation</param>
-            <param name="timeout">the time span to wait for a message to receive</param>
-            <returns>
-            The string representation of the encoded data of the message or <c>null</c> if
-            no message arrived within <paramref name="timeout"/>.
-            </returns>
-            <exception cref="T:NetMQ.AgainException">If <paramref name="socket"/> is a <see cref="T:NetMQ.NetMQSocket"/> and
-            <see cref="P:NetMQ.SocketOptions.ReceiveTimeout"/> elapsed.</exception>
-            <exception cref="T:NetMQ.FaultException">The internal select operation failed.</exception>
-            <exception cref="T:NetMQ.TerminatingException">The socket has been stopped.</exception>
-        </member>
         <member name="M:NetMQ.ReceivingSocketExtensions.ReceiveMultipartStrings(NetMQ.IReceivingSocket,System.Int32)">
             <summary>
-            Receive all frames of the next message from <paramref name="socket"/>, blocking until they arrive, and decode as strings using <see cref="F:NetMQ.ReceivingSocketExtensions.DefaultEncoding"/>.
+            Receive all frames of the next message from <paramref name="socket"/>, blocking until they arrive, and decode as strings using <see cref="F:NetMQ.SendReceiveConstants.DefaultEncoding"/>.
             </summary>
             <param name="socket">The socket to receive from.</param>
             <param name="expectedFrameCount">Specifies the initial capacity of the <see cref="T:System.Collections.Generic.List`1"/> used
@@ -8632,7 +7510,7 @@
         </member>
         <member name="M:NetMQ.ReceivingSocketExtensions.ReceiveMultipartStrings(NetMQ.IReceivingSocket,System.Text.Encoding,System.Int32)">
             <summary>
-            Receive all frames of the next message from <paramref name="socket"/>, blocking until they arrive, and decode as strings using <see cref="F:NetMQ.ReceivingSocketExtensions.DefaultEncoding"/>.
+            Receive all frames of the next message from <paramref name="socket"/>, blocking until they arrive, and decode as strings using <see cref="F:NetMQ.SendReceiveConstants.DefaultEncoding"/>.
             </summary>
             <param name="socket">The socket to receive from.</param>
             <param name="encoding">The encoding used to convert the frame's data to a string.</param>
@@ -8642,7 +7520,7 @@
         </member>
         <member name="M:NetMQ.ReceivingSocketExtensions.TryReceiveMultipartStrings(NetMQ.IReceivingSocket,System.Collections.Generic.List{System.String}@,System.Int32)">
             <summary>
-            Attempt to receive all frames of the next message from <paramref name="socket"/>, and decode them as strings using <see cref="F:NetMQ.ReceivingSocketExtensions.DefaultEncoding"/>.
+            Attempt to receive all frames of the next message from <paramref name="socket"/>, and decode them as strings using <see cref="F:NetMQ.SendReceiveConstants.DefaultEncoding"/>.
             If no message is immediately available, return <c>false</c>.
             </summary>
             <param name="socket">The socket to receive from.</param>
@@ -8667,7 +7545,7 @@
         </member>
         <member name="M:NetMQ.ReceivingSocketExtensions.TryReceiveMultipartStrings(NetMQ.IReceivingSocket,System.TimeSpan,System.Collections.Generic.List{System.String}@,System.Int32)">
             <summary>
-            Attempt to receive all frames of the next message from <paramref name="socket"/>, and decode them as strings using <see cref="F:NetMQ.ReceivingSocketExtensions.DefaultEncoding"/>.
+            Attempt to receive all frames of the next message from <paramref name="socket"/>, and decode them as strings using <see cref="F:NetMQ.SendReceiveConstants.DefaultEncoding"/>.
             If no message is available within <paramref name="timeout"/>, return <c>false</c>.
             </summary>
             <param name="socket">The socket to receive from.</param>
@@ -8691,35 +7569,6 @@
             to buffer results. If the number of frames is known, set it here. If more frames arrive than expected,
             an extra allocation will occur, but the result will still be correct.</param>
             <returns><c>true</c> if a message was available, otherwise <c>false</c>.</returns>
-        </member>
-        <member name="M:NetMQ.ReceivingSocketExtensions.ReceiveStringMessages(NetMQ.IReceivingSocket,System.Int32)">
-            <summary>Receives a list of all frames of the next message, decoded as ASCII strings.</summary>
-            <param name="socket">The socket to receive from.</param>
-            <param name="expectedFrameCount">Specifies the initial capacity of the <see cref="T:System.Collections.Generic.List`1"/> used to buffer
-            results. If the number of frames is known, set it here. If more frames arrive than expected, an extra
-            allocation will occur, but the result will still be correct.</param>
-            <returns>A list of all frames of the next message, decoded as strings.</returns>
-            <exception cref="T:NetMQ.AgainException">If <paramref name="socket"/> is a <see cref="T:NetMQ.NetMQSocket"/> and
-            <see cref="P:NetMQ.SocketOptions.ReceiveTimeout"/> elapsed.</exception>
-        </member>
-        <member name="M:NetMQ.ReceivingSocketExtensions.ReceiveStringMessages(NetMQ.IReceivingSocket,System.Text.Encoding,System.Int32)">
-            <summary>Receives a list of all frames of the next message, decoded as strings having the specified
-            <paramref name="encoding"/>.</summary>
-            <remarks>Blocks until a message is received. The list may have one or more entries.</remarks>
-            <param name="socket">The socket to receive from.</param>
-            <param name="encoding">The encoding to use when converting a frame's bytes into a string.</param>
-            <param name="expectedFrameCount">Specifies the initial capacity of the <see cref="T:System.Collections.Generic.List`1"/> used to buffer
-            results. If the number of frames is known, set it here. If more frames arrive than expected, an extra
-            allocation will occur, but the result will still be correct.</param>
-            <returns>A list of all frames of the next message, decoded as strings.</returns>
-            <exception cref="T:NetMQ.AgainException">If <paramref name="socket"/> is a <see cref="T:NetMQ.NetMQSocket"/> and
-            <see cref="P:NetMQ.SocketOptions.ReceiveTimeout"/> elapsed.</exception>
-        </member>
-        <member name="M:NetMQ.ReceivingSocketExtensions.ReceiveAllString(NetMQ.IReceivingSocket)">
-            <summary></summary>
-            <param name="socket">The socket to receive from.</param>
-            <exception cref="T:NetMQ.AgainException">If <paramref name="socket"/> is a <see cref="T:NetMQ.NetMQSocket"/> and
-            <see cref="P:NetMQ.SocketOptions.ReceiveTimeout"/> elapsed.</exception>
         </member>
         <member name="M:NetMQ.ReceivingSocketExtensions.ReceiveMultipartMessage(NetMQ.IReceivingSocket,System.Int32)">
             <summary>
@@ -8756,38 +7605,6 @@
             an extra allocation will occur, but the result will still be correct.</param>
             <returns><c>true</c> if a message was available, otherwise <c>false</c>.</returns>
         </member>
-        <member name="M:NetMQ.ReceivingSocketExtensions.ReceiveMessage(NetMQ.IReceivingSocket,NetMQ.NetMQMessage,System.Boolean)">
-            <summary>
-            non-blocking receive of a (multipart)message and stores it in the <see cref="T:NetMQ.NetMQMessage"/> object
-            </summary>
-            <param name="socket">The socket to receive from.</param>
-            <param name="message">the NetMQMessage to receive the bytes into</param>
-            <param name="dontWait">non-blocking if <c>true</c> and blocking otherwise</param>
-            <exception cref="T:NetMQ.AgainException">If <paramref name="socket"/> is a <see cref="T:NetMQ.NetMQSocket"/> and
-            <see cref="P:NetMQ.SocketOptions.ReceiveTimeout"/> elapsed.</exception>
-        </member>
-        <member name="M:NetMQ.ReceivingSocketExtensions.ReceiveMessage(NetMQ.IReceivingSocket,System.Boolean)">
-            <summary>
-            non-blocking receive of a (multipart)message
-            </summary>
-            <param name="socket">The socket to receive from.</param>
-            <param name="dontWait">non-blocking if <c>true</c> and blocking otherwise</param>
-            <returns>the received message</returns>
-            <exception cref="T:NetMQ.AgainException">If <paramref name="socket"/> is a <see cref="T:NetMQ.NetMQSocket"/> and
-            <see cref="P:NetMQ.SocketOptions.ReceiveTimeout"/> elapsed.</exception>
-        </member>
-        <member name="M:NetMQ.ReceivingSocketExtensions.ReceiveMessage(NetMQ.NetMQSocket,System.TimeSpan)">
-            <summary>
-            receive of a (multipart)message within a specified timespan
-            </summary>
-            <param name="socket">The socket to receive from.</param>
-            <param name="timeout">the timespan to wait for a message</param>
-            <returns>the received message or <c>null</c> if non arrived within the timeout period</returns>
-            <exception cref="T:NetMQ.TerminatingException">The socket has been stopped.</exception>
-            <exception cref="T:NetMQ.FaultException">The internal select operation failed.</exception>
-            <exception cref="T:NetMQ.AgainException">If <paramref name="socket"/> is a <see cref="T:NetMQ.NetMQSocket"/> and
-            <see cref="P:NetMQ.SocketOptions.ReceiveTimeout"/> elapsed.</exception>
-        </member>
         <member name="M:NetMQ.ReceivingSocketExtensions.ReceiveSignal(NetMQ.IReceivingSocket)">
             <summary>
             Receive frames from <paramref name="socket"/>, blocking until a valid signal arrives.
@@ -8813,19 +7630,6 @@
             <param name="timeout">The maximum period of time to wait for a message to become available.</param>
             <param name="signal"><c>true</c> if the received signal was zero, otherwise <c>false</c>. If no signal received, <c>false</c>.</param>
             <returns><c>true</c> if a valid signal was observed, otherwise <c>false</c>.</returns>
-        </member>
-        <member name="M:NetMQ.ReceivingSocketExtensions.WaitForSignal(NetMQ.IReceivingSocket)">
-            <summary>
-            Receives repeatedly until a valid signal message is seen, then returns the signal value.
-            </summary>
-            <remarks>
-            Signal messages must contain a single frame or eight bytes, where the first eight bytes (excluding the first
-            bit) must equal exactly <c>0x77665544332211</c>.
-            </remarks>
-            <param name="socket">The socket to receive from.</param>
-            <returns>true if that one frame has no bits set other than in the lowest-order byte.</returns>
-            <exception cref="T:NetMQ.AgainException">If <paramref name="socket"/> is a <see cref="T:NetMQ.NetMQSocket"/> and
-            <see cref="P:NetMQ.SocketOptions.ReceiveTimeout"/> elapsed.</exception>
         </member>
         <member name="M:NetMQ.ReceivingSocketExtensions.SkipFrame(NetMQ.IReceivingSocket)">
             <summary>
@@ -8911,34 +7715,7 @@
         <member name="F:NetMQ.SendReceiveConstants.InfiniteTimeout">
             <summary>Indicates an infinite timeout for send and receive operations.</summary>
         </member>
-        <member name="T:NetMQ.SendReceiveOptions">
-            <summary>
-            This flags enum-type provides a way to specify basic Receive behaviour.
-            It may be None, or have the DontWait bit (indicating to wait for a message),
-            or the SendMore bit, set.
-            </summary>
-        </member>
-        <member name="F:NetMQ.SendReceiveOptions.None">
-            <summary>
-            Both bits cleared (neither DontWait nor SendMore are set)
-            </summary>
-        </member>
-        <member name="F:NetMQ.SendReceiveOptions.DontWait">
-            <summary>
-            Set this flag to specify NOT to block waiting for a message to arrive.
-            </summary>
-        </member>
-        <member name="F:NetMQ.SendReceiveOptions.SendMore">
-            <summary>
-            Set this (the SendMore bit) to signal more messages beyond the current one, for a given unit of communication.
-            </summary>
-        </member>
         <member name="T:NetMQ.SocketEvents">
-            <summary>
-            This enum-type specifies socket transport events (TCP and IPC only).
-            </summary>
-        </member>
-        <member name="T:NetMQ.SocketEvent">
             <summary>
             This enum-type specifies socket transport events (TCP and IPC only).
             </summary>
@@ -8953,7 +7730,7 @@
             <summary>
             Create a new DealerSocket and attach socket to zero or more endpoints.               
             </summary>                
-            <param name="connectionString">List of NetMQ endpoints, seperated by commas and prefixed by '@' (to bind the socket) or '>' (to connect the socket).
+            <param name="connectionString">List of NetMQ endpoints, separated by commas and prefixed by '@' (to bind the socket) or '>' (to connect the socket).
             Default action is connect (if endpoint doesn't start with '@' or '>')</param>
             <example><code>var socket = new DealerSocket(">tcp://127.0.0.1:5555,@127.0.0.1:55556");</code></example>                 
         </member>
@@ -8972,7 +7749,7 @@
             <summary>
             Create a new PairSocket and attach socket to zero or more endpoints.               
             </summary>                
-            <param name="connectionString">List of NetMQ endpoints, seperated by commas and prefixed by '@' (to bind the socket) or '>' (to connect the socket).
+            <param name="connectionString">List of NetMQ endpoints, separated by commas and prefixed by '@' (to bind the socket) or '>' (to connect the socket).
             Default action is connect (if endpoint doesn't start with '@' or '>')</param>
             <example><code>var socket = new PairSocket(">tcp://127.0.0.1:5555,@127.0.0.1:55556");</code></example>                 
         </member>
@@ -8982,6 +7759,13 @@
             </summary>
             <param name="socketHandle">the SocketBase to create the new socket from</param>
         </member>
+        <member name="M:NetMQ.Sockets.PairSocket.CreateSocketPair(NetMQ.Sockets.PairSocket@,NetMQ.Sockets.PairSocket@)">
+            <summary>
+            Create and return an inproc pipe where socket1 is bound and socket2 is connected.
+            </summary>
+            <param name="socket1">the Bind socket</param>
+            <param name="socket2">the Connect socket</param>
+        </member>
         <member name="T:NetMQ.Sockets.PublisherSocket">
             <summary>
             A PublisherSocket is a NetMQSocket intended to be used as the Pub in the PubSub pattern.
@@ -8990,21 +7774,17 @@
         </member>
         <member name="M:NetMQ.Sockets.PublisherSocket.#ctor(System.String)">
             <summary>
-            Create a new PublisherSocket and attach socket to zero or more endpoints.               
-            </summary>                
-            <param name="connectionString">List of NetMQ endpoints, seperated by commas and prefixed by '@' (to bind the socket) or '>' (to connect the socket).
+            Create a new PublisherSocket and attach socket to zero or more endpoints.
+            </summary>
+            <param name="connectionString">List of NetMQ endpoints, separated by commas and prefixed by '@' (to bind the socket) or '>' (to connect the socket).
             Default action is bind (if endpoint doesn't start with '@' or '>')</param>
-            <example><code>var socket = new PublisherSocket(">tcp://127.0.0.1:5555,>127.0.0.1:55556");</code></example>               
+            <example><code>var socket = new PublisherSocket(">tcp://127.0.0.1:5555,>127.0.0.1:55556");</code></example>
         </member>
         <member name="M:NetMQ.Sockets.PublisherSocket.#ctor(NetMQ.Core.SocketBase)">
             <summary>
             Create a new PublisherSocket based upon the given SocketBase.
             </summary>
             <param name="socketHandle">the SocketBase to create the new socket from</param>
-        </member>
-        <member name="M:NetMQ.Sockets.PublisherSocket.Receive(NetMQ.Msg@,NetMQ.SendReceiveOptions)">
-            <summary><see cref="T:NetMQ.Sockets.PublisherSocket"/> doesn't support sending, so this override throws <see cref="T:System.NotSupportedException"/>.</summary>
-            <exception cref="T:System.NotSupportedException">Receive is not supported.</exception>
         </member>
         <member name="M:NetMQ.Sockets.PublisherSocket.TryReceive(NetMQ.Msg@,System.TimeSpan)">
             <summary><see cref="T:NetMQ.Sockets.PublisherSocket"/> doesn't support sending, so this override throws <see cref="T:System.NotSupportedException"/>.</summary>
@@ -9018,25 +7798,17 @@
         </member>
         <member name="M:NetMQ.Sockets.PullSocket.#ctor(System.String)">
             <summary>
-            Create a new PullSocket and attach socket to zero or more endpoints.               
-            </summary>                
-            <param name="connectionString">List of NetMQ endpoints, seperated by commas and prefixed by '@' (to bind the socket) or '>' (to connect the socket).
+            Create a new PullSocket and attach socket to zero or more endpoints.
+            </summary>
+            <param name="connectionString">List of NetMQ endpoints, separated by commas and prefixed by '@' (to bind the socket) or '>' (to connect the socket).
             Default action is bind (if endpoint doesn't start with '@' or '>')</param>
-            <example><code>var socket = new PullSocket(">tcp://127.0.0.1:5555,>127.0.0.1:55556");</code></example>               
+            <example><code>var socket = new PullSocket(">tcp://127.0.0.1:5555,>127.0.0.1:55556");</code></example>
         </member>
         <member name="M:NetMQ.Sockets.PullSocket.#ctor(NetMQ.Core.SocketBase)">
             <summary>
             Create a new PullSocket based upon the given SocketBase.
             </summary>
             <param name="socketHandle">the SocketBase to create the new socket from</param>
-        </member>
-        <member name="M:NetMQ.Sockets.PullSocket.Send(NetMQ.Msg@,NetMQ.SendReceiveOptions)">
-            <summary>
-            Don't invoke this on a PullSocket - you'll just get a NotSupportedException.
-            </summary>
-            <param name="msg">the Msg to transmit</param>
-            <param name="options">a SendReceiveOptions that may be None, or any of the bits DontWait, SendMore</param>
-            <exception cref="T:System.NotSupportedException">Send must not be called on a PullSocket.</exception>
         </member>
         <member name="T:NetMQ.Sockets.PushSocket">
             <summary>
@@ -9046,21 +7818,17 @@
         </member>
         <member name="M:NetMQ.Sockets.PushSocket.#ctor(System.String)">
             <summary>
-            Create a new PushSocket and attach socket to zero or more endpoints.               
-            </summary>                
-            <param name="connectionString">List of NetMQ endpoints, seperated by commas and prefixed by '@' (to bind the socket) or '>' (to connect the socket).
+            Create a new PushSocket and attach socket to zero or more endpoints.
+            </summary>
+            <param name="connectionString">List of NetMQ endpoints, separated by commas and prefixed by '@' (to bind the socket) or '>' (to connect the socket).
             Default action is connect (if endpoint doesn't start with '@' or '>')</param>
-            <example><code>var socket = new PushSocket(">tcp://127.0.0.1:5555,@127.0.0.1:55556");</code></example>               
+            <example><code>var socket = new PushSocket(">tcp://127.0.0.1:5555,@127.0.0.1:55556");</code></example>
         </member>
         <member name="M:NetMQ.Sockets.PushSocket.#ctor(NetMQ.Core.SocketBase)">
             <summary>
             Create a new PushSocket based upon the given SocketBase.
             </summary>
             <param name="socketHandle">the SocketBase to create the new socket from</param>
-        </member>
-        <member name="M:NetMQ.Sockets.PushSocket.Receive(NetMQ.Msg@,NetMQ.SendReceiveOptions)">
-            <summary><see cref="T:NetMQ.Sockets.PushSocket"/> doesn't support sending, so this override throws <see cref="T:System.NotSupportedException"/>.</summary>
-            <exception cref="T:System.NotSupportedException">Receive is not supported.</exception>
         </member>
         <member name="M:NetMQ.Sockets.PushSocket.TryReceive(NetMQ.Msg@,System.TimeSpan)">
             <summary><see cref="T:NetMQ.Sockets.PushSocket"/> doesn't support sending, so this override throws <see cref="T:System.NotSupportedException"/>.</summary>
@@ -9076,7 +7844,7 @@
             <summary>
             Create a new RequestSocket and attach socket to zero or more endpoints.               
             </summary>                
-            <param name="connectionString">List of NetMQ endpoints, seperated by commas and prefixed by '@' (to bind the socket) or '>' (to connect the socket).
+            <param name="connectionString">List of NetMQ endpoints, separated by commas and prefixed by '@' (to bind the socket) or '>' (to connect the socket).
             Default action is connect (if endpoint doesn't start with '@' or '>')</param>
             <example><code>var socket = new RequestSocket(">tcp://127.0.0.1:5555,@127.0.0.1:55556");</code></example>  
         </member>
@@ -9118,7 +7886,7 @@
             <summary>
             Create a new ResponseSocket and attach socket to zero or more endpoints.               
             </summary>                
-            <param name="connectionString">List of NetMQ endpoints, seperated by commas and prefixed by '@' (to bind the socket) or '>' (to connect the socket).
+            <param name="connectionString">List of NetMQ endpoints, separated by commas and prefixed by '@' (to bind the socket) or '>' (to connect the socket).
             Default action is bind (if endpoint doesn't start with '@' or '>')</param>
             <example><code>var socket = new ResponseSocket(">tcp://127.0.0.1:5555,>127.0.0.1:55556");</code></example>  
         </member>
@@ -9137,7 +7905,7 @@
             <summary>
             Create a new RouterSocket and attach socket to zero or more endpoints.               
             </summary>                
-            <param name="connectionString">List of NetMQ endpoints, seperated by commas and prefixed by '@' (to bind the socket) or '>' (to connect the socket).
+            <param name="connectionString">List of NetMQ endpoints, separated by commas and prefixed by '@' (to bind the socket) or '>' (to connect the socket).
             Default action is bind (if endpoint doesn't start with '@' or '>')</param>
             <example><code>var socket = new RouterSocket(">tcp://127.0.0.1:5555,>127.0.0.1:55556");</code></example>  
         </member>
@@ -9161,7 +7929,7 @@
             <summary>
             Create a new StreamSocket and attach socket to zero or more endpoints.               
             </summary>                
-            <param name="connectionString">List of NetMQ endpoints, seperated by commas and prefixed by '@' (to bind the socket) or '>' (to connect the socket).
+            <param name="connectionString">List of NetMQ endpoints, separated by commas and prefixed by '@' (to bind the socket) or '>' (to connect the socket).
             Default action is connect (if endpoint doesn't start with '@' or '>')</param>
             <example><code>var socket = new StreamSocket(">tcp://127.0.0.1:5555,@127.0.0.1:55556");</code></example>  
         </member>
@@ -9179,25 +7947,17 @@
         </member>
         <member name="M:NetMQ.Sockets.SubscriberSocket.#ctor(System.String)">
             <summary>
-            Create a new SubscriberSocket and attach socket to zero or more endpoints.               
-            </summary>                
-            <param name="connectionString">List of NetMQ endpoints, seperated by commas and prefixed by '@' (to bind the socket) or '>' (to connect the socket).
+            Create a new SubscriberSocket and attach socket to zero or more endpoints.
+            </summary>
+            <param name="connectionString">List of NetMQ endpoints, separated by commas and prefixed by '@' (to bind the socket) or '>' (to connect the socket).
             Default action is connect (if endpoint doesn't start with '@' or '>')</param>
-            <example><code>var socket = new SubscriberSocket(">tcp://127.0.0.1:5555,@127.0.0.1:55556");</code></example>  
+            <example><code>var socket = new SubscriberSocket(">tcp://127.0.0.1:5555,@127.0.0.1:55556");</code></example>
         </member>
         <member name="M:NetMQ.Sockets.SubscriberSocket.#ctor(NetMQ.Core.SocketBase)">
             <summary>
             Create a new SubscriberSocket based upon the given SocketBase.
             </summary>
             <param name="socketHandle">the SocketBase to create the new socket from</param>
-        </member>
-        <member name="M:NetMQ.Sockets.SubscriberSocket.Send(NetMQ.Msg@,NetMQ.SendReceiveOptions)">
-            <summary>
-            Don't invoke this on a SubscriberSocket - you'll just get a NotSupportedException.
-            </summary>
-            <param name="msg">the Msg to transmit</param>
-            <param name="options">a SendReceiveOptions that may be None, or any of the bits DontWait, SendMore</param>
-            <exception cref="T:System.NotSupportedException">Send must not be called on a SubscriberSocket.</exception>
         </member>
         <member name="M:NetMQ.Sockets.SubscriberSocket.Subscribe(System.String)">
             <summary>
@@ -9258,11 +8018,11 @@
         </member>
         <member name="M:NetMQ.Sockets.XPublisherSocket.#ctor(System.String)">
             <summary>
-            Create a new XPublisherSocket and attach socket to zero or more endpoints.               
-            </summary>                
-            <param name="connectionString">List of NetMQ endpoints, seperated by commas and prefixed by '@' (to bind the socket) or '>' (to connect the socket).
+            Create a new XPublisherSocket and attach socket to zero or more endpoints.
+            </summary>
+            <param name="connectionString">List of NetMQ endpoints, separated by commas and prefixed by '@' (to bind the socket) or '>' (to connect the socket).
             Default action is bind (if endpoint doesn't start with '@' or '>')</param>
-            <example><code>var socket = new XPublisherSocket(">tcp://127.0.0.1:5555,>127.0.0.1:55556");</code></example>  
+            <example><code>var socket = new XPublisherSocket(">tcp://127.0.0.1:5555,>127.0.0.1:55556");</code></example>
         </member>
         <member name="M:NetMQ.Sockets.XPublisherSocket.#ctor(NetMQ.Core.SocketBase)">
             <summary>
@@ -9345,11 +8105,11 @@
         </member>
         <member name="M:NetMQ.Sockets.XSubscriberSocket.#ctor(System.String)">
             <summary>
-            Create a new XSubscriberSocket and attach socket to zero or more endpoints.               
-            </summary>                
-            <param name="connectionString">List of NetMQ endpoints, seperated by commas and prefixed by '@' (to bind the socket) or '>' (to connect the socket).
+            Create a new XSubscriberSocket and attach socket to zero or more endpoints.
+            </summary>
+            <param name="connectionString">List of NetMQ endpoints, separated by commas and prefixed by '@' (to bind the socket) or '>' (to connect the socket).
             Default action is connect (if endpoint doesn't start with '@' or '>')</param>
-            <example><code>var socket = new XSubscriberSocket(">tcp://127.0.0.1:5555,@127.0.0.1:55556");</code></example>  
+            <example><code>var socket = new XSubscriberSocket(">tcp://127.0.0.1:5555,@127.0.0.1:55556");</code></example>
         </member>
         <member name="M:NetMQ.Sockets.XSubscriberSocket.#ctor(NetMQ.Core.SocketBase)">
             <summary>
@@ -9517,28 +8277,6 @@
         <member name="M:NetMQ.EndpointNotFoundException.#ctor(System.Runtime.Serialization.SerializationInfo,System.Runtime.Serialization.StreamingContext)">
             <summary>Constructor for serialisation.</summary>
         </member>
-        <member name="T:NetMQ.AgainException">
-            <summary>
-            AgainException is a NetMQException that is used within SocketBase.Send and SocketBase.Recv to signal failures
-            (as when the Send/Receive fails and DontWait is set or no timeout is specified)
-            and is raised within Sub.XSetSocketOption if sending the queued-message fails.
-            </summary>
-        </member>
-        <member name="M:NetMQ.AgainException.#ctor(System.Exception,System.String)">
-            <summary>
-            Create a new AgainException with a given inner-exception and message.
-            </summary>
-            <param name="innerException">an Exception for this new exception to contain and expose via its InnerException property</param>
-            <param name="message">the textual description of what gave rise to this exception, to expose via the Message property</param>
-        </member>
-        <member name="M:NetMQ.AgainException.#ctor">
-            <summary>
-            Create a new AgainException with no message nor inner-exception.
-            </summary>
-        </member>
-        <member name="M:NetMQ.AgainException.#ctor(System.Runtime.Serialization.SerializationInfo,System.Runtime.Serialization.StreamingContext)">
-            <summary>Constructor for serialisation.</summary>
-        </member>
         <member name="T:NetMQ.TerminatingException">
             <summary>
             TerminatingException is a NetMQException that is used within SocketBase and Ctx to signal
@@ -9588,7 +8326,7 @@
         </member>
         <member name="T:NetMQ.FaultException">
             <summary>
-            FaultException is a NetMQException that is used within within the message-queueing system to signal general fault conditions.
+            FaultException is a NetMQException that is used within the message-queueing system to signal general fault conditions.
             </summary>
         </member>
         <member name="M:NetMQ.FaultException.#ctor(System.Exception,System.String)">
@@ -9641,7 +8379,7 @@
         </member>
         <member name="T:NetMQ.HostUnreachableException">
             <summary>
-            HostUnreachableException is an Exception that is used within within the message-queueing system
+            HostUnreachableException is an Exception that is used within the message-queueing system
             to signal failures to communicate with a host.
             </summary>
         </member>
@@ -9698,7 +8436,7 @@
             Forwards messages bidirectionally between two sockets. You can also specify a control socket tn which proxied messages will be sent.
             </summary>
             <remarks>
-            This class must be explicitly started by calling <see cref="M:NetMQ.Proxy.Start"/>. If an external <see cref="T:NetMQ.Poller"/> has been specified,
+            This class must be explicitly started by calling <see cref="M:NetMQ.Proxy.Start"/>. If an external <see cref="!:Poller"/> has been specified,
             then that call will block until <see cref="M:NetMQ.Proxy.Stop"/> is called.
             <para/>
             If using an external <see cref="T:NetMQ.NetMQPoller"/>, ensure the front and back end sockets have been added to it.
@@ -9766,11 +8504,6 @@
             For non-zero values, the lowest bit corresponds to thread 1, second lowest bit to thread 2, and so on.
             </summary>
         </member>
-        <member name="P:NetMQ.SocketOptions.CopyMessages">
-            <summary>
-            Unused.
-            </summary>
-        </member>
         <member name="P:NetMQ.SocketOptions.Identity">
             <summary>
             Get or set unique identity of the socket, from a message-queueing router's perspective.
@@ -9792,12 +8525,6 @@
         <member name="P:NetMQ.SocketOptions.SendBuffer">
             <summary>
             Get or set the size of the transmit buffer for the specified socket.
-            </summary>
-        </member>
-        <member name="P:NetMQ.SocketOptions.ReceivevBuffer">
-            <summary>
-            Get or set the size of the receive buffer for the specified socket.
-            A value of zero means that the OS default is in effect.
             </summary>
         </member>
         <member name="P:NetMQ.SocketOptions.ReceiveBuffer">
@@ -9867,7 +8594,7 @@
         </member>
         <member name="P:NetMQ.SocketOptions.MaxMsgSize">
             <summary>
-            Get or set the upper limit to to the size for inbound messages.
+            Get or set the upper limit to the size for inbound messages.
             If a peer sends a message larger than this it is disconnected.
             The default value is -1, which means no limit.
             </summary>
@@ -9888,6 +8615,22 @@
             The default is 1000.
             </summary>
         </member>
+        <member name="P:NetMQ.SocketOptions.SendLowWatermark">
+            <summary>
+            The low-water mark for message transmission.
+            This is the number of messages that should be processed before transmission is
+            unblocked (in case it was blocked by reaching high-watermark). The default value is
+            calculated using relevant high-watermark (HWM): HWM > 2048 ? HWM - 1024 : (HWM + 1) / 2
+            </summary>
+        </member>
+        <member name="P:NetMQ.SocketOptions.ReceiveLowWatermark">
+            <summary>
+            The low-water mark for message reception.
+            This is the number of messages that should be processed  before reception is
+            unblocked (in case it was blocked by reaching high-watermark). The default value is
+            calculated using relevant high-watermark (HWM): HWM > 2048 ? HWM - 1024 : (HWM + 1) / 2
+            </summary>
+        </member>
         <member name="P:NetMQ.SocketOptions.MulticastHops">
             <summary>
             Get or set the time-to-live (maximum number of hops) that outbound multicast packets
@@ -9895,29 +8638,10 @@
             The default value of 1 means that the multicast packets don't leave the local network.
             </summary>
         </member>
-        <member name="P:NetMQ.SocketOptions.ReceiveTimeout">
-            <summary>
-            Get or set the amount of time after which a synchronous receive call will time out.
-            </summary>
-        </member>
-        <member name="P:NetMQ.SocketOptions.SendTimeout">
-            <summary>
-            Specifies the amount of time after which a synchronous send call will time out.
-            A value of 0 means Send will return immediately, with a EAGAIN error if the message cannot be sent.
-            A value of -1 means to block until the message is sent.
-            TODO: May need to update this explanation.
-            </summary>
-        </member>
         <member name="P:NetMQ.SocketOptions.IPv4Only">
             <summary>
             Get or set whether the underlying socket is for IPv4 only (not IPv6),
             as opposed to one that allows connections with either IPv4 or IPv6.
-            </summary>
-        </member>
-        <member name="P:NetMQ.SocketOptions.GetLastEndpoint">
-            <summary>
-            Get the last endpoint bound for TCP and IPC transports.
-            The returned value will be a string in the form of a ZMQ DSN.
             </summary>
         </member>
         <member name="P:NetMQ.SocketOptions.LastEndpoint">
@@ -9929,6 +8653,13 @@
             If the TCP host is ANY, indicated by a *, then the returned address
             will be 0.0.0.0 (for IPv4).
             </remarks>
+        </member>
+        <member name="P:NetMQ.SocketOptions.RouterMandatory">
+            <summary>
+            Set the RouterSocket behavior when an unroutable message is encountered.
+            A value of false is the default and discards the message silently when it cannot be routed.
+            A value of true causes throw of HostUnreachableException if the message cannot be routed.
+            </summary>       
         </member>
         <member name="P:NetMQ.SocketOptions.TcpKeepalive">
             <summary>
@@ -9943,11 +8674,6 @@
             If the keepalive probes are not replied to by your peer, you can assert that the connection
             cannot be considered valid and then take the corrective action.
             </remarks>
-        </member>
-        <member name="P:NetMQ.SocketOptions.TcpKeepaliveCnt">
-            <summary>
-            Unused
-            </summary>
         </member>
         <member name="P:NetMQ.SocketOptions.TcpKeepaliveIdle">
             <summary>
@@ -9989,6 +8715,18 @@
             <summary>
             This applies only to publisher sockets.
             Set whether to support broadcast functionality
+            </summary>
+        </member>
+        <member name="P:NetMQ.SocketOptions.RouterRawSocket">
+            <summary>
+            This applies only to router sockets.
+            Set whether RouterSocket allows non-zmq tcp connects.
+            If true, router socket accepts non-zmq tcp connections
+            </summary>
+        </member>
+        <member name="P:NetMQ.SocketOptions.RouterHandover">
+            <summary>
+            When enabled new router connections with same identity take over old ones
             </summary>
         </member>
         <member name="P:NetMQ.SocketOptions.Endian">
@@ -10089,12 +8827,6 @@
             If there are any subscribers - raise the Elapsed event.
             </summary>
             <param name="sender">the sender to include within the event's event-args</param>
-        </member>
-        <member name="T:NetMQ.zmq.ThisNamespaceIsNotUsed">
-            <summary>
-            All public types have been moved out of the <see cref="N:NetMQ.Core"/> namespace. This class remains
-            to prevent compile errors when users still have <c>using NetMQ.zmq;</c> in their code.
-            </summary>
         </member>
         <member name="T:NetMQ.ZmqSocketType">
             <summary>
