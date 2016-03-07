@@ -3,6 +3,7 @@ using System.Collections;
 using System.Threading;
 using System.IO;
 using Emgu.CV;
+using UnityEngine.UI;
 
 /// <summary>
 /// Special thanks to Eric Haines for providing a multi threaded Image Rescaling source file
@@ -167,10 +168,11 @@ public class TextureScale
 /// A new attempt at capturing images from the screen using Async methods
 /// to alleviate system management and reduce lag from image related work.
 /// Developed by: Mario Migliacio, Fall 2015 semester, ROBOSUB SIMULATOR.
+/// Last modified by Mario Migliacio on 3/6/2016.
 /// </summary>
 public class async_screencap : MonoBehaviour
 {
-    #region Field Variables
+    #region Field Variables/ Properties
     /// <summary>
     /// Width and Height of 720p resolution: 1280 x 720.
     /// iter represents the iteration count when creating a image.
@@ -181,6 +183,14 @@ public class async_screencap : MonoBehaviour
     private int i = 1;
     private int j = 1;
     private Texture2D currText;
+
+    // Gui related controls
+    public Slider png, mat, format;
+    public Button pngButton, matButton, reformatButton;
+    public bool PngSavingControl { get; set; }
+    public bool MatSavingControl { get; set; }
+    public bool ReformatControl { get; set; }
+
     #endregion
 
     #region START
@@ -193,9 +203,29 @@ public class async_screencap : MonoBehaviour
     /// </summary>
     private void Start ()
     {
+        // find each Unity GUI component
+        png = png.GetComponent<Slider>();
+        mat = mat.GetComponent<Slider>();
+        format = format.GetComponent<Slider>();
+        pngButton = pngButton.GetComponent<Button>();
+        matButton = matButton.GetComponent<Button>();
+        reformatButton = reformatButton.GetComponent<Button>();
+
+        // enable each button
+        pngButton.enabled = true;
+        matButton.enabled = true;
+        reformatButton.enabled = true;
+
+        // Make sure that each option is off to start with
+        PngSavingControl = false;
+        MatSavingControl = false;
+        ReformatControl = false;
+
         //InvokeRepeating("CaptureAsync", 0, 0.2f);                     // test. Complete.
-        InvokeRepeating("_CaptureAsync_ReadPixelsAsync", 0, 0.1f);
+        // call the update this way
+        InvokeRepeating("_CaptureAsync_ReadPixelsAsync", 0, 0.25f);
 	}
+
     #endregion
 
     #region Initial Test
@@ -210,6 +240,7 @@ public class async_screencap : MonoBehaviour
         Application.CaptureScreenshot(Application.dataPath + "/images/image" + i + ".png");
         i++;
     }
+
     #endregion
 
     #region Image Processing
@@ -243,7 +274,7 @@ public class async_screencap : MonoBehaviour
     private void SaveTextureToFile()
     {
         byte[] bytes = currText.EncodeToPNG();
-
+        
         //Save our test image 
         File.WriteAllBytes(Application.dataPath + "/images/image" + i + ".png", bytes);
         i++;     // so that the capture image doesnt continuously overwrite itself
@@ -259,6 +290,7 @@ public class async_screencap : MonoBehaviour
         mat.Save(Application.dataPath + "/images/mat" + j + ".png");
         j++;
     }
+
     #endregion
 
     #region Texture GET/SET 
@@ -287,6 +319,7 @@ public class async_screencap : MonoBehaviour
     {
         currText = image;
     }
+
     #endregion
 
     #region Async Image Capture
@@ -303,25 +336,99 @@ public class async_screencap : MonoBehaviour
 
     private IEnumerator CaptureAsync_ReadPixelsAsync()
     {
-        //Wait for graphics to render
         yield return new WaitForEndOfFrame();
-
-        //Create a texture to pass to encoding
+        
         Texture2D image = new Texture2D(Screen.width, Screen.height, TextureFormat.RGB24, false);
-        //Put buffer into texture
         image.ReadPixels(new Rect(0, 0, Screen.width, Screen.height), 0, 0);
-        SetTexture(image);
-        //Begin Image processing before clean up.
-        //ResizeTo720p();
-        //SaveTextureToFile();
-        //SaveMatToFile();
-        //End   Image processing before clean up.
 
-        //Split the processes up
+        SetTexture(image);
+
+        // allow for dynamic turning of/off image reformatting.
+        if (ReformatControl)
+        {
+            ResizeTo720p();
+        }
+
+        // allow for dynamic turning on/off png file saving.
+        if (PngSavingControl)
+        {
+            SaveTextureToFile();
+        }
+
+        // allow for dynamic turning on/off mat file saving.
+        if (MatSavingControl)
+        {
+            SaveMatToFile();
+        }
+
+        // Split the processes up
         yield return 0;
 
-        //stop memory from causing Unity to crash unexpectedly
+        // stop memory from causing Unity to crash unexpectedly
         DestroyObject(image);
     }
+
+    #endregion
+
+    #region GUI controls
+    // debugging purposes make a better design, with preset configurations for the simulation.
+
+    /// <summary>
+    /// If the user clicks on the button to begin saving images as PNG, let the boolean state control allow for it.
+    /// If they click the button again, disable the feature.
+    /// </summary>
+    public void PngButtonClick()
+    {
+        if (PngSavingControl == false)
+        {
+            png.value = 1;
+            PngSavingControl = true;
+        }
+        
+        else if (PngSavingControl)
+        {
+            png.value = 0;
+            PngSavingControl = false;
+        }
+    }
+
+    /// <summary>
+    /// If the user clicks on the button to begin saving images as MAT, let the boolean state control allow for it.
+    /// If they click the button again, disable the feature.
+    /// </summary>
+    public void MatButtonClick()
+    {
+        if (MatSavingControl == false)
+        {
+            mat.value = 1;
+            MatSavingControl = true;
+        }
+
+        else if (MatSavingControl)
+        {
+            mat.value = 0;
+            MatSavingControl = false;
+        }
+    }
+
+    /// <summary>
+    /// If the user clicks on the button to begin reformatting images to 720p, let the boolean state control allow for it.
+    /// If they click the button again, disable the feature.
+    /// </summary>
+    public void FormatButtonClick()
+    {
+        if (ReformatControl == false)
+        {
+            format.value = 1;
+            ReformatControl = true;
+        }
+
+        else if (ReformatControl)
+        {
+            format.value = 0;
+            ReformatControl = false;
+        }
+    }
+
+    #endregion
 }
-#endregion

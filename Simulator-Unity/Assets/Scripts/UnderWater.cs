@@ -4,7 +4,7 @@ using UnityEngine.UI;
 public class UnderWater : MonoBehaviour
 {
     // This script enables underwater effects. Attach to main camera.
-    // Last modified by Mario Migliacio on 2/18/2016.
+    // Last modified by Mario Migliacio on 3/6/2016.
 
     #region Field variables
     /// <summary>
@@ -15,6 +15,7 @@ public class UnderWater : MonoBehaviour
     /// lightControl: a boolean control that would be utilized if plans for lighting ever come to light.... (sorry).
     /// old/new __ Green/Blue/Alpha: these values are tracked through the GUI event system and Update method to maintain the fogColor.
     /// Slider objects represent the slider bars on the GUI for fogDensity, blueColor, and greenColor.
+    /// Text objects represent the TextBox UI objects, these are found directly under the Sliders on the current GUI layout.
     /// </summary>
     public float underwaterLevel = 16;
 
@@ -25,6 +26,7 @@ public class UnderWater : MonoBehaviour
     private Material noSkybox;
     private bool lightControl;
     public Slider fogSlider, blueSlider, greenSlider;
+    public Text fogText, blueText, greenText;
 
     // relating to colors.
     private float oldBlue, oldGreen;
@@ -46,9 +48,14 @@ public class UnderWater : MonoBehaviour
         newGreen = 0.4f; newBlue = 0.7f;
         //Set the background color
         GetComponent<Camera>().backgroundColor = new Color(0, oldGreen, oldBlue, 0);
+
+        // connect the unity engine GUI components!
         fogSlider = fogSlider.GetComponent<Slider>();
         blueSlider = blueSlider.GetComponent<Slider>();
         greenSlider = greenSlider.GetComponent<Slider>();
+        fogText = fogText.GetComponent<Text>();
+        blueText = blueText.GetComponent<Text>();
+        greenText = greenText.GetComponent<Text>();
     }
 
     #endregion
@@ -95,6 +102,7 @@ public class UnderWater : MonoBehaviour
     {
         // with the changes to the FogDensity property in place, make a call to update.
         fogDensity = fogValue;
+        fogText.text = fogValue.ToString();
 
         Update();
     }
@@ -109,6 +117,7 @@ public class UnderWater : MonoBehaviour
         // the old colors are constantly being modified through the event system, these color changes are not seen 
         // until the new___ colors are set to these modified values. As Update() calls for the new___ colors.
         oldBlue = blueValue;
+        blueText.text = oldBlue.ToString();
     }
 
     /// <summary>
@@ -121,6 +130,7 @@ public class UnderWater : MonoBehaviour
         // the old colors are constantly being modified through the event system, these color changes are not seen 
         // until the new___ colors are set to these modified values. As Update() calls for the new___ colors.
         oldGreen = greenValue;
+        greenText.text = oldGreen.ToString();
     }
 
     /// <summary>
@@ -134,6 +144,9 @@ public class UnderWater : MonoBehaviour
         newBlue = oldBlue;
         newGreen = oldGreen;
 
+        blueText.text = newBlue.ToString();
+        greenText.text = newGreen.ToString();
+
         Update();
     }
 
@@ -144,32 +157,56 @@ public class UnderWater : MonoBehaviour
     public void Preset1Click()
     {
         fogDensity = fogSlider.value = 0.15f;
+        fogText.text = fogDensity.ToString();
+
         newBlue = blueSlider.value = 0.5f;
+        blueText.text = newBlue.ToString();
+
         newGreen = greenSlider.value = 0.45f;
+        greenText.text = newGreen.ToString();
+
         Update();
     }
     
     public void Preset2Click()
     {
         fogDensity = fogSlider.value = 0.3321429f;
+        fogText.text = fogDensity.ToString();
+
         newBlue = blueSlider.value = 1.8f;
+        blueText.text = newBlue.ToString();
+
         newGreen = greenSlider.value = 0.6785714f;
+        greenText.text = newGreen.ToString();
+
         Update();
     }
 
     public void Preset3Click()
     {
         fogDensity = fogSlider.value = 0.4839286f;
+        fogText.text = fogDensity.ToString();
+
         newBlue = blueSlider.value = 1.357143f;
+        blueText.text = newBlue.ToString();
+
         newGreen = greenSlider.value = 0.2642857f;
+        greenText.text = newGreen.ToString();
+
         Update();
     }
 
     public void Preset4Click()
     {
         fogDensity = fogSlider.value = 1.0f;
+        fogText.text = fogDensity.ToString();
+
         newBlue = blueSlider.value = 0.2f;
+        blueText.text = newBlue.ToString();
+
         newGreen = greenSlider.value = 0.08571429f;
+        greenText.text = newGreen.ToString();
+
         Update();
     }
 
