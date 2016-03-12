@@ -4,6 +4,7 @@ using System.Collections;
 public class GlobalManager {
     private static GlobalManager _instance; 
     public bool enableConnection = true;
+<<<<<<< HEAD
     public string _brokerIP;
     private GlobalSettingGUI _ui;
     public string BrokerIP
@@ -26,6 +27,8 @@ public class GlobalManager {
             ss.InitCommunicator();
         }
     }
+=======
+>>>>>>> sub_rework
 
 	public static GlobalManager Instance
 	{
