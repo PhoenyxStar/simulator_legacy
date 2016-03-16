@@ -5,42 +5,52 @@ using System.Collections.Generic;
 using Newtonsoft.Json.Linq;
 using System.IO;
 
+// TODO: Correct spelling. Buoyancy not bouyancy.
+
 public class SubPhysics : MonoBehaviour {
     Rigidbody rb;
-    Rigidbody rt;
-    Rigidbody ft;
-    Rigidbody tt;
-    Rigidbody bt;
-    Rigidbody pt;
-    Rigidbody st;
+
     float port = 0f;
     float star = 0f;
     float front = 0f;
     float back = 0f;
     float top = 0f;
     float bot = 0f;
-    [SerializeField]
-    float MaxMotorThrust;
+
     [SerializeField]
     float MaxThrusterInput;
     [SerializeField]
-    float SubMass;
-    //[SerializeField]
-    //Vector3 CenterOfMass;
-    [SerializeField]
     float Drag;
-    //[SerializeField]
-    int[] ThrusterReversals = {1, 1, 1, 1, 1, -1}; // xa, xb, ya, yb, za, zb
-    //[SerializeField]
-    Vector3 CenterOfBouyancy;
+    [SerializeField]
+    float AngularDrag;
     [SerializeField]
     bool ThrustersOn;
     [SerializeField]
     bool BouyancyOn;
     [SerializeField]
     bool GravityOn;
+
+    float SubMass;
+    float MaxMotorThrust;
+
+    Vector3 CenterOfBouyancy;
     float COEF = 0.0f;
     string Joystick;
+    public JObject settings;
+
+    Vector3 rt_pos_rel;
+    Vector3 ft_pos_rel;
+    Vector3 pt_pos_rel;
+    Vector3 st_pos_rel;
+    Vector3 tt_pos_rel;
+    Vector3 bt_pos_rel;
+
+    Vector3 rt_orient_rel;
+    Vector3 ft_orient_rel;
+    Vector3 pt_orient_rel;
+    Vector3 st_orient_rel;
+    Vector3 tt_orient_rel;
+    Vector3 bt_orient_rel;
 
     Communicator comm;
 
@@ -49,31 +59,35 @@ public class SubPhysics : MonoBehaviour {
 		GameObject body = GameObject.Find ("SubCenter");
 		rb = GetComponent<Rigidbody> ();
 
-		rt = GameObject.Find ("RT").GetComponent<Rigidbody> ();
-		ft = GameObject.Find ("FT").GetComponent<Rigidbody> ();
-		tt = GameObject.Find ("TT").GetComponent<Rigidbody> ();
-		bt = GameObject.Find ("BT").GetComponent<Rigidbody> ();
-		pt = GameObject.Find ("PT").GetComponent<Rigidbody> ();
-		st = GameObject.Find ("ST").GetComponent<Rigidbody> ();
-
         CenterOfBouyancy = rb.centerOfMass;
         CenterOfBouyancy.y += 0.1f;
 
 		rb.drag = Drag;
-		rb.angularDrag = Drag;
+		rb.angularDrag = AngularDrag;
 
         Physics.gravity = new Vector3(0,0,0);
 
 		rb.SetDensity (1.0f);
         //rb.useGravity = true;
-        rb.mass = SubMass;
-
-        COEF = MaxMotorThrust / MaxThrusterInput;
 
 		if (GlobalManager.Instance.enableConnection) {
 			comm = new Communicator ();
 			comm.Initialize ("thruster");
 		}
+
+        // load settings file
+        string path = "../../robosub/settings/modules/control.json";
+        if(!File.Exists(path))
+        {
+            path = "Assets/settings/modules/control.json";
+        }
+        string jsonString = File.ReadAllText(path);
+        settings = JObject.Parse(jsonString);
+
+        GetSettings();
+
+        rb.mass = SubMass;
+        COEF = MaxMotorThrust / MaxThrusterInput;
 
         LoggingSystem.log.Info("Starting SubPhysics");
     }
@@ -95,46 +109,32 @@ public class SubPhysics : MonoBehaviour {
             List<string> received;
 
             received = comm.receive_messages ();
-            //foreach (string x in received) {
-            //LoggingSystem.log.Info (x);
-            //}
             if (received.Count > 0) {
                 for (int i = 0; i < received.Count; ++i) {
                     // send every thruster packet received
                     message parsed_msg = new message (received [i]);
                     if (parsed_msg.mtype == "thruster") {
                         tp = new thruster_packet (parsed_msg.value);
-                        port = (float)tp.za;
-                        star = (float)tp.zb;
+                        port = (float)tp.ya;
+                        star = (float)tp.yb;
                         front = (float)tp.xa;
                         back = (float)tp.xb;
-                        top = (float)tp.ya;
-                        bot = (float)tp.yb;
-                        port *= ThrusterReversals[4]; // za
-                        star *= ThrusterReversals[5]; // za
-                        front *= ThrusterReversals[0]; // xa
-                        back *= ThrusterReversals[1]; // xa
-                        top *= ThrusterReversals[2]; // ya
-                        bot *= ThrusterReversals[3]; // yb
+                        top = (float)tp.za;
+                        bot = (float)tp.zb;
                     }
                 }
             }
         }
 
-        Vector3 rt_pos = new Vector3(0, 0, (float)-0.4);
-        Vector3 ft_pos = new Vector3(0, 0, (float)0.3);
-        Vector3 pt_pos = new Vector3((float)-0.2, 0, 0);
-        Vector3 st_pos = new Vector3((float)0.2, 0, 0);
-        Vector3 tt_pos = new Vector3(0, (float)0.2, 0);
-        Vector3 bt_pos = new Vector3(0, (float)-0.2, 0);
+        // Rotate base thruster positions according to current sub orientation
+        Vector3 rt_pos = rb.transform.localRotation * rt_pos_rel;
+        Vector3 ft_pos = rb.transform.localRotation * ft_pos_rel;
+        Vector3 pt_pos = rb.transform.localRotation * pt_pos_rel;
+        Vector3 st_pos = rb.transform.localRotation * st_pos_rel;
+        Vector3 tt_pos = rb.transform.localRotation * tt_pos_rel;
+        Vector3 bt_pos = rb.transform.localRotation * bt_pos_rel;
 
-        rt_pos = rb.transform.localRotation * rt_pos;
-        ft_pos = rb.transform.localRotation * ft_pos;
-        pt_pos = rb.transform.localRotation * pt_pos;
-        st_pos = rb.transform.localRotation * st_pos;
-        tt_pos = rb.transform.localRotation * tt_pos;
-        bt_pos = rb.transform.localRotation * bt_pos;
-
+        // Transform rotated thruster postions into world thruster positions
         Vector3 rt_pos_world = rb.transform.position + rt_pos;
         Vector3 ft_pos_world = rb.transform.position + ft_pos;
         Vector3 pt_pos_world = rb.transform.position + pt_pos;
@@ -142,13 +142,15 @@ public class SubPhysics : MonoBehaviour {
         Vector3 tt_pos_world = rb.transform.position + tt_pos;
         Vector3 bt_pos_world = rb.transform.position + bt_pos;
 
-        Vector3 rt_force = new Vector3((float)(1.0*back*COEF), 0, 0);
-        Vector3 ft_force = new Vector3((float)(1.0*front*COEF), 0, 0);
-        Vector3 pt_force = new Vector3(0, (float)(1.0*port*COEF), 0);
-        Vector3 st_force = new Vector3(0, (float)(1.0*star*COEF), 0);
-        Vector3 tt_force = new Vector3(0, 0, (float)(1.0*top*COEF));
-        Vector3 bt_force = new Vector3(0, 0, (float)(1.0*bot*COEF));
+        // Calculate force vector for each thruster based on orientation in settings file
+        Vector3 rt_force = rt_orient_rel * back * COEF;
+        Vector3 ft_force = ft_orient_rel * front * COEF;
+        Vector3 pt_force = pt_orient_rel * port * COEF;
+        Vector3 st_force = st_orient_rel * star * COEF;
+        Vector3 tt_force = tt_orient_rel * top * COEF;
+        Vector3 bt_force = bt_orient_rel * bot * COEF;
 
+        // Rotate force vector according to current sub orientation
         rt_force = rb.transform.localRotation * rt_force;
         ft_force = rb.transform.localRotation * ft_force;
         pt_force = rb.transform.localRotation * pt_force;
@@ -156,6 +158,7 @@ public class SubPhysics : MonoBehaviour {
         tt_force = rb.transform.localRotation * tt_force;
         bt_force = rb.transform.localRotation * bt_force;
 
+        // Make thrusters go
         rb.AddForceAtPosition(rt_force, rt_pos_world);
         rb.AddForceAtPosition(ft_force, ft_pos_world);
         rb.AddForceAtPosition(pt_force, pt_pos_world);
@@ -170,6 +173,7 @@ public class SubPhysics : MonoBehaviour {
         float ForceOfBouyancy = 1.0f;
         Vector3 force = new Vector3(0, 0, 0);
 
+        // Calculate force of bouyancy
         if(depth < 0.0f) 
         {
             force = Vector3.up * (9.8f + ForceOfBouyancy) * rb.mass;
@@ -180,16 +184,18 @@ public class SubPhysics : MonoBehaviour {
             force = (depth) * (Vector3.up * (9.8f + ForceOfBouyancy) * rb.mass);
         }
 
+        // Transform relative Center of Bouyancy to world
         Vector3 COB_World = rb.transform.localRotation * CenterOfBouyancy;
         COB_World += rb.transform.position;
 
+        // Add bouyancy
         rb.AddForceAtPosition(force, COB_World);
     }
 
     void UpdateGravity()
     {
-        // Not sure why but setting global physics to 0 and then
-        // just emulating physics on the sub looks and acts much
+        // Not sure why but setting global gravity to 0 and then
+        // just emulating gravity on the sub looks and acts much
         // better.
         rb.AddForce(new Vector3(0, -9.8f * rb.mass, 0));
     }
@@ -202,5 +208,66 @@ public class SubPhysics : MonoBehaviour {
         float subCenter = rb.position.y;
 
         return subCenter - waterTop;
+    }
+
+    void GetSettings()
+    {
+        rt_pos_rel = SubToUnity(new Vector3(
+                    (float)settings["thrusters"]["back"]["position"]["x"], 
+                    (float)settings["thrusters"]["back"]["position"]["y"], 
+                    (float)settings["thrusters"]["back"]["position"]["z"]));
+        ft_pos_rel = SubToUnity(new Vector3(
+                    (float)settings["thrusters"]["front"]["position"]["x"], 
+                    (float)settings["thrusters"]["front"]["position"]["y"], 
+                    (float)settings["thrusters"]["front"]["position"]["z"]));
+        pt_pos_rel = SubToUnity(new Vector3(
+                    (float)settings["thrusters"]["left"]["position"]["x"], 
+                    (float)settings["thrusters"]["left"]["position"]["y"], 
+                    (float)settings["thrusters"]["left"]["position"]["z"]));
+        st_pos_rel = SubToUnity(new Vector3(
+                    (float)settings["thrusters"]["right"]["position"]["x"], 
+                    (float)settings["thrusters"]["right"]["position"]["y"], 
+                    (float)settings["thrusters"]["right"]["position"]["z"]));
+        tt_pos_rel = SubToUnity(new Vector3(
+                    (float)settings["thrusters"]["top"]["position"]["x"], 
+                    (float)settings["thrusters"]["top"]["position"]["y"], 
+                    (float)settings["thrusters"]["top"]["position"]["z"]));
+        bt_pos_rel = SubToUnity(new Vector3(
+                    (float)settings["thrusters"]["bottom"]["position"]["x"], 
+                    (float)settings["thrusters"]["bottom"]["position"]["y"], 
+                    (float)settings["thrusters"]["bottom"]["position"]["z"]));
+
+        rt_orient_rel = SubToUnity(new Vector3(
+                    (float)settings["thrusters"]["back"]["orientation"]["x"], 
+                    (float)settings["thrusters"]["back"]["orientation"]["y"], 
+                    (float)settings["thrusters"]["back"]["orientation"]["z"]));
+        ft_orient_rel = SubToUnity(new Vector3(
+                    (float)settings["thrusters"]["front"]["orientation"]["x"], 
+                    (float)settings["thrusters"]["front"]["orientation"]["y"], 
+                    (float)settings["thrusters"]["front"]["orientation"]["z"]));
+        pt_orient_rel = SubToUnity(new Vector3(
+                    (float)settings["thrusters"]["left"]["orientation"]["x"], 
+                    (float)settings["thrusters"]["left"]["orientation"]["y"], 
+                    (float)settings["thrusters"]["left"]["orientation"]["z"]));
+        st_orient_rel = SubToUnity(new Vector3(
+                    (float)settings["thrusters"]["right"]["orientation"]["x"], 
+                    (float)settings["thrusters"]["right"]["orientation"]["y"], 
+                    (float)settings["thrusters"]["right"]["orientation"]["z"]));
+        tt_orient_rel = SubToUnity(new Vector3(
+                    (float)settings["thrusters"]["top"]["orientation"]["x"], 
+                    (float)settings["thrusters"]["top"]["orientation"]["y"], 
+                    (float)settings["thrusters"]["top"]["orientation"]["z"]));
+        bt_orient_rel = SubToUnity(new Vector3(
+                    (float)settings["thrusters"]["bottom"]["orientation"]["x"], 
+                    (float)settings["thrusters"]["bottom"]["orientation"]["y"], 
+                    (float)settings["thrusters"]["bottom"]["orientation"]["z"]));
+
+        SubMass = (float)settings["mass"];
+        MaxMotorThrust = (float)settings["max_thrust"];
+    }
+
+    Vector3 SubToUnity(Vector3 vec)
+    {
+        return new Vector3(-vec.y, vec.z, vec.x);
     }
 }
