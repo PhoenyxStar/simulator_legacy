@@ -220,7 +220,11 @@ public class Communicator
         // clear it first(disconnect the formel connection)
         OnDestroy();
         // load settings file
-        string path = "Assets/settings/modules/broker.json";
+        string path = "../../robosub/settings/modules/broker.json";
+        if(!File.Exists(path))
+        {
+            path = "Assets/settings/modules/broker.json";
+        }
         string jsonString = File.ReadAllText(path);
         settings = JObject.Parse(jsonString);
 

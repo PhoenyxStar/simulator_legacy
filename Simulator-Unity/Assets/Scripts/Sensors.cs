@@ -1,10 +1,15 @@
 ﻿using UnityEngine;
 using System.Collections;
 
+// NOTE: 
+// Pitch Range: -90 - 90
+// Roll Range: -180 - 180
+// Yaw Range: -180 - 180
+
 public class Sensors : MonoBehaviour
 {
-
     private GameObject Sub;
+    private Rigidbody rb;
 
     private Vector3 velocity;
     private Vector3 lastVelocity;
@@ -12,6 +17,9 @@ public class Sensors : MonoBehaviour
     private Vector3 acceleration;
     private Vector3 magneticField;
     private Vector3 angularVelocity;
+    private float _Yaw;
+    private float _Pitch;
+    private float _Roll;
 
     Communicator communicator; 
     private string[] messageRecipients;
@@ -56,7 +64,8 @@ public class Sensors : MonoBehaviour
     // Use this for initialization
     void Start()
     {
-        Sub = GameObject.Find("SubBody");
+        Sub = GameObject.Find("SubCenter");
+		rb = Sub.GetComponent<Rigidbody>();
 
         velocity = new Vector3(0, 0, 0);
         lastVelocity = new Vector3(0, 0, 0);
@@ -64,17 +73,13 @@ public class Sensors : MonoBehaviour
         acceleration = new Vector3(0, 0, 0);
         magneticField = new Vector3(0, 0, 0);
         angularVelocity = new Vector3(0, 0, 0);
-
-		//if (GlobalManager.Instance.enableConnection) {
-  //          InitCommnicator();
-  //      }
     }
 
     public void InitCommunicator()
     {
         communicator = new Communicator();
         communicator.Initialize("sensor");
-        messageRecipients = new string[] { "control" };
+        messageRecipients = new string[] { "control", "ai", "control_gui" };
     }
 
     // Update is called once per frame
@@ -85,6 +90,7 @@ public class Sensors : MonoBehaviour
 		UpdateAcceleration ();
 		UpdateMagneticField ();
 		UpdateAngularVelocity ();
+        UpdateYPR();
 		if (GlobalManager.Instance.enableConnection) {
             // communicator is disabled at the beginning and enabled after running
             if (communicator == null)
@@ -100,7 +106,6 @@ public class Sensors : MonoBehaviour
         GameObject water = GameObject.Find("WaterTop");
 		Rigidbody rb = GetComponent<Rigidbody>();
 
-        // TODO: Figure out how Unity water works. Is this correct for its top? 
         double waterTop = ((Transform)water.GetComponent("Transform")).position.y;
         double subCenter = rb.position.y;
 
@@ -201,13 +206,13 @@ public class Sensors : MonoBehaviour
 
     public void SendSensorMessage()
     {
-        GameObject body = GameObject.Find("SubBody");
+        GameObject body = GameObject.Find("SubCenter");
 		Rigidbody rb = GetComponent<Rigidbody>();
 		Quaternion orientation = rb.rotation;
 		Vector3 yrp = orientation.eulerAngles;
 
         // "dt" is time since last message
-		sensor_packet sensorPacket = new sensor_packet((int)yrp.x, (int)yrp.z, (int)yrp.y,
+		sensor_packet sensorPacket = new sensor_packet((int)this.Yaw, (int)this.Pitch, (int)this.Roll,
             (float)Depth, (float)GetBatteryOutput(), true, Time.unscaledDeltaTime);
 
         // Send a sensorPacket to each recipient
@@ -217,4 +222,60 @@ public class Sensors : MonoBehaviour
             communicator.send_message(msg);
         }
     }
+
+    public void UpdateYPR()
+    {
+        Vector3 sub_forward = rb.transform.forward;
+        Vector3 sub_right = rb.transform.right;
+
+        Vector3 vec = new Vector3();
+
+        // Yaw is angle around global y (vertical) axis
+        float yaw = Mathf.Atan2(sub_forward.x, sub_forward.z);
+
+        // Yaw subs forward vector back to 0 yaw so that it can be put into atan2 for pitch
+        vec.x =  sub_forward.x*Mathf.Cos(-yaw) + sub_forward.z*Mathf.Sin(-yaw);
+        vec.y =  sub_forward.y;
+        vec.z = -sub_forward.x*Mathf.Sin(-yaw) + sub_forward.z*Mathf.Cos(-yaw);
+
+        // Pitch is angle around subs x (right) axis
+        float pitch = Mathf.Atan2(vec.y, vec.z);
+
+        // Yaw subs right vector so that it can be put into atan2 for roll
+        vec.x =  sub_right.x*Mathf.Cos(-yaw) + sub_right.z*Mathf.Sin(-yaw);
+        vec.y =  sub_right.y;
+        vec.z = -sub_right.x*Mathf.Sin(-yaw) + sub_right.z*Mathf.Cos(-yaw);
+
+        // Roll is angle around subs z (forward) axis
+        float roll = Mathf.Atan2(vec.y, vec.x);
+
+        _Yaw = ToDegrees(yaw);
+        _Pitch = ToDegrees(pitch);
+        _Roll = -ToDegrees(roll);
+
+        // Convert from 0 - 360 -> -180 - 180
+        if(_Yaw > 180.0f)
+            _Yaw = 180.0f - _Yaw;
+
+        // If angle is small enough just set it to 0.0
+        _Yaw = (Mathf.Abs(_Yaw) < 0.1f) ? 0.0f : _Yaw;
+        _Pitch = (Mathf.Abs(_Pitch) < 0.1f) ? 0.0f : _Pitch;
+        _Roll = (Mathf.Abs(_Roll) < 0.1f) ? 0.0f : _Roll;
+    }
+
+    // Helpful for debugging orientation calculations
+    public void DisplayVector(Vector3 vec, Color c)
+    {
+        Debug.DrawLine(rb.transform.position, rb.transform.position + vec, c);
+    }
+
+    public float ToRadians(float theta) { return Mathf.Deg2Rad * theta; }
+
+    public float ToDegrees(float theta) { return Mathf.Rad2Deg * theta; }
+
+    public float Yaw { get { return _Yaw; } }
+
+    public float Pitch { get { return _Pitch; } }
+
+    public float Roll { get { return _Roll; } }
 }
