@@ -11,15 +11,19 @@ using System.Text.RegularExpressions;
 
 public class sensor_packet
 {
-	public int pitch;
-	public int roll;
-	public int yaw;
-	public float depth;
-	public float battery;
-	public bool start_switch;
-	public double dt;
+    public double pitch;
+    public double roll;
+    public double yaw;
+    public double depth;
+    public double battery;
+    public int start_switch;
+    public double dt;
+    public double dpitch;
+    public double droll;
+    public double dyaw;
+    public double ddepth;
 
-	public string JSON = "{\"pitch\":0, \"roll\":0, \"yaw\":0, \"depth\":0, \"battery\":0, \"start_switch\":false, \"dt\":0}";
+    public string JSON = "{ \"pitch\": 0,  \"roll\": 0,  \"yaw\":  0,  \"depth\": 0,  \"battery\": 0, \"start_switch\": 0, \"dt\": 0, \"dpitch\": 0,  \"droll\": 0,  \"dyaw\":  0,  \"ddepth\": 0 }";
     public string whole;
 
     public sensor_packet(string raw)
@@ -27,13 +31,17 @@ public class sensor_packet
         JObject d = JObject.Parse(raw);
         try
         {
-            pitch = (int)d["pitch"];
-            roll = (int)d["roll"];
-            yaw = (int)d["yaw"];
-            depth = (float)d["depth"];
-            battery = (float)d["battery"];
-            start_switch = (bool)d["start_switch"];
+            pitch = (double)d["pitch"];
+            roll = (double)d["roll"];
+            yaw = (double)d["yaw"];
+            depth = (double)d["depth"];
+            battery = (double)d["battery"];
+            start_switch = (int)d["start_switch"];
             dt = (double)d["dt"];
+            dpitch = (double)d["dpitch"];
+            droll = (double)d["droll"];
+            dyaw = (double)d["dyaw"];
+            ddepth = (double)d["ddepth"];
             whole = raw;
 
         }
@@ -45,7 +53,7 @@ public class sensor_packet
 
     }
 
-    public sensor_packet(int pitch, int roll, int yaw, float depth, float battery, bool start_switch, double dt)
+    public sensor_packet(double pitch, double roll, double yaw, double depth, double battery, int start_switch, double dt, double dpitch=0.0, double droll=0.0, double dyaw=0.0, double ddepth=0.0)
     {
         this.pitch = pitch;
         this.roll = roll;
@@ -54,6 +62,11 @@ public class sensor_packet
         this.battery = battery;
         this.start_switch = start_switch;
         this.dt = dt;
+        this.dpitch = dpitch;
+        this.droll = droll;
+        this.dyaw = dyaw;
+        this.ddepth = ddepth;
+
         setupJSON();
 
     }
@@ -69,7 +82,11 @@ public class sensor_packet
         d["battery"] = battery;
         d["start_switch"] = start_switch;
         d["dt"] = dt;
-		whole = d.ToString(Formatting.None);
+        d["dpitch"] = dpitch;
+        d["droll"] = droll;
+        d["dyaw"] = dyaw;
+        d["ddepth"] = ddepth;
+        whole = d.ToString(Formatting.None);
     }
 }
 
@@ -80,12 +97,12 @@ public class thruster_packet
         JObject d = JObject.Parse(raw);
         try
         {
-			xa = (double)d["xa"];
-			xb = (double)d["xb"];
-			ya = (double)d["ya"];
-			yb = (double)d["yb"];
-			za = (double)d["za"];
-			zb = (double)d["zb"];
+            xa = (double)d["xa"];
+            xb = (double)d["xb"];
+            ya = (double)d["ya"];
+            yb = (double)d["yb"];
+            za = (double)d["za"];
+            zb = (double)d["zb"];
             whole = d.ToString();
 
         }
@@ -95,7 +112,7 @@ public class thruster_packet
             return;
         }
     }
-	public thruster_packet(double xa, double xb, double ya, double yb, double za, double zb)
+    public thruster_packet(double xa, double xb, double ya, double yb, double za, double zb)
     {
         this.xa = xa;
         this.xb = xb;
@@ -107,11 +124,11 @@ public class thruster_packet
     }
     string JSON = "{ \"xa\": \"\", \"xb\": \"\", \"ya\": \"\", \"yb\": \"\", \"za\": \"\", \"zb\": \"\"}";
     public double xa;
-	public double xb;
-	public double ya;
-	public double yb;
-	public double za;
-	public double zb;
+    public double xb;
+    public double ya;
+    public double yb;
+    public double za;
+    public double zb;
     public string whole;
     
     void setupJSON()
@@ -133,10 +150,10 @@ public class message
 {
     public string JSON = "{\"sender\": \"\", \"recipient\": \"\",\"mtype\": \"\", \"value\": \"\"}";
     public string sender;
-	public string recipient;
+    public string recipient;
     public string whole;
     public string mtype;
-	public string value;
+    public string value;
 
     public message(string raw)
     {
@@ -149,9 +166,9 @@ public class message
             value = (string)d["value"];
             mtype = (string)d["mtype"];
             whole = raw;
-//			whole = whole.Replace(@"\", @"");
-//			whole = whole.Replace(@"""{", @"{");
-//			whole = whole.Replace(@"}""", @"}");
+//          whole = whole.Replace(@"\", @"");
+//          whole = whole.Replace(@"""{", @"{");
+//          whole = whole.Replace(@"}""", @"}");
         }
         catch (Exception e)
         {
@@ -174,7 +191,7 @@ public class message
         d["recipient"] = recipient;
         d["mtype"] = mtype;
         d["value"] = value;
-		whole = d.ToString(Formatting.None);
+        whole = d.ToString(Formatting.None);
     }
 
 };
@@ -326,12 +343,13 @@ public class Communicator
         float[] ypr = { UnityEngine.Random.Range(0.0f, 100.0f), UnityEngine.Random.Range(0.0f, 100.0f), UnityEngine.Random.Range(0.0f, 100.0f) };
         //s->getYPR(ypr);
         return send_message(new message("sensor", recipient, "sensor",
-                          new sensor_packet((int)(ypr[0]),
-                          (int)(ypr[1]),
-                          (int)(ypr[2]),
-                          (float)Math.Ceiling(UnityEngine.Random.Range(0.0f, 50.0f)/*s->getDepth(), 2*/),
-                          (float)Math.Ceiling(UnityEngine.Random.Range(1.0f, 100.0f)/*s->getBattery(), 2*/),
-                          true/*s->getStart()*/, UnityEngine.Random.Range(0.0f, 2.0f)/*s->getDT()*/).whole).whole);
+                          new sensor_packet((double)(ypr[0]),
+                          (double)(ypr[1]),
+                          (double)(ypr[2]),
+                          (double)Math.Ceiling(UnityEngine.Random.Range(0.0f, 50.0f)/*s->getDepth(), 2*/),
+                          (double)Math.Ceiling(UnityEngine.Random.Range(1.0f, 100.0f)/*s->getBattery(), 2*/),
+                          0/*s->getStart()*/, UnityEngine.Random.Range(0.0f, 2.0f),/*s->getDT()*/
+                          0.0, 0.0, 0.0, 0.0).whole).whole);
     }
     //private bool sendSensorPacket(string recipient)
     //{

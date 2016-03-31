@@ -212,8 +212,8 @@ public class Sensors : MonoBehaviour
 		Vector3 yrp = orientation.eulerAngles;
 
         // "dt" is time since last message
-		sensor_packet sensorPacket = new sensor_packet((int)this.Yaw, (int)this.Pitch, (int)this.Roll,
-            (float)Depth, (float)GetBatteryOutput(), true, Time.unscaledDeltaTime);
+		sensor_packet sensorPacket = new sensor_packet((double)this.Yaw, (double)this.Pitch, (double)this.Roll,
+            (double)Depth, (double)GetBatteryOutput(), 0, Time.unscaledDeltaTime, 0.0, 0.0, 0.0, 0.0);
 
         // Send a sensorPacket to each recipient
         foreach (string recipient in messageRecipients)
