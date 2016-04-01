@@ -212,7 +212,7 @@ public class Sensors : MonoBehaviour
 		Vector3 yrp = orientation.eulerAngles;
 
         // "dt" is time since last message
-		sensor_packet sensorPacket = new sensor_packet((double)this.Yaw, (double)this.Pitch, (double)this.Roll,
+		sensor_packet sensorPacket = new sensor_packet((double)this.Pitch, (double)this.Roll, (double)this.Yaw,
             (double)Depth, (double)GetBatteryOutput(), 0, Time.unscaledDeltaTime, 0.0, 0.0, 0.0, 0.0);
 
         // Send a sensorPacket to each recipient
@@ -249,8 +249,8 @@ public class Sensors : MonoBehaviour
         // Roll is angle around subs z (forward) axis
         float roll = Mathf.Atan2(vec.y, vec.x);
 
-        _Yaw = ToDegrees(yaw);
-        _Pitch = ToDegrees(pitch);
+        _Yaw = -ToDegrees(yaw);
+        _Pitch = -ToDegrees(pitch);
         _Roll = -ToDegrees(roll);
 
         // Convert from 0 - 360 -> -180 - 180
