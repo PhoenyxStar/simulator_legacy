@@ -24,11 +24,15 @@ public class SubPhysics : MonoBehaviour {
     [SerializeField]
     float AngularDrag;
     [SerializeField]
+    float Thruster_Variance;
+    [SerializeField]
     bool ThrustersOn;
     [SerializeField]
     bool BouyancyOn;
     [SerializeField]
     bool GravityOn;
+    [SerializeField]
+    bool ThrusterDebugOn;
 
     float SubMass;
     float MaxMotorThrust;
@@ -121,13 +125,13 @@ public class SubPhysics : MonoBehaviour {
                     message parsed_msg = new message (received [i]);
                     if (parsed_msg.mtype == "thruster") {
                         tp = new thruster_packet (parsed_msg.value);
-                        port = (float)tp.ya;
-                        star = (float)tp.yb;
-                        front = (float)tp.xa;
-                        back = (float)tp.xb;
-                        top = (float)tp.za;
-                        bot = (float)tp.zb;
-                    }
+                        front = (float)tp.xa + (UnityEngine.Random.value * 2.0f - 1.0f) * Thruster_Variance;
+                        back = (float)tp.xb + (UnityEngine.Random.value * 2.0f - 1.0f) * Thruster_Variance;
+                        port = (float)tp.ya + (UnityEngine.Random.value * 2.0f - 1.0f) * Thruster_Variance;
+                        star = (float)tp.yb + (UnityEngine.Random.value * 2.0f - 1.0f) * Thruster_Variance;
+                        top = (float)tp.za + (UnityEngine.Random.value * 2.0f - 1.0f) * Thruster_Variance;
+                        bot = (float)tp.zb + (UnityEngine.Random.value * 2.0f - 1.0f) * Thruster_Variance;
+                    }                                                        
                 }
             }
         }
@@ -171,6 +175,18 @@ public class SubPhysics : MonoBehaviour {
         rb.AddForceAtPosition(st_force, st_pos_world);
         rb.AddForceAtPosition(tt_force, tt_pos_world);
         rb.AddForceAtPosition(bt_force, bt_pos_world);
+
+
+        if(ThrusterDebugOn)
+        {
+            // Draw thruster output
+            Debug.DrawLine(rt_pos_world, rt_pos_world - (rt_force * 0.1f), Color.red);
+            Debug.DrawLine(ft_pos_world, ft_pos_world - (ft_force * 0.1f), Color.red);
+            Debug.DrawLine(pt_pos_world, pt_pos_world - (pt_force * 0.1f), Color.blue);
+            Debug.DrawLine(st_pos_world, st_pos_world - (st_force * 0.1f), Color.blue);
+            Debug.DrawLine(tt_pos_world, tt_pos_world - (tt_force * 0.1f), Color.green);
+            Debug.DrawLine(bt_pos_world, bt_pos_world - (bt_force * 0.1f), Color.green);
+        }
     }
 
     void UpdateBouyancy()
