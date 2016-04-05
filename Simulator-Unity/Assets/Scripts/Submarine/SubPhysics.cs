@@ -10,12 +10,12 @@ using System.IO;
 public class SubPhysics : MonoBehaviour {
     Rigidbody rb;
 
-    float port = 0f;
-    float star = 0f;
-    float front = 0f;
-    float back = 0f;
-    float top = 0f;
-    float bot = 0f;
+    public float port = 0f;
+    public float star = 0f;
+    public float front = 0f;
+    public float back = 0f;
+    public float top = 0f;
+    public float bot = 0f;
 
     [SerializeField]
     float MaxThrusterInput;
@@ -187,6 +187,7 @@ public class SubPhysics : MonoBehaviour {
             Debug.DrawLine(tt_pos_world, tt_pos_world - (tt_force * 0.1f), Color.green);
             Debug.DrawLine(bt_pos_world, bt_pos_world - (bt_force * 0.1f), Color.green);
         }
+
     }
 
     void UpdateBouyancy()
