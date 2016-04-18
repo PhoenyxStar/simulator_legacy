@@ -35,12 +35,13 @@ public class SubPhysics : MonoBehaviour {
     bool ThrusterDebugOn;
 
     float SubMass;
-    float MaxMotorThrust;
+    float MaxMotorForce;
 
     Vector3 CenterOfBouyancy;
     float COEF = 0.0f;
     string Joystick;
     public JObject settings;
+
 
     Vector3 rt_pos_rel;
     Vector3 ft_pos_rel;
@@ -55,6 +56,13 @@ public class SubPhysics : MonoBehaviour {
     Vector3 st_orient_rel;
     Vector3 tt_orient_rel;
     Vector3 bt_orient_rel;
+
+    Thruster rear_thruster;
+    Thruster front_thruster;
+    Thruster port_thruster;
+    Thruster star_thruster;
+    Thruster top_thruster;
+    Thruster bot_thruster;
 
     Communicator comm;
 
@@ -90,8 +98,15 @@ public class SubPhysics : MonoBehaviour {
 
         GetSettings();
 
+        rear_thruster = new Thruster("rear", rt_pos_rel, rt_orient_rel, MaxThrusterInput, MaxMotorForce);
+        front_thruster = new Thruster("front", ft_pos_rel, ft_orient_rel, MaxThrusterInput, MaxMotorForce);
+        port_thruster = new Thruster("port", pt_pos_rel, pt_orient_rel, MaxThrusterInput, MaxMotorForce);
+        star_thruster = new Thruster("star", st_pos_rel, st_orient_rel, MaxThrusterInput, MaxMotorForce);
+        top_thruster = new Thruster("top", tt_pos_rel, tt_orient_rel, MaxThrusterInput, MaxMotorForce);
+        bot_thruster = new Thruster("bot", bt_pos_rel, bt_orient_rel, MaxThrusterInput, MaxMotorForce);
+
         rb.mass = SubMass;
-        COEF = MaxMotorThrust / MaxThrusterInput;
+        COEF = MaxMotorForce / MaxThrusterInput;
 
         LoggingSystem.log.Info("Starting SubPhysics");
     }
@@ -103,7 +118,7 @@ public class SubPhysics : MonoBehaviour {
     }
 
     // Update is called once per frame
-    void Update () {
+    void FixedUpdate () {
         if(ThrustersOn)
             UpdateThrusters();
         if(BouyancyOn)
@@ -125,69 +140,49 @@ public class SubPhysics : MonoBehaviour {
                     message parsed_msg = new message (received [i]);
                     if (parsed_msg.mtype == "thruster") {
                         tp = new thruster_packet (parsed_msg.value);
-                        front = (float)tp.xa + (UnityEngine.Random.value * 2.0f - 1.0f) * Thruster_Variance;
-                        back = (float)tp.xb + (UnityEngine.Random.value * 2.0f - 1.0f) * Thruster_Variance;
-                        port = (float)tp.ya + (UnityEngine.Random.value * 2.0f - 1.0f) * Thruster_Variance;
-                        star = (float)tp.yb + (UnityEngine.Random.value * 2.0f - 1.0f) * Thruster_Variance;
-                        top = (float)tp.za + (UnityEngine.Random.value * 2.0f - 1.0f) * Thruster_Variance;
-                        bot = (float)tp.zb + (UnityEngine.Random.value * 2.0f - 1.0f) * Thruster_Variance;
+                        front = (float)tp.xa;
+                        back = (float)tp.xb;
+                        port = (float)tp.ya;
+                        star = (float)tp.yb;
+                        top = (float)tp.za;
+                        bot = (float)tp.zb;
+
+                        rear_thruster.SetThrusterPower(back);
+                        front_thruster.SetThrusterPower(front);
+                        port_thruster.SetThrusterPower(port);
+                        star_thruster.SetThrusterPower(star);
+                        top_thruster.SetThrusterPower(top);
+                        bot_thruster.SetThrusterPower(bot);
                     }                                                        
                 }
             }
         }
 
-        // Rotate base thruster positions according to current sub orientation
-        Vector3 rt_pos = rb.transform.localRotation * rt_pos_rel;
-        Vector3 ft_pos = rb.transform.localRotation * ft_pos_rel;
-        Vector3 pt_pos = rb.transform.localRotation * pt_pos_rel;
-        Vector3 st_pos = rb.transform.localRotation * st_pos_rel;
-        Vector3 tt_pos = rb.transform.localRotation * tt_pos_rel;
-        Vector3 bt_pos = rb.transform.localRotation * bt_pos_rel;
+        // TODO: Change dt
+        rear_thruster.Update(rb.transform.position, rb.transform.localRotation, 0.02f);
+        front_thruster.Update(rb.transform.position, rb.transform.localRotation, 0.02f);
+        port_thruster.Update(rb.transform.position, rb.transform.localRotation, 0.02f);
+        star_thruster.Update(rb.transform.position, rb.transform.localRotation, 0.02f);
+        top_thruster.Update(rb.transform.position, rb.transform.localRotation, 0.02f);
+        bot_thruster.Update(rb.transform.position, rb.transform.localRotation, 0.02f);
 
-        // Transform rotated thruster postions into world thruster positions
-        Vector3 rt_pos_world = rb.transform.position + rt_pos;
-        Vector3 ft_pos_world = rb.transform.position + ft_pos;
-        Vector3 pt_pos_world = rb.transform.position + pt_pos;
-        Vector3 st_pos_world = rb.transform.position + st_pos;
-        Vector3 tt_pos_world = rb.transform.position + tt_pos;
-        Vector3 bt_pos_world = rb.transform.position + bt_pos;
-
-        // Calculate force vector for each thruster based on orientation in settings file
-        Vector3 rt_force = rt_orient_rel * back * COEF;
-        Vector3 ft_force = ft_orient_rel * front * COEF;
-        Vector3 pt_force = pt_orient_rel * port * COEF;
-        Vector3 st_force = st_orient_rel * star * COEF;
-        Vector3 tt_force = tt_orient_rel * top * COEF;
-        Vector3 bt_force = bt_orient_rel * bot * COEF;
-
-        // Rotate force vector according to current sub orientation
-        rt_force = rb.transform.localRotation * rt_force;
-        ft_force = rb.transform.localRotation * ft_force;
-        pt_force = rb.transform.localRotation * pt_force;
-        st_force = rb.transform.localRotation * st_force;
-        tt_force = rb.transform.localRotation * tt_force;
-        bt_force = rb.transform.localRotation * bt_force;
-
-        // Make thrusters go
-        rb.AddForceAtPosition(rt_force, rt_pos_world);
-        rb.AddForceAtPosition(ft_force, ft_pos_world);
-        rb.AddForceAtPosition(pt_force, pt_pos_world);
-        rb.AddForceAtPosition(st_force, st_pos_world);
-        rb.AddForceAtPosition(tt_force, tt_pos_world);
-        rb.AddForceAtPosition(bt_force, bt_pos_world);
-
+        rb.AddForceAtPosition(rear_thruster.WorldThrust, rear_thruster.WorldPosition);
+        rb.AddForceAtPosition(front_thruster.WorldThrust, front_thruster.WorldPosition);
+        rb.AddForceAtPosition(port_thruster.WorldThrust, port_thruster.WorldPosition);
+        rb.AddForceAtPosition(star_thruster.WorldThrust, star_thruster.WorldPosition);
+        rb.AddForceAtPosition(top_thruster.WorldThrust, top_thruster.WorldPosition);
+        rb.AddForceAtPosition(bot_thruster.WorldThrust, bot_thruster.WorldPosition);
 
         if(ThrusterDebugOn)
         {
             // Draw thruster output
-            Debug.DrawLine(rt_pos_world, rt_pos_world - (rt_force * 0.1f), Color.red);
-            Debug.DrawLine(ft_pos_world, ft_pos_world - (ft_force * 0.1f), Color.red);
-            Debug.DrawLine(pt_pos_world, pt_pos_world - (pt_force * 0.1f), Color.blue);
-            Debug.DrawLine(st_pos_world, st_pos_world - (st_force * 0.1f), Color.blue);
-            Debug.DrawLine(tt_pos_world, tt_pos_world - (tt_force * 0.1f), Color.green);
-            Debug.DrawLine(bt_pos_world, bt_pos_world - (bt_force * 0.1f), Color.green);
+            Debug.DrawRay(rear_thruster.WorldPosition, -rear_thruster.WorldThrust * 0.1f, Color.red);
+            Debug.DrawRay(front_thruster.WorldPosition, -front_thruster.WorldThrust * 0.1f, Color.red);
+            Debug.DrawRay(port_thruster.WorldPosition, -port_thruster.WorldThrust * 0.1f, Color.blue);
+            Debug.DrawRay(star_thruster.WorldPosition, -star_thruster.WorldThrust * 0.1f, Color.blue);
+            Debug.DrawRay(top_thruster.WorldPosition, -top_thruster.WorldThrust * 0.1f, Color.green);
+            Debug.DrawRay(bot_thruster.WorldPosition, -bot_thruster.WorldThrust * 0.1f, Color.green);
         }
-
     }
 
     void UpdateBouyancy()
@@ -286,7 +281,7 @@ public class SubPhysics : MonoBehaviour {
                     (float)settings["thrusters"]["bottom"]["orientation"]["z"]));
 
         SubMass = (float)settings["mass"];
-        MaxMotorThrust = (float)settings["max_thrust"];
+        MaxMotorForce = (float)settings["max_thrust"];
     }
 
     Vector3 SubToUnity(Vector3 vec)
