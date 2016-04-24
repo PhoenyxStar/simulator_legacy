@@ -140,12 +140,12 @@ public class SubPhysics : MonoBehaviour {
                     message parsed_msg = new message (received [i]);
                     if (parsed_msg.mtype == "thruster") {
                         tp = new thruster_packet (parsed_msg.value);
-                        front = (float)tp.xa;
-                        back = (float)tp.xb;
-                        port = (float)tp.ya;
-                        star = (float)tp.yb;
-                        top = (float)tp.za;
-                        bot = (float)tp.zb;
+                        front = (float)tp.thrusters[0];
+                        back = (float)tp.thrusters[1];
+                        port = (float)tp.thrusters[2];
+                        star = (float)tp.thrusters[3];
+                        top = (float)tp.thrusters[4];
+                        bot = (float)tp.thrusters[5];
 
                         rear_thruster.SetThrusterPower(back);
                         front_thruster.SetThrusterPower(front);

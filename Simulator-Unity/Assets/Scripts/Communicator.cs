@@ -9,193 +9,6 @@ using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
-public class sensor_packet
-{
-    public double pitch;
-    public double roll;
-    public double yaw;
-    public double depth;
-    public double battery;
-    public int start_switch;
-    public double dt;
-    public double dpitch;
-    public double droll;
-    public double dyaw;
-    public double ddepth;
-
-    public string JSON = "{ \"pitch\": 0,  \"roll\": 0,  \"yaw\":  0,  \"depth\": 0,  \"battery\": 0, \"start_switch\": 0, \"dt\": 0, \"dpitch\": 0,  \"droll\": 0,  \"dyaw\":  0,  \"ddepth\": 0 }";
-    public string whole;
-
-    public sensor_packet(string raw)
-    {
-        JObject d = JObject.Parse(raw);
-        try
-        {
-            pitch = (double)d["pitch"];
-            roll = (double)d["roll"];
-            yaw = (double)d["yaw"];
-            depth = (double)d["depth"];
-            battery = (double)d["battery"];
-            start_switch = (int)d["start_switch"];
-            dt = (double)d["dt"];
-            dpitch = (double)d["dpitch"];
-            droll = (double)d["droll"];
-            dyaw = (double)d["dyaw"];
-            ddepth = (double)d["ddepth"];
-            whole = raw;
-
-        }
-        catch (Exception e)
-        {
-            LoggingSystem.log.Error("Sensor packet: unable to parse string.\n");
-            return;
-        }
-
-    }
-
-    public sensor_packet(double pitch, double roll, double yaw, double depth, double battery, int start_switch, double dt, double dpitch=0.0, double droll=0.0, double dyaw=0.0, double ddepth=0.0)
-    {
-        this.pitch = pitch;
-        this.roll = roll;
-        this.yaw = yaw;
-        this.depth = depth;
-        this.battery = battery;
-        this.start_switch = start_switch;
-        this.dt = dt;
-        this.dpitch = dpitch;
-        this.droll = droll;
-        this.dyaw = dyaw;
-        this.ddepth = ddepth;
-
-        setupJSON();
-
-    }
-
-    void setupJSON()
-    {
-        JObject d = JObject.Parse(JSON);
-
-        d["pitch"] = pitch;
-        d["roll"] = roll;
-        d["yaw"] = yaw;
-        d["depth"] = depth;
-        d["battery"] = battery;
-        d["start_switch"] = start_switch;
-        d["dt"] = dt;
-        d["dpitch"] = dpitch;
-        d["droll"] = droll;
-        d["dyaw"] = dyaw;
-        d["ddepth"] = ddepth;
-        whole = d.ToString(Formatting.None);
-    }
-}
-
-public class thruster_packet
-{
-    public thruster_packet(string raw)
-    {
-        JObject d = JObject.Parse(raw);
-        try
-        {
-            xa = (double)d["xa"];
-            xb = (double)d["xb"];
-            ya = (double)d["ya"];
-            yb = (double)d["yb"];
-            za = (double)d["za"];
-            zb = (double)d["zb"];
-            whole = d.ToString();
-
-        }
-        catch (Exception e)
-        {
-            LoggingSystem.log.Error("Thrustet packet: unable to parse string.\n");
-            return;
-        }
-    }
-    public thruster_packet(double xa, double xb, double ya, double yb, double za, double zb)
-    {
-        this.xa = xa;
-        this.xb = xb;
-        this.ya = ya;
-        this.yb = yb;
-        this.za = za;
-        this.zb = zb;
-        setupJSON();
-    }
-    string JSON = "{ \"xa\": \"\", \"xb\": \"\", \"ya\": \"\", \"yb\": \"\", \"za\": \"\", \"zb\": \"\"}";
-    public double xa;
-    public double xb;
-    public double ya;
-    public double yb;
-    public double za;
-    public double zb;
-    public string whole;
-    
-    void setupJSON()
-    {
-        JObject d = JObject.Parse(JSON);
-
-        d["xa"] = xa;
-        d["xb"] = xb;
-        d["ya"] = ya;
-        d["yb"] = yb;
-        d["za"] = za;
-        d["zb"] = zb;
-        whole = d.ToString(Formatting.None);
-    }
-    thruster_packet(int a) { setupJSON(); }
-};
-
-public class message
-{
-    public string JSON = "{\"sender\": \"\", \"recipient\": \"\",\"mtype\": \"\", \"value\": \"\"}";
-    public string sender;
-    public string recipient;
-    public string whole;
-    public string mtype;
-    public string value;
-
-    public message(string raw)
-    {
-        JObject d = JObject.Parse(raw);
-
-        try
-        {
-            sender = (string)d["sender"];
-            recipient = (string)d["recipient"];
-            value = (string)d["value"];
-            mtype = (string)d["mtype"];
-            whole = raw;
-//          whole = whole.Replace(@"\", @"");
-//          whole = whole.Replace(@"""{", @"{");
-//          whole = whole.Replace(@"}""", @"}");
-        }
-        catch (Exception e)
-        {
-            LoggingSystem.log.Error(e.Message);
-        }
-    }
-    public message(string sender, string recipient, string mtype, string value)
-    {
-        this.sender = sender;
-        this.recipient = recipient;
-        this.mtype = mtype;
-        this.value = value;
-        setupJSON();
-    }
-
-    private void setupJSON()
-    {
-        JObject d = JObject.Parse(JSON);
-        d["sender"] = sender;
-        d["recipient"] = recipient;
-        d["mtype"] = mtype;
-        d["value"] = value;
-        whole = d.ToString(Formatting.None);
-    }
-
-};
-
 public class Communicator
 {
     private int sndbuf;
@@ -277,6 +90,23 @@ public class Communicator
         socket.Options.Identity = System.Text.Encoding.ASCII.GetBytes(module_name);
         socket.Connect(broker_ip);
         LoggingSystem.log.Info("Module conneted");
+
+        /*
+        thruster_packet tp = new thruster_packet("{\"0\":55.0,\"1\":55.0,\"2\":-33.0,\"3\":33.0,\"4\":0.0,\"5\":0.0}");
+        LoggingSystem.log.Info(tp.thrusters);
+        LoggingSystem.log.Info(tp.whole);
+
+        List<double> lst = new List<double>();
+        lst.Add(10.0);
+        lst.Add(-10.0);
+        lst.Add(0.0);
+        lst.Add(0.0);
+        lst.Add(43.0);
+        lst.Add(43.0);
+        tp = new thruster_packet(lst);
+        LoggingSystem.log.Info(tp.thrusters);
+        LoggingSystem.log.Info(tp.whole);
+        */
     }
 
     public void ConnectBroker()
@@ -364,6 +194,7 @@ public class Communicator
     //                      true/*s->getStart()*/, 0.2/*s->getDT()*/).whole).whole);
     //}
 
+    /*
     private bool sendThrusterPacket(string recipient)
     {
         //if (!GlobalManager.Instance.enableConnection)
@@ -379,6 +210,7 @@ public class Communicator
                           (int)UnityEngine.Random.Range(1.0f, 100.0f),
                           (int)UnityEngine.Random.Range(1.0f, 100.0f)).whole).whole);
     }
+    */
 
     private void TestSensorData()
     {
@@ -387,8 +219,8 @@ public class Communicator
             //return;
         //}
         // send test packets every 2 seconds
-        sendSensorPacket("helm");
-        sendThrusterPacket("helm");
+        //sendSensorPacket("helm");
+        //sendThrusterPacket("helm");
     }
 
     // Use this for initialization
@@ -402,6 +234,7 @@ public class Communicator
         //TestSensorData();
     }
 
+    /*
     float elapseTime = 0;
     // Update is called once per frame
     void Update()
@@ -451,6 +284,7 @@ public class Communicator
             }
         }
     }
+    */
 
     public void OnDestroy()
     {
