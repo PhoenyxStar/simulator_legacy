@@ -75,4 +75,12 @@ public class Thruster
     {
         world_force = sub_rotation * (relative_orientation * current_thrust * (max_motor_force / max_thruster_input));
     }
+
+    public float CurrentThrust
+    {
+        get
+        {
+            return current_thrust * (max_motor_force / max_thruster_input);
+        }
+    }
 }
