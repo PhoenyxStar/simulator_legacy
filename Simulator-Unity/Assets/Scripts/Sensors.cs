@@ -79,7 +79,7 @@ public class Sensors : MonoBehaviour
     {
         communicator = new Communicator();
         communicator.Initialize("sensor");
-        messageRecipients = new string[] { "control", "ai", "control_gui" };
+        messageRecipients = new string[] { "control", "ai", "control_gui", "helm" };
     }
 
     // Update is called once per frame
