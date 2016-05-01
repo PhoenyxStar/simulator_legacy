@@ -88,7 +88,7 @@ public class SubPhysics : MonoBehaviour {
 		}
 
         // load settings file
-        string path = "../../robosub/settings/modules/control.json";
+        string path = "../../settings/modules/control.json";
         if(!File.Exists(path))
         {
             path = "Assets/settings/modules/control.json";

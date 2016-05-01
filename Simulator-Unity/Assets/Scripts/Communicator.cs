@@ -50,7 +50,7 @@ public class Communicator
         // clear it first(disconnect the formel connection)
         OnDestroy();
         // load settings file
-        string path = "../../robosub/settings/modules/broker.json";
+        string path = "../../settings/modules/broker.json";
         if(!File.Exists(path))
         {
             path = "Assets/settings/modules/broker.json";
