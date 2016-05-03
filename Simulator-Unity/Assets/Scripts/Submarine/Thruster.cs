@@ -18,9 +18,10 @@ public class Thruster
     private float max_motor_force;
     private float commanded_thrust;
     private float current_thrust;
-    //float noise; ??
+    private float ramp_rate;
+    private float ramp_rate_real;
 
-    public Thruster(string name, Vector3 relative_position, Vector3 relative_orientation, float max_thruster_input, float max_motor_force)
+    public Thruster(string name, Vector3 relative_position, Vector3 relative_orientation, float max_thruster_input, float max_motor_force, float ramp_rate)
     {
         this.name = name;
         this.relative_position = relative_position;
@@ -29,14 +30,42 @@ public class Thruster
         this.max_motor_force = max_motor_force;
         this.commanded_thrust = 0.0f;
         this.current_thrust = 0.0f;
+
+        // Ramp rate is expressed as multiple of positive thruster range per second
+        // E.g 2.0 means that it would take one second to go from full forward thrust
+        // to full reverse thrust
+        this.ramp_rate = ramp_rate;
+        // Real ramp rate takes into account max thruster input to calculate
+        // ramp rate as multiple of max thruster input
+        this.ramp_rate_real = this.ramp_rate * max_thruster_input;
     }
 
     public void Update(Vector3 sub_pos, Quaternion sub_rot, float dt)
     {
         SetSubPositionAndRotation(sub_pos, sub_rot);
-        current_thrust = commanded_thrust; // TODO: Ramp up
+
+        CalcThrusterOutput(dt);
         CalcWorldPosition();
         CalcWorldThrust();
+    }
+
+    // This takes into account delay, ramping, etc
+    private void CalcThrusterOutput(float dt)
+    {
+        float direction = Mathf.Sign(commanded_thrust - current_thrust);
+
+        // If current thrust is within one "frame" of commanded thrust
+        // just set thrust to commanded thrust
+        if(WithinError(current_thrust, commanded_thrust, ramp_rate_real * dt))
+            current_thrust = commanded_thrust;
+        else
+            current_thrust = current_thrust + (ramp_rate_real * dt * direction);
+    }
+
+    // Returns true if x is less than err away from y
+    private bool WithinError(float x, float y, float err)
+    {
+        return (Mathf.Abs(y - x) < Mathf.Abs(err)) ? true : false;
     }
     
     public void SetThrusterPower(float thrust)

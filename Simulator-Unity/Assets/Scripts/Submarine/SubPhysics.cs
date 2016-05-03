@@ -98,12 +98,12 @@ public class SubPhysics : MonoBehaviour {
 
         GetSettings();
 
-        rear_thruster = new Thruster("rear", rt_pos_rel, rt_orient_rel, MaxThrusterInput, MaxMotorForce);
-        front_thruster = new Thruster("front", ft_pos_rel, ft_orient_rel, MaxThrusterInput, MaxMotorForce);
-        port_thruster = new Thruster("port", pt_pos_rel, pt_orient_rel, MaxThrusterInput, MaxMotorForce);
-        star_thruster = new Thruster("star", st_pos_rel, st_orient_rel, MaxThrusterInput, MaxMotorForce);
-        top_thruster = new Thruster("top", tt_pos_rel, tt_orient_rel, MaxThrusterInput, MaxMotorForce);
-        bot_thruster = new Thruster("bot", bt_pos_rel, bt_orient_rel, MaxThrusterInput, MaxMotorForce);
+        rear_thruster = new Thruster("rear", rt_pos_rel, rt_orient_rel, MaxThrusterInput, MaxMotorForce, 2.0f);
+        front_thruster = new Thruster("front", ft_pos_rel, ft_orient_rel, MaxThrusterInput, MaxMotorForce, 2.0f);
+        port_thruster = new Thruster("port", pt_pos_rel, pt_orient_rel, MaxThrusterInput, MaxMotorForce, 2.0f);
+        star_thruster = new Thruster("star", st_pos_rel, st_orient_rel, MaxThrusterInput, MaxMotorForce, 2.0f);
+        top_thruster = new Thruster("top", tt_pos_rel, tt_orient_rel, MaxThrusterInput, MaxMotorForce, 2.0f);
+        bot_thruster = new Thruster("bot", bt_pos_rel, bt_orient_rel, MaxThrusterInput, MaxMotorForce, 2.0f);
 
         rb.mass = SubMass;
         COEF = MaxMotorForce / MaxThrusterInput;
@@ -158,13 +158,12 @@ public class SubPhysics : MonoBehaviour {
             }
         }
 
-        // TODO: Change dt
-        rear_thruster.Update(rb.transform.position, rb.transform.localRotation, 0.02f);
-        front_thruster.Update(rb.transform.position, rb.transform.localRotation, 0.02f);
-        port_thruster.Update(rb.transform.position, rb.transform.localRotation, 0.02f);
-        star_thruster.Update(rb.transform.position, rb.transform.localRotation, 0.02f);
-        top_thruster.Update(rb.transform.position, rb.transform.localRotation, 0.02f);
-        bot_thruster.Update(rb.transform.position, rb.transform.localRotation, 0.02f);
+        rear_thruster.Update(rb.transform.position, rb.transform.localRotation, Time.deltaTime);
+        front_thruster.Update(rb.transform.position, rb.transform.localRotation, Time.deltaTime);
+        port_thruster.Update(rb.transform.position, rb.transform.localRotation, Time.deltaTime);
+        star_thruster.Update(rb.transform.position, rb.transform.localRotation, Time.deltaTime);
+        top_thruster.Update(rb.transform.position, rb.transform.localRotation, Time.deltaTime);
+        bot_thruster.Update(rb.transform.position, rb.transform.localRotation, Time.deltaTime);
 
         rb.AddForceAtPosition(rear_thruster.WorldThrust, rear_thruster.WorldPosition);
         rb.AddForceAtPosition(front_thruster.WorldThrust, front_thruster.WorldPosition);
