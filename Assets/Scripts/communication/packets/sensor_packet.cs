@@ -42,8 +42,7 @@ public class sensor_packet
         }
         catch (Exception e)
         {
-            Logger.log.Error("Sensor packet exception: " + e);
-            return;
+            Debug.Log("Sensor packet exception: " + e.Message);
         }
 
     }

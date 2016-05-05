@@ -32,7 +32,7 @@ public class message
         }
         catch (Exception e)
         {
-            Logger.log.Error(e.Message);
+            Debug.Log("message exception: " + e.Message);
         }
     }
     public message(string sender, string recipient, string mtype, string value)

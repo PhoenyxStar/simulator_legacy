@@ -8,11 +8,42 @@ using System.IO;
 public class ThrusterModule : Module
 {
     List<Thruster> thrusters;
-    Rigidbody sub;
+    Rigidbody rb;
+
+    public ThrusterModule(Rigidbody rb)
+    {
+        this.rb = rb;
+    }
 
     protected override void init()
     {
         // load thrusters
+        thrusters = new List<Thruster>();
+        string path = "../settings/modules/control.json";
+        string jsonString = File.ReadAllText(path);
+        JObject tsettings = JObject.Parse(jsonString);
+        try
+        {
+            foreach (JToken token in tsettings["thrusters"].Children())
+            {
+                JProperty property = (JProperty)token;
+                string name = property.Name;
+                JObject thruster = (JObject)property.Value;
+                Vector3 position = SubToUnity(new Vector3(
+                    (float)thruster["position"]["x"],
+                    (float)thruster["position"]["y"],
+                    (float)thruster["position"]["z"]));
+                Vector3 orientation = SubToUnity(new Vector3(
+                    (float)thruster["orientation"]["x"],
+                    (float)thruster["orientation"]["y"],
+                    (float)thruster["orientation"]["z"]));
+                thrusters.Add(new Thruster(name, position, orientation));
+            }
+        }
+        catch (Exception e)
+        {
+            Debug.Log(e.Message);
+        }
     }
 
     protected override void update()
@@ -33,10 +64,25 @@ public class ThrusterModule : Module
                         thrusters[j].SetThrusterPower((float)tp.thrusters[j]);
                 }
             }
+        } else {
+            for(int j = 0; j < thrusters.Count; ++j)
+                thrusters[j].SetThrusterPower(0.0f); // zero thruster if no message
         }
 
         // update physics
-        foreach(Thruster thruster in thrusters)
-            thruster.Update(sub.transform.position, sub.transform.localRotation, Time.deltaTime);
+        foreach(var thruster in thrusters)
+        {
+            thruster.Update(rb.transform.position, rb.transform.localRotation, dt);
+            rb.AddForceAtPosition(thruster.WorldThrust, thruster.WorldPosition);
+        }
+
+        // draw force vectors
+        foreach(var thruster in thrusters)
+            Debug.DrawRay(thruster.WorldPosition, -thruster.WorldThrust * 0.05f, Color.red);
+    }
+
+    Vector3 SubToUnity(Vector3 vec)
+    {
+        return new Vector3(-vec.y, vec.z, vec.x);
     }
 }

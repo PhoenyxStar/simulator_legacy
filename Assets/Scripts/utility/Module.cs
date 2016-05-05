@@ -5,12 +5,12 @@ using System.Collections;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-public abstract class Module : MonoBehaviour
+public abstract class Module
 {
     protected string name;
     protected int fps;
-    protected double dt;
-    private double accumulator;
+    protected float dt;
+    private float accumulator;
     protected Communicator com;
     protected static JObject settings;
 
@@ -26,11 +26,10 @@ public abstract class Module : MonoBehaviour
 
         // setup communicator
         this.name = name;
-        com = new Communicator();
-        com.Initialize(name);
+        com = new Communicator(name);
 
         // load settings
-        string path = "../../settings/modules/" + name + ".json";
+        string path = "../settings/modules/" + name + ".json";
         string jsonString = File.ReadAllText(path);
         settings = JObject.Parse(jsonString);
         try
@@ -39,7 +38,7 @@ public abstract class Module : MonoBehaviour
         }
         catch (Exception e)
         {
-            Logger.log.Warn(e.Message);
+            Debug.Log(e.Message);
         }
 
         // init derived
@@ -50,7 +49,7 @@ public abstract class Module : MonoBehaviour
     {
         // safe enough if running at 60Hz
         accumulator += Time.unscaledDeltaTime;
-        if(accumulator >= 1.0 / fps)
+        if(accumulator >= 1.0 / (float)fps)
         {
             dt = accumulator;
             accumulator = 0; // reset to prevent spiral of death

@@ -22,7 +22,7 @@ public class Thruster
     private float ramp_rate_real;
     private float variance;
 
-    public Thruster(string name, Vector3 relative_position, Vector3 relative_orientation, float max_thruster_input, float max_motor_force, float ramp_rate)
+    public Thruster(string name, Vector3 relative_position, Vector3 relative_orientation, float max_thruster_input = 1.0f, float max_motor_force = 25.0f, float ramp_rate = 1.0f)
     {
         this.name = name;
         this.relative_position = relative_position;

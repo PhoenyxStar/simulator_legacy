@@ -7,7 +7,7 @@ using System.Collections;
 
 public class SensorModule : Module
 {
-    private GameObject sub;
+    // sub physics
     private Rigidbody rb;
 
     // sensor packet
@@ -22,16 +22,19 @@ public class SensorModule : Module
     private float dyaw;
     private float ddepth;
 
+    public SensorModule(Rigidbody rb)
+    {
+        this.rb = rb;
+    }
+
     protected override void init()
     {
-        sub = GameObject.Find("Submarine");
-		rb = sub.GetComponent<Rigidbody>();
-        dt = 0;
+        // init sensors
         pitch = 0;
         roll = 0;
         yaw = 0;
         depth = 0;
-        battery = 0;
+        battery = 20;
         start_switch = 0;
         dpitch = 0;
         droll = 0;
@@ -42,7 +45,7 @@ public class SensorModule : Module
     protected override void update()
 	{
         // update sensors
-		UpdateDepth();
+        UpdateDepth();
         UpdateYPR();
 
         // send sensor messages
@@ -55,12 +58,11 @@ public class SensorModule : Module
     void UpdateDepth()
     {
         GameObject water = GameObject.Find("WaterTop");
-		Rigidbody rb = GetComponent<Rigidbody>();
-        float waterTop = ((Transform)water.GetComponent("Transform")).position.y;
-        float subCenter = rb.position.y;
+        float watery = water.GetComponent<Transform>().position.y;
+        float suby = rb.position.y;
         float last_depth = depth;
-        depth = subCenter - waterTop;
-        ddepth = (depth - last_depth) / Time.unscaledDeltaTime;
+        depth = suby - watery;
+        ddepth = (depth - last_depth) / dt;
     }
 
     public void UpdateYPR()
@@ -100,15 +102,10 @@ public class SensorModule : Module
 
     public void SendSensorMessage(string name)
     {
-		sensor_packet sp = new sensor_packet((double)pitch, (double)roll, (double)yaw, (double)depth, (double)battery, start_switch, (double)dt,
+        sensor_packet sp = new sensor_packet((double)pitch, (double)roll, (double)yaw, (double)depth, (double)battery, start_switch, (double)dt,
                                              (double)dpitch, (double)droll, (double)dyaw, (double)ddepth);
         message msg = new message("sensor", name, "sensor", sp.whole);
         com.send_message(msg);
-    }
-
-    public void DisplayVector(Vector3 vec, Color c)
-    {
-        Debug.DrawLine(rb.transform.position, rb.transform.position + vec, c);
     }
 
     public float ToRadians(float theta) { return Mathf.Deg2Rad * theta; }

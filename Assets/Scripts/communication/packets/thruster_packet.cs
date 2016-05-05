@@ -9,7 +9,7 @@ public class thruster_packet
 {
     JObject d;
     string JSON;
-    public List<double> thrusters;
+    public List<float> thrusters;
     public string whole;
 
     public thruster_packet(string raw)
@@ -17,22 +17,22 @@ public class thruster_packet
         d = JObject.Parse(raw);
         try
         {
-            thrusters = new List<double>();
+            thrusters = new List<float>();
 
             foreach(var x in d)
             {
-                thrusters.Add((double)x.Value);
+                thrusters.Add((float)x.Value);
             }
             whole = raw;
 
         }
         catch (Exception e)
         {
-            Logger.log.Error("Thruster packet exception: " + e);
+            Debug.Log("Thruster packet exception: " + e.Message);
             return;
         }
     }
-    public thruster_packet(List<double> speeds)
+    public thruster_packet(List<float> speeds)
     {
         d = new JObject();
         thrusters = speeds;
@@ -46,11 +46,11 @@ public class thruster_packet
         setupJSON();
     }
 
-    void add_thruster(double val)
+    void add_thruster(float val)
     {
         string s = Convert.ToString(thrusters.Count);
         JObject j = new JObject(s, val);
-        // add to json string
+        d.Add(j);
     }
 
     void setupJSON()
