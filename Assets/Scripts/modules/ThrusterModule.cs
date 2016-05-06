@@ -62,6 +62,7 @@ public class ThrusterModule : Module
                     thruster_packet tp = new thruster_packet(parsed_msg.value);
                     for(int j = 0; j < tp.thrusters.Count; ++j)
                         thrusters[j].SetThrusterPower((float)tp.thrusters[j]);
+                    com.send_message(new message("thruster", "control_gui", "thruster", parsed_msg.value));
                 }
             }
         } else {
