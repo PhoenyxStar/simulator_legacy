@@ -3,7 +3,7 @@ using UnityEngine.UI;
 
 public class UnderWater : MonoBehaviour
 {
-    public float underwaterLevel = 16;
+    public float underwaterLevel = 0;
     private Material defaultSkybox;
     private Material noSkybox;
     private Color fogColor;

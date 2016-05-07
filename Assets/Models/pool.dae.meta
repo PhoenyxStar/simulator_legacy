@@ -1,15 +1,48 @@
 fileFormatVersion: 2
-guid: c37bf6c1ceb837342b94c5a49f55efa2
-timeCreated: 1445878579
+guid: dd964e588f0cc4101b3f20bf1227613a
+timeCreated: 1462515444
 licenseType: Free
 ModelImporter:
-  serializedVersion: 18
+  serializedVersion: 19
   fileIDToRecycleName:
-    100000: //RootNode
-    400000: //RootNode
-    2300000: //RootNode
-    3300000: //RootNode
-    4300000: Ellipse001
+    100000: ID11
+    100002: ID17
+    100004: ID25
+    100006: ID31
+    100008: ID37
+    100010: //RootNode
+    100012: skp_camera_Last_Saved_SketchUp_View
+    400000: ID11
+    400002: ID17
+    400004: ID25
+    400006: ID31
+    400008: ID37
+    400010: //RootNode
+    400012: skp_camera_Last_Saved_SketchUp_View
+    2300000: ID11
+    2300002: ID17
+    2300004: ID25
+    2300006: ID31
+    2300008: ID37
+    2300010: //RootNode
+    3300000: ID11
+    3300002: ID17
+    3300004: ID25
+    3300006: ID31
+    3300008: ID37
+    3300010: //RootNode
+    4300000: SketchUp
+    4300002: ID11
+    4300004: ID17
+    4300006: ID25
+    4300008: ID31
+    4300010: ID37
+    6400000: ID11
+    6400002: ID17
+    6400004: ID25
+    6400006: ID31
+    6400008: ID37
+    6400010: //RootNode
     9500000: //RootNode
   materials:
     importMaterials: 1
@@ -18,6 +51,7 @@ ModelImporter:
   animations:
     legacyGenerateAnimations: 4
     bakeSimulation: 0
+    resampleCurves: 1
     optimizeGameObjects: 0
     motionNodeName: 
     animationImportErrors: 
@@ -25,18 +59,18 @@ ModelImporter:
     animationRetargetingWarnings: 
     animationDoRetargetingWarnings: 0
     animationCompression: 1
-    animationRotationError: .5
-    animationPositionError: .5
-    animationScaleError: .5
+    animationRotationError: 0.5
+    animationPositionError: 0.5
+    animationScaleError: 0.5
     animationWrapMode: 0
     extraExposedTransformPaths: []
     clipAnimations: []
     isReadable: 1
   meshes:
     lODScreenPercentages: []
-    globalScale: 1
+    globalScale: 0.0255
     meshCompression: 0
-    addColliders: 0
+    addColliders: 1
     importBlendShapes: 1
     swapUVChannels: 0
     generateSecondaryUV: 0
@@ -51,20 +85,19 @@ ModelImporter:
     useFileScale: 1
   tangentSpace:
     normalSmoothAngle: 60
-    splitTangentsAcrossUV: 1
     normalImportMode: 0
-    tangentImportMode: 1
+    tangentImportMode: 3
   importAnimation: 1
   copyAvatar: 0
   humanDescription:
     human: []
     skeleton: []
-    armTwist: .5
-    foreArmTwist: .5
-    upperLegTwist: .5
-    legTwist: .5
-    armStretch: .0500000007
-    legStretch: .0500000007
+    armTwist: 0.5
+    foreArmTwist: 0.5
+    upperLegTwist: 0.5
+    legTwist: 0.5
+    armStretch: 0.05
+    legStretch: 0.05
     feetSpacing: 0
     rootMotionBoneName: 
     hasTranslationDoF: 0
