@@ -15,7 +15,7 @@ public class Submarine : MonoBehaviour
     // modules
     SensorModule smod;
     ThrusterModule tmod;
-    //CameraModule cmod;
+    CameraModule cmod;
 
     void Start ()
     {
@@ -29,6 +29,7 @@ public class Submarine : MonoBehaviour
         smod.Init("sensor");
         tmod = new ThrusterModule(rb);
         tmod.Init("thruster");
+        //cmod = new CameraModule();
         //cmod.Init("camera");
     }
 
@@ -37,7 +38,6 @@ public class Submarine : MonoBehaviour
         smod.Update();
         tmod.Update();
         //cmod.Update();
-
         UpdateBouyancy();
     }
 
