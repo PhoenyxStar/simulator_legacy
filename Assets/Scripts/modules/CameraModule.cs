@@ -8,7 +8,9 @@ using Newtonsoft.Json.Linq;
 public class CameraModule : Module
 {
     [DllImport ("libSharedImage")]
-    unsafe private static extern void ShowImage(string name, int rows, int cols, IntPtr buf);
+    unsafe private static extern int UpdateShared(string name, int rows, int cols, IntPtr buf);
+    [DllImport ("libSharedImage")]
+    unsafe private static extern int ShutdownShared(string name);
 
     Dictionary<string,Capture> cameras;
 
@@ -43,22 +45,7 @@ public class CameraModule : Module
             byte[] frame = iter.Value.Read();
             IntPtr ptr = Marshal.AllocHGlobal(frame.Length);
             Marshal.Copy(frame, 0, ptr, frame.Length);
-            ShowImage(iter.Key, iter.Value.height, iter.Value.width, ptr);
-            int ret = 0;
-            switch(ret)
-            {
-                case -1:
-                    Debug.Log("Failed to open SHM:" + iter.Key);
-                    break;
-
-                case -2:
-                    Debug.Log("Failed to open SEM:" + iter.Key);
-                    break;
-
-                case -3:
-                    Debug.Log("Failed to map SHM:" + iter.Key);
-                    break;
-            }
+            UpdateShared(iter.Key, iter.Value.height, iter.Value.width, ptr);
         }
     }
 
@@ -66,7 +53,7 @@ public class CameraModule : Module
     {
         foreach(KeyValuePair<string,Capture> iter in cameras)
         {
-            //ShutdownShared(iter.Key);
+            ShutdownShared(iter.Key);
         }
     }
 }

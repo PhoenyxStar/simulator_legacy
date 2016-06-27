@@ -7,9 +7,9 @@ extern "C"
         for(int i = 0; i < NCAMERAS; ++i)
         {
             if(strcmp(name, names[i]) == 0)
-                return ids[i];
-            return -1;
+                return i;
         }
+        return -1;
     }
 
     int GetInit(char *name)
@@ -38,8 +38,12 @@ extern "C"
             std::string header_name = std::string(PREFIX) + name;
             int fd = shm_open(header_name.c_str(), O_RDWR | O_CREAT, S_IRWXU);
             if(fd <= 0)
+            {
+                fprintf(file, "Failed to open shm: %s - %s", header_name.c_str(), strerror(errno));
+                fflush(file);
                 return -1;
-            Ptr<SharedImageHeader> header = new SharedImageHeader();
+            }
+            SharedImageHeader *header = new SharedImageHeader();
             header->fd = fd;
             header->size = cv::Size(height, width);
             header->type = TYPE;
@@ -48,7 +52,11 @@ extern "C"
             // create semaphore
             sem_t *sem = sem_open(header_name.c_str(), O_CREAT, S_IRWXU, 1);
             if(sem <= 0)
+            {
+                fprintf(file, "Failed to open sem: %s - %s", header_name.c_str(), strerror(errno));
+                fflush(file);
                 return -2;
+            }
             header->sem = sem;
 
             // allocate memory for image
@@ -58,7 +66,11 @@ extern "C"
             // put first frame into memory
             void *mem = mmap(0, total_size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0); // let os create buffer
             if(mem <= 0)
+            {
+                fprintf(file, "Failed to open shm: %s - %s", header_name.c_str(), strerror(errno));
+                fflush(file);
                 return -3;
+            }
             header->data = (char*)mem + sizeof(SharedImageHeader); // set sim data segment to data segment of mem
             sem_wait(header->sem); // lock memory
             memcpy(mem, header, sizeof(SharedImageHeader)); // copy header
@@ -78,31 +90,37 @@ extern "C"
 
     int UpdateShared(char *name, int width, int height, unsigned char *buf)
     {
+        int id = GetID(name);
         if(GetInit(name) == 0) // does not exist
             return InitShared(name, width, height, buf); // create it
-        sem_wait(headers[GetID(name)]->sem); // lock memory
-        memcpy(headers[GetID(name)]->data, buf, headers[GetID(name)]->data_size); // write
-        sem_post(headers[GetID(name)]->sem); // unlock memory
+        if(headers[id]->sem == NULL)
+            {
+                fprintf(file, "motherfuck");
+                fflush(file);
+            }
+        sem_wait(headers[id]->sem); // lock memory
+        memcpy(headers[id]->data, buf, headers[id]->data_size); // write
+        sem_post(headers[id]->sem); // unlock memory
         return 0;
     }
 
     int ShutdownShared(char *name)
     {
+        int id = GetID(name);
         if(GetInit(name) == 0) // does not exist
             return -1;
 
         // delete sem
-        sem_close(headers[GetID(name)]->sem);
+        sem_close(headers[id]->sem);
         sem_unlink(name);
 
         // delete shm
-        munmap(headers[GetID(name)]->data, sizeof(SharedImageHeader) + headers[GetID(name)]->data_size);
-        close(headers[GetID(name)]->fd);
+        munmap(headers[id]->data, sizeof(SharedImageHeader) + headers[id]->data_size);
+        close(headers[id]->fd);
         shm_unlink(name);
 
-        // uninitialized
-        init[GetID(name)] = 0;
-
+        // uninitialize
+        init[id] = 0;
         return 0;
     }
 }

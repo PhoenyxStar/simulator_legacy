@@ -15,7 +15,7 @@ public class Capture
     private RenderTexture texture;
     private Texture2D frame;
 
-    public Capture(string name, int width = 500, int height = 500)
+    public Capture(string name, int width = 200, int height = 200)
     {
         this.width = width;
         this.height = height;
@@ -31,6 +31,7 @@ public class Capture
         cam.Render();
         frame.ReadPixels(new Rect(0, 0, texture.width, texture.height), 0, 0);
         frame.Apply();
+        RenderTexture.active = null;
     }
 
     public byte[] Retrieve()

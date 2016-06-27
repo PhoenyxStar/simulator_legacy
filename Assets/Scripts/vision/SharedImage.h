@@ -11,8 +11,8 @@ extern "C"
     #define TYPE CV_8UC3
     SharedImageHeader *headers[NCAMERAS];
     const char *names[NCAMERAS] = {"left", "right"};
-    int ids[NCAMERAS] = {0, 1};
     int init[NCAMERAS] = {0, 0};
+    FILE *file = fopen("sharedimage.log", "w+");
 
     int GetID(char *name);
     int GetInit(char *name);
