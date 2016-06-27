@@ -16,6 +16,7 @@ public abstract class Module
 
     protected abstract void init();
     protected abstract void update();
+    protected abstract void shutdown();
 
     public void Init(string name)
     {
@@ -57,5 +58,10 @@ public abstract class Module
             // update derived
             update();
         }
+    }
+
+    public void Shutdown()
+    {
+        shutdown();
     }
 }

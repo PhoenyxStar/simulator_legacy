@@ -3,7 +3,6 @@ using UnityEngine;
 using System.Collections;
 using System.Threading;
 using System.IO;
-using Emgu.CV;
 using UnityEngine.UI;
 using System.Runtime.InteropServices;
 
@@ -16,7 +15,7 @@ public class Capture
     private RenderTexture texture;
     private Texture2D frame;
 
-    public Capture(string name, int width = 640, int height = 480)
+    public Capture(string name, int width = 500, int height = 500)
     {
         this.width = width;
         this.height = height;
@@ -26,36 +25,36 @@ public class Capture
         frame = new Texture2D(cam.targetTexture.width, cam.targetTexture.height);
     }
 
-    public IEnumerator Render()
+    public void Update()
     {
-        yield return new WaitForEndOfFrame(); // wait for draw call
-        frame.ReadPixels(new Rect(0, 0, cam.targetTexture.width, cam.targetTexture.height), 0, 0);
+        RenderTexture.active = texture;
+        cam.Render();
+        frame.ReadPixels(new Rect(0, 0, texture.width, texture.height), 0, 0);
         frame.Apply();
     }
 
     public byte[] Retrieve()
     {
-        return TexturetoMat(frame, width, height);
+        return TexturetoMat(frame);
     }
 
     public byte[] Read()
     {
-        Render();
+        Update();
         return Retrieve();
     }
 
-    byte[] TexturetoMat(Texture2D texture, int width, int height)
+    byte[] TexturetoMat(Texture2D texture)
     {
-        byte[] data = new byte[width * height * 3]; // 24 bit color
-        int index = 0;
-        for (int x = 0; x < width; x++)
+        byte[] data = new byte[texture.width * texture.height * 3]; // 24 bit color
+        Color32[] pixels = texture.GetPixels32();
+        for (int x = 0; x < texture.width; ++x)
         {
-            for (int y = 0; y < height; y++)
+            for (int y = 0; y < texture.height; ++y)
             {
-                data[index] = (byte)(texture.GetPixel(x,y).b * 255);
-                data[index + 1] = (byte)(texture.GetPixel(x,y).g * 255);
-                data[index + 2] = (byte)(texture.GetPixel(x,y).r * 255);
-                index += 3;
+                data[(y * texture.width + x) * 3] = pixels[(texture.height - y - 1) * width + x].b;
+                data[(y * texture.width + x) * 3 + 1] = pixels[(texture.height - y - 1) * width + x].g;
+                data[(y * texture.width + x) * 3 + 2] = pixels[(texture.height - y - 1) * width + x].r;
             }
         }
         return data;

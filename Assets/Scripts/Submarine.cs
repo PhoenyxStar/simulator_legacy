@@ -29,15 +29,15 @@ public class Submarine : MonoBehaviour
         smod.Init("sensor");
         tmod = new ThrusterModule(rb);
         tmod.Init("thruster");
-        //cmod = new CameraModule();
-        //cmod.Init("camera");
+        cmod = new CameraModule();
+        cmod.Init("camera");
     }
 
     void Update()
     {
         smod.Update();
         tmod.Update();
-        //cmod.Update();
+        cmod.Update();
         UpdateBouyancy();
     }
 

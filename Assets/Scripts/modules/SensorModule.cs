@@ -55,6 +55,11 @@ public class SensorModule : Module
         SendSensorMessage("ai");
     }
 
+    protected override void shutdown()
+    {
+
+    }
+
     void UpdateDepth()
     {
         GameObject water = GameObject.Find("WaterTop");

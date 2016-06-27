@@ -82,6 +82,11 @@ public class ThrusterModule : Module
             Debug.DrawRay(thruster.WorldPosition, -thruster.WorldThrust * 0.05f, Color.red);
     }
 
+    protected override void shutdown()
+    {
+        
+    }
+
     Vector3 SubToUnity(Vector3 vec)
     {
         return new Vector3(-vec.y, vec.z, vec.x);
