@@ -15,7 +15,7 @@ public class Capture
     private RenderTexture texture;
     private Texture2D frame;
 
-    public Capture(string name, int width = 200, int height = 200)
+    public Capture(string name, int width = 1000, int height = 1000)
     {
         this.width = width;
         this.height = height;

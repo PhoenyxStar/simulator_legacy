@@ -23,7 +23,7 @@ public class CameraModule : Module
     {
         try
         {
-            foreach (JToken token in settings["cameras"].Children())
+            foreach (JToken token in settings["monocameras"].Children())
             {
                 JProperty property = (JProperty)token;
                 string name = property.Name;

@@ -36,7 +36,7 @@ extern "C"
             // create shared image header
             unsigned long data_size = width * height * 3; // 3 channel
             std::string header_name = std::string(PREFIX) + name;
-            int fd = shm_open(header_name.c_str(), O_RDWR | O_CREAT, S_IRWXU);
+            int fd = shm_open(header_name.c_str(), O_RDWR | O_CREAT | O_TRUNC, S_IRWXU);
             if(fd <= 0)
             {
                 fprintf(file, "Failed to open shm: %s - %s", header_name.c_str(), strerror(errno));
@@ -93,11 +93,6 @@ extern "C"
         int id = GetID(name);
         if(GetInit(name) == 0) // does not exist
             return InitShared(name, width, height, buf); // create it
-        if(headers[id]->sem == NULL)
-            {
-                fprintf(file, "motherfuck");
-                fflush(file);
-            }
         sem_wait(headers[id]->sem); // lock memory
         memcpy(headers[id]->data, buf, headers[id]->data_size); // write
         sem_post(headers[id]->sem); // unlock memory
