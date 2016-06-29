@@ -22,6 +22,19 @@ extern "C"
         return headers[GetID(name)];
     }
 
+    void UnityText2Mat(int width, int height, unsigned char *unity, unsigned char *mat)
+    {
+        for (int x = 0; x < width; ++x)
+        {
+            for (int y = 0; y < height; ++y)
+            {
+                mat[(y * width + x) * 3] = unity[((height - y - 1) * width + x) * 3 + 3];
+                mat[(y * width + x) * 3 + 1] = unity[((height - y - 1) * width + x) * 3 + 2];
+                mat[(y * width + x) * 3 + 2] = unity[((height - y - 1) * width + x) * 3 + 1];
+            }
+        }
+    }
+
     void ShowImage(char *name, int rows, int cols, unsigned char *buf)
     {
         Mat image(rows, cols, CV_8UC3, buf);
@@ -33,8 +46,14 @@ extern "C"
     {
         if(GetInit(name) == 0) // does not exist
         {
-            // create shared image header
+            // convert to opencv mat
             unsigned long data_size = width * height * 3; // 3 channel
+            unsigned char *tmp = new unsigned char[data_size];
+            UnityText2Mat(width, height, buf, tmp);
+            delete buf;
+            buf = tmp;
+
+            // create shared image header
             std::string header_name = std::string(PREFIX) + name;
             int fd = shm_open(header_name.c_str(), O_RDWR | O_CREAT | O_TRUNC, S_IRWXU);
             if(fd <= 0)
@@ -93,9 +112,19 @@ extern "C"
         int id = GetID(name);
         if(GetInit(name) == 0) // does not exist
             return InitShared(name, width, height, buf); // create it
+
+        // convert to opencv mat
+        unsigned long data_size = width * height * 3; // 3 channel
+        unsigned char *tmp = new unsigned char[data_size];
+        UnityText2Mat(width, height, buf, tmp);
+        delete buf;
+        buf = tmp;
+
+        // write
         sem_wait(headers[id]->sem); // lock memory
         memcpy(headers[id]->data, buf, headers[id]->data_size); // write
         sem_post(headers[id]->sem); // unlock memory
+
         return 0;
     }
 

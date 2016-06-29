@@ -6,58 +6,62 @@ using System.IO;
 using UnityEngine.UI;
 using System.Runtime.InteropServices;
 
-public class Capture
+public class Capture : MonoBehaviour
 {
+    [DllImport ("libSharedImage")]
+    unsafe private static extern int UpdateShared(string name, int rows, int cols, IntPtr buf);
+    [DllImport ("libSharedImage")]
+    unsafe private static extern int ShutdownShared(string name);
+
     Camera cam;
-    string name;
+    float fps;
+    [SerializeField]
     public int width;
+    [SerializeField]
     public int height;
-    private RenderTexture texture;
-    private Texture2D frame;
+    private RenderTexture rendertex;
+    private Texture2D texture;
 
-    public Capture(string name, int width = 1000, int height = 1000)
+    void Start()
     {
-        this.width = width;
-        this.height = height;
-        cam = GameObject.Find(name + "Camera").GetComponent<Camera>();
-        texture = new RenderTexture(width, height, 24, RenderTextureFormat.ARGB32);
-        cam.targetTexture = texture;
-        frame = new Texture2D(cam.targetTexture.width, cam.targetTexture.height);
+        this.width = 400;
+        this.height = 400;
+        this.fps = 5.0f;
+        cam = GetComponent<Camera>();
+        rendertex = new RenderTexture(width, height, 24, RenderTextureFormat.ARGB32);
+        cam.targetTexture = rendertex;
+        texture = new Texture2D(cam.targetTexture.width, cam.targetTexture.height);
+        InvokeRepeating("UpdateCaller", 0, 1.0f / fps);
     }
 
-    public void Update()
+    void UpdateCaller()
     {
-        RenderTexture.active = texture;
+        StartCoroutine("UpdateCamera");
+    }
+
+    void UpdateCamera()
+    {
+        // set target textures
+        cam.targetTexture = rendertex;
+        RenderTexture.active = cam.targetTexture;
+
+        // disable camera and render
+        cam.enabled = false;
         cam.Render();
-        frame.ReadPixels(new Rect(0, 0, texture.width, texture.height), 0, 0);
-        frame.Apply();
-        RenderTexture.active = null;
+
+        // download gpu framebuffer
+        texture.ReadPixels(new Rect(0, 0, rendertex.width, rendertex.height), 0, 0);
+        texture.Apply();
+
+        // convert to opencv mat memory layout
+        byte[] data = texture.GetRawTextureData();
+        IntPtr ptr = Marshal.AllocHGlobal(data.Length);
+        Marshal.Copy(data, 0, ptr, data.Length);
+        UpdateShared(name, width, height, ptr);
     }
 
-    public byte[] Retrieve()
+    void OnDestroy()
     {
-        return TexturetoMat(frame);
-    }
-
-    public byte[] Read()
-    {
-        Update();
-        return Retrieve();
-    }
-
-    byte[] TexturetoMat(Texture2D texture)
-    {
-        byte[] data = new byte[texture.width * texture.height * 3]; // 24 bit color
-        Color32[] pixels = texture.GetPixels32();
-        for (int x = 0; x < texture.width; ++x)
-        {
-            for (int y = 0; y < texture.height; ++y)
-            {
-                data[(y * texture.width + x) * 3] = pixels[(texture.height - y - 1) * width + x].b;
-                data[(y * texture.width + x) * 3 + 1] = pixels[(texture.height - y - 1) * width + x].g;
-                data[(y * texture.width + x) * 3 + 2] = pixels[(texture.height - y - 1) * width + x].r;
-            }
-        }
-        return data;
+        ShutdownShared(name);
     }
 }

@@ -28,8 +28,7 @@ public class CameraModule : Module
                 JProperty property = (JProperty)token;
                 string name = property.Name;
                 JObject camera = (JObject)property.Value;
-                Capture c = new Capture(name);
-                cameras.Add(name, c);
+                cameras.Add(name, GameObject.Find(name).GetComponent<Capture>());
             }
         }
         catch (Exception e)
@@ -40,20 +39,22 @@ public class CameraModule : Module
 
     protected override void update()
     {
+        /*
         foreach(KeyValuePair<string,Capture> iter in cameras)
         {
-            byte[] frame = iter.Value.Read();
+            byte[] frame = iter.Value.GetFrame();
             IntPtr ptr = Marshal.AllocHGlobal(frame.Length);
             Marshal.Copy(frame, 0, ptr, frame.Length);
             UpdateShared(iter.Key, iter.Value.height, iter.Value.width, ptr);
         }
+        */
     }
 
     protected override void shutdown()
     {
         foreach(KeyValuePair<string,Capture> iter in cameras)
         {
-            ShutdownShared(iter.Key);
+            //ShutdownShared(iter.Key);
         }
     }
 }

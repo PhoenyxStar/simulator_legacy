@@ -17,12 +17,12 @@ public class Underwater : MonoBehaviour
         defaultFogColor = RenderSettings.fogColor;
         defaultFogDensity = RenderSettings.fogDensity;
         defaultSkybox = RenderSettings.skybox;
-	    GetComponent<Camera>().backgroundColor = new Color(0, 0.7f, 0.7f, 1);
+	    gameObject.GetComponent<Camera>().backgroundColor = new Color(0, 0.7f, 0.7f, 1);
     }
 
     void Update ()
     {
-        if (GetComponent<Camera>().transform.position.y < underwaterLevel)
+        if (gameObject.GetComponent<Camera>().transform.position.y < underwaterLevel)
         {
             RenderSettings.fog = true;
             RenderSettings.fogColor = new Color(0, 0.7f, 0.7f, 1);

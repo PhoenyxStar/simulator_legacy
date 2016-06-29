@@ -17,6 +17,7 @@ extern "C"
     int GetID(char *name);
     int GetInit(char *name);
     SharedImageHeader* GetHeader(char *name);
+    void UnityText2Mat(int width, int height, unsigned char *unity, unsigned char *mat);
     void ShowImage(char *name, int width, int height, unsigned char *buf);
     int InitShared(char *name, int width, int height, unsigned char *buf);
     int UpdateShared(char *name, int width, int height, unsigned char *buf);
