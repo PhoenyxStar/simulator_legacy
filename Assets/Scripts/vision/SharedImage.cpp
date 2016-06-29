@@ -22,17 +22,21 @@ extern "C"
         return headers[GetID(name)];
     }
 
-    void UnityText2Mat(int width, int height, unsigned char *unity, unsigned char *mat)
+    void RGB2BGR(int width, int height, unsigned char **buf)
     {
+        unsigned long data_size = width * height * 3;
+        unsigned char *tmp = new unsigned char[data_size];
         for (int x = 0; x < width; ++x)
         {
             for (int y = 0; y < height; ++y)
             {
-                mat[(y * width + x) * 3] = unity[((height - y - 1) * width + x) * 3 + 3];
-                mat[(y * width + x) * 3 + 1] = unity[((height - y - 1) * width + x) * 3 + 2];
-                mat[(y * width + x) * 3 + 2] = unity[((height - y - 1) * width + x) * 3 + 1];
+                tmp[(y * width + x) * 3] = *buf[(y * width + x) * 3 + 2];
+                tmp[(y * width + x) * 3 + 1] = *buf[(y * width + x) * 3 + 1];
+                tmp[(y * width + x) * 3 + 2] = *buf[(y * width + x) * 3];
             }
         }
+        delete *buf;
+        *buf = tmp;
     }
 
     void ShowImage(char *name, int rows, int cols, unsigned char *buf)
@@ -48,10 +52,7 @@ extern "C"
         {
             // convert to opencv mat
             unsigned long data_size = width * height * 3; // 3 channel
-            unsigned char *tmp = new unsigned char[data_size];
-            UnityText2Mat(width, height, buf, tmp);
-            delete buf;
-            buf = tmp;
+            RGB2BGR(width, height, &buf);
 
             // create shared image header
             std::string header_name = std::string(PREFIX) + name;
@@ -115,10 +116,7 @@ extern "C"
 
         // convert to opencv mat
         unsigned long data_size = width * height * 3; // 3 channel
-        unsigned char *tmp = new unsigned char[data_size];
-        UnityText2Mat(width, height, buf, tmp);
-        delete buf;
-        buf = tmp;
+        RGB2BGR(width, height, &buf);
 
         // write
         sem_wait(headers[id]->sem); // lock memory
