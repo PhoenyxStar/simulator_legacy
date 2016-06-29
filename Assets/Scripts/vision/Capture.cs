@@ -14,7 +14,7 @@ public class Capture : MonoBehaviour
     unsafe private static extern int ShutdownShared(string name);
 
     Camera cam;
-    float fps;
+    int fps;
     [SerializeField]
     public int width;
     [SerializeField]
@@ -24,9 +24,9 @@ public class Capture : MonoBehaviour
 
     void Start()
     {
-        this.width = 400;
-        this.height = 400;
-        this.fps = 5.0f;
+        this.width = 1000;
+        this.height = 1000;
+        this.fps = 5;
         cam = GetComponent<Camera>();
         rendertex = new RenderTexture(width, height, 24, RenderTextureFormat.ARGB32);
         cam.targetTexture = rendertex;
@@ -54,7 +54,17 @@ public class Capture : MonoBehaviour
         texture.Apply();
 
         // convert to opencv mat memory layout
-        byte[] data = texture.GetRawTextureData();
+        byte[] data = new byte[width * height * 3];
+        Color32[] pixels = texture.GetPixels32();
+        for (int x = 0; x < texture.width; ++x)
+        {
+            for (int y = 0; y < texture.height; ++y)
+            {
+                data[(y * texture.width + x) * 3] = pixels[(texture.height - y - 1) * width + x].b;
+                data[(y * texture.width + x) * 3 + 1] = pixels[(texture.height - y - 1) * width + x].g;
+                data[(y * texture.width + x) * 3 + 2] = pixels[(texture.height - y - 1) * width + x].r;
+            }
+        }
         IntPtr ptr = Marshal.AllocHGlobal(data.Length);
         Marshal.Copy(data, 0, ptr, data.Length);
         UpdateShared(name, width, height, ptr);
