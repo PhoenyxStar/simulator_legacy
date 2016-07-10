@@ -122,6 +122,9 @@ extern "C"
         sem_wait(headers[id]->sem); // lock memory
         memcpy(headers[id]->data, buf, headers[id]->data_size); // write
         sem_post(headers[id]->sem); // unlock memory
+
+		delete buf;
+
         return 0;
     }
 
