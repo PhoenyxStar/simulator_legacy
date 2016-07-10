@@ -84,7 +84,7 @@ public class ThrusterModule : Module
 
     protected override void shutdown()
     {
-        
+
     }
 
     Vector3 SubToUnity(Vector3 vec)

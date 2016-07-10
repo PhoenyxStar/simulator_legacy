@@ -47,6 +47,8 @@ extern "C"
         	image = Mat(rows, cols, CV_8UC3, buf);
 		else if(bytes_per_pixel == 12)
 			image = Mat(rows, cols, CV_32FC3, buf);
+		else if(bytes_per_pixel == 2)
+			image = Mat(rows, cols, CV_16SC1, buf);
 		else
 			return;
         imshow(name, image);
@@ -65,7 +67,7 @@ extern "C"
 		 return Q;
 	}
 
-	void RangeMap(char *name, int width, int height, float baseline, float focal_length, unsigned char *left, unsigned char *right)
+	int Range(char *name, int width, int height, float baseline, float focal_length, unsigned char *left, unsigned char *right)
 	{
 		// create matrices
 		Mat lmat(height, width, CV_8UC3, left);
@@ -76,12 +78,17 @@ extern "C"
 			stereobm = StereoBM::create(NDISP, WSIZE);
 		UMat disp;
 		stereobm->compute(lmat.getUMat(ACCESS_RW), rmat.getUMat(ACCESS_RW), disp); // CV_16SC1
+
+		ShowImage(name, width, height, 2, disp.getMat(ACCESS_READ).data);
+
+		// calulcate range
 		UMat range(disp.rows, disp.cols, CV_32FC3);
 		Mat Q = QMatrix(width / 2, height / 2, baseline, focal_length);
         reprojectImageTo3D(disp, range, Q, true);
 
 		// save to shared memory
 		UpdateShared(name, width, height, 12, range.getMat(ACCESS_READ).data);
+		return 0;
 	}
 
     int InitShared(char *name, int width, int height, int bytes_per_pixel, unsigned char *buf)
@@ -94,10 +101,10 @@ extern "C"
 			if(bytes_per_pixel == 3)
 			{
 				type = CV_8UC3;
-				data_size = width * height * sizeof(unsigned char) * 3;
+				data_size = width * height * 3;
             } else if(bytes_per_pixel == 12) {
 				type = CV_32FC3;
-				data_size = width * height * sizeof(float) * 3;
+				data_size = width * height * 12;
 			} else
 				return -1;
 
@@ -163,15 +170,6 @@ extern "C"
         int id = GetID(name);
         if(GetInit(name) == 0) // does not exist
             return InitShared(name, width, height, bytes_per_pixel, buf); // create it
-
-        // calc size
-		unsigned long data_size;
-		if(bytes_per_pixel == 3)
-			data_size = width * height * sizeof(unsigned char) * 3;
-		else if(bytes_per_pixel == 12)
-			data_size = width * height * sizeof(float) * 3;
-		else
-			return -1;
 
 		// convert to mat layout
         Texture2Mat(width, height, buf);

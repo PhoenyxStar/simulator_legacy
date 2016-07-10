@@ -9,7 +9,7 @@ using System.Runtime.InteropServices;
 public class Capture : MonoBehaviour
 {
     [DllImport ("libSharedImage")]
-    unsafe private static extern int UpdateShared(string name, int rows, int cols, IntPtr buf);
+    unsafe private static extern int UpdateShared(string name, int rows, int cols, int bpp, IntPtr buf);
     [DllImport ("libSharedImage")]
     unsafe private static extern int ShutdownShared(string name);
 
@@ -21,6 +21,7 @@ public class Capture : MonoBehaviour
     public int height;
     private RenderTexture rendertex;
     private Texture2D texture;
+	byte[] frame;
 
     void Start()
     {
@@ -53,15 +54,20 @@ public class Capture : MonoBehaviour
         texture.ReadPixels(new Rect(0, 0, rendertex.width, rendertex.height), 0, 0);
         texture.Apply();
 
-        // convert to opencv mat memory layout
-        byte[] data = texture.GetRawTextureData();
-        IntPtr ptr = Marshal.AllocHGlobal(data.Length);
-        Marshal.Copy(data, 0, ptr, data.Length);
-        UpdateShared(name, width, height, ptr);
+        // pull texture from GPU, create memory, and offload to C++
+        frame = texture.GetRawTextureData();
+        IntPtr ptr = Marshal.AllocHGlobal(frame.Length);
+        Marshal.Copy(frame, 0, ptr, frame.Length);
+        UpdateShared(name, width, height, 3, ptr);
     }
 
     void OnDestroy()
     {
         ShutdownShared(name);
     }
+
+	public byte[] GetFrame()
+	{
+		return frame;
+	}
 }

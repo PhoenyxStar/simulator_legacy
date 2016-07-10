@@ -25,7 +25,7 @@ extern "C"
 	Mat QMatrix(int cx, int cy, float baseline, float focal_length);
 
 	// calculates a 3D rangemap and stores in shared memory
-	void RangeMap(char *name, int width, int height, float baseline, float focal_length, unsigned char *left, unsigned char *right);
+	int Range(char *name, int width, int height, float baseline, float focal_length, unsigned char *left, unsigned char *right);
 
 	// shared memory save functions
     int InitShared(char *name, int width, int height, int bytes_per_pixel, unsigned char *buf);
