@@ -22,7 +22,7 @@ extern "C"
         return headers[GetID(name)];
     }
 
-    void RGB2BGR(int width, int height, unsigned char **buf)
+    void Texture2Mat(int width, int height, unsigned char *buf)
     {
         unsigned long data_size = width * height * 3;
         unsigned char *tmp = new unsigned char[data_size];
@@ -30,13 +30,13 @@ extern "C"
         {
             for (int y = 0; y < height; ++y)
             {
-                tmp[(y * width + x) * 3] = *buf[(y * width + x) * 3 + 2];
-                tmp[(y * width + x) * 3 + 1] = *buf[(y * width + x) * 3 + 1];
-                tmp[(y * width + x) * 3 + 2] = *buf[(y * width + x) * 3];
+                tmp[((height - y - 1) * width + x) * 3] = buf[(y * width + x) * 3 + 2];
+                tmp[((height - y - 1) * width + x) * 3 + 1] = buf[(y * width + x) * 3 + 1];
+                tmp[((height - y - 1) * width + x) * 3 + 2] = buf[(y * width + x) * 3];
             }
         }
-        delete *buf;
-        *buf = tmp;
+        memcpy(buf, tmp, data_size);
+        delete tmp;
     }
 
     void ShowImage(char *name, int rows, int cols, unsigned char *buf)
@@ -52,7 +52,7 @@ extern "C"
         {
             // convert to opencv mat
             unsigned long data_size = width * height * 3; // 3 channel
-            RGB2BGR(width, height, &buf);
+            Texture2Mat(width, height, buf);
 
             // create shared image header
             std::string header_name = std::string(PREFIX) + name;
@@ -116,13 +116,12 @@ extern "C"
 
         // convert to opencv mat
         unsigned long data_size = width * height * 3; // 3 channel
-        RGB2BGR(width, height, &buf);
+        Texture2Mat(width, height, buf);
 
         // write
         sem_wait(headers[id]->sem); // lock memory
         memcpy(headers[id]->data, buf, headers[id]->data_size); // write
         sem_post(headers[id]->sem); // unlock memory
-
         return 0;
     }
 

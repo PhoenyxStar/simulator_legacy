@@ -14,7 +14,7 @@ public class Capture : MonoBehaviour
     unsafe private static extern int ShutdownShared(string name);
 
     Camera cam;
-    float fps;
+    int fps;
     [SerializeField]
     public int width;
     [SerializeField]
@@ -26,7 +26,7 @@ public class Capture : MonoBehaviour
     {
         this.width = 500;
         this.height = 500;
-        this.fps = 5.0f;
+        this.fps = 20;
         cam = GetComponent<Camera>();
         rendertex = new RenderTexture(width, height, 16, RenderTextureFormat.ARGB32);
         cam.targetTexture = rendertex;

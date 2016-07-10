@@ -17,7 +17,7 @@ extern "C"
     int GetID(char *name);
     int GetInit(char *name);
     SharedImageHeader* GetHeader(char *name);
-    void RGB2BGR(int width, int height, unsigned char **buf);
+    void Texture2Mat(int width, int height, unsigned char *buf);
     void ShowImage(char *name, int width, int height, unsigned char *buf);
     int InitShared(char *name, int width, int height, unsigned char *buf);
     int UpdateShared(char *name, int width, int height, unsigned char *buf);
