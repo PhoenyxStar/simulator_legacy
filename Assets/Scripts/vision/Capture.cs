@@ -29,6 +29,8 @@ public class Capture : MonoBehaviour
         this.fps = 20;
         cam = GetComponent<Camera>();
         rendertex = new RenderTexture(width, height, 16, RenderTextureFormat.ARGB32);
+		rendertex.filterMode = FilterMode.Bilinear;
+		rendertex.antiAliasing = 8;
         cam.targetTexture = rendertex;
         texture = new Texture2D(cam.targetTexture.width, cam.targetTexture.height, TextureFormat.RGB24, false);
         InvokeRepeating("UpdateCaller", 0, 1.0f / fps);
