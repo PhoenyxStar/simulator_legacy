@@ -20,7 +20,7 @@ public class ThrusterModule : Module
     {
         // load thrusters
         thrusters = new List<Thruster>();
-        string path = "../settings/modules/control.json";
+        string path = "../settings/modules/thruster.json";
         string jsonString = File.ReadAllText(path);
         JObject tsettings = JObject.Parse(jsonString);
         try
