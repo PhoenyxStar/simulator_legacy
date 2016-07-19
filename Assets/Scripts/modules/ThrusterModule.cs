@@ -9,6 +9,7 @@ public class ThrusterModule : Module
 {
     List<Thruster> thrusters;
     Rigidbody rb;
+	private float sigma = 0.02f;
 
     public ThrusterModule(Rigidbody rb)
     {
@@ -61,7 +62,10 @@ public class ThrusterModule : Module
                 {
                     thruster_packet tp = new thruster_packet(parsed_msg.value);
                     for(int j = 0; j < tp.thrusters.Count; ++j)
-                        thrusters[j].SetThrusterPower((float)tp.thrusters[j]);
+					{
+						float power = (float)tp.thrusters[j] + RandomGaussian(sigma,0); // add some noise
+                        thrusters[j].SetThrusterPower(power);
+					}
                     com.send_message(new message("thruster", "control_gui", "thruster", parsed_msg.value));
                 }
             }
@@ -84,11 +88,20 @@ public class ThrusterModule : Module
 
     protected override void shutdown()
     {
-        
+
     }
 
     Vector3 SubToUnity(Vector3 vec)
     {
         return new Vector3(-vec.y, vec.z, vec.x);
     }
+
+	public float RandomGaussian(float sigma, float mu)
+	{
+		System.Random rand = new System.Random();
+		double u1 = rand.NextDouble();
+		double u2 = rand.NextDouble();
+		double x = Math.Sqrt(-2 * Math.Log(u1)) * Math.Cos(2 * Math.PI * u2);
+		return (float) x * sigma + mu;
+	}
 }

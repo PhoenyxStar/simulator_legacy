@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+using System;
+using UnityEngine;
 using System.Collections;
 
 // Pitch Range: -90 - 90
@@ -9,6 +10,7 @@ public class SensorModule : Module
 {
     // sub physics
     private Rigidbody rb;
+	private float sigma = 1.0f;
 
     // sensor packet
     private float pitch;
@@ -103,6 +105,11 @@ public class SensorModule : Module
         // Convert from 0 - 360 -> -180 - 180
         if(yaw > 180.0f)
             yaw = 180.0f - yaw;
+
+		// add some noise
+		yaw += RandomGaussian(sigma,0);
+		pitch += RandomGaussian(sigma,0);
+		roll += RandomGaussian(sigma,0);
     }
 
     public void SendSensorMessage(string name)
@@ -113,6 +120,22 @@ public class SensorModule : Module
         com.send_message(msg);
     }
 
-    public float ToRadians(float theta) { return Mathf.Deg2Rad * theta; }
-    public float ToDegrees(float theta) { return Mathf.Rad2Deg * theta; }
+    public float ToRadians(float theta)
+	{
+		return Mathf.Deg2Rad * theta;
+	}
+
+    public float ToDegrees(float theta)
+	{
+		return Mathf.Rad2Deg * theta;
+	}
+
+	public float RandomGaussian(float sigma, float mu)
+	{
+		System.Random rand = new System.Random();
+		double u1 = rand.NextDouble();
+		double u2 = rand.NextDouble();
+		double x = Math.Sqrt(-2 * Math.Log(u1)) * Math.Cos(2 * Math.PI * u2);
+		return (float) x * sigma + mu;
+	}
 }
