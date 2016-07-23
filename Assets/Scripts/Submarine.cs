@@ -38,8 +38,20 @@ public class Submarine : MonoBehaviour
         smod.Update();
         tmod.Update();
         cmod.Update();
+		UpdateGravity();
         UpdateBouyancy();
     }
+
+	void UpdateGravity()
+	{
+		float depth = GetDepth();
+		Vector3 force = new Vector3(0, 0, 0);
+		if(depth > 0.0f)
+			force = Vector3.down * 9.81f * rb.mass * Time.deltaTime;
+
+        // Add bouyancy
+        rb.AddForce(force, ForceMode.Impulse);
+	}
 
     void UpdateBouyancy()
     {
@@ -47,8 +59,8 @@ public class Submarine : MonoBehaviour
         Vector3 force = new Vector3(0, 0, 0);
 
         // Calculate force of bouyancy
-        if(depth < -0.5f)
-            force = Vector3.up * buoyant_force;
+        if(depth < -0.1f)
+            force = Vector3.up * buoyant_force * (1 - 0.2f / depth);
 
         // Transform relative Center of Bouyancy to world
         Vector3 cob_world = rb.transform.localRotation * buoyant_center;
