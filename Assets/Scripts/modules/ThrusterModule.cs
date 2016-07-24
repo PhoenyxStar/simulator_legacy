@@ -10,6 +10,7 @@ public class ThrusterModule : Module
     List<Thruster> thrusters;
     Rigidbody rb;
 	private float sigma = 0.02f;
+	private float mu = 0.0f;
 
     public ThrusterModule(Rigidbody rb)
     {
@@ -63,7 +64,7 @@ public class ThrusterModule : Module
                     thruster_packet tp = new thruster_packet(parsed_msg.value);
                     for(int j = 0; j < tp.thrusters.Count; ++j)
 					{
-						float power = (float)tp.thrusters[j] + RandomGaussian(sigma,0); // add some noise
+						float power = (float)tp.thrusters[j] + RandomGaussian(sigma,mu); // add some noise
                         thrusters[j].SetThrusterPower(power);
 					}
                     com.send_message(new message("thruster", "control_gui", "thruster", parsed_msg.value));

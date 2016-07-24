@@ -11,6 +11,7 @@ public class SensorModule : Module
     // sub physics
     private Rigidbody rb;
 	private float sigma = 1.0f;
+	private float mu = 0.0f;
 
     // sensor packet
     private float pitch;
@@ -107,9 +108,9 @@ public class SensorModule : Module
             yaw = 180.0f - yaw;
 
 		// add some noise
-		yaw += RandomGaussian(sigma,0);
-		pitch += RandomGaussian(sigma,0);
-		roll += RandomGaussian(sigma,0);
+		yaw += RandomGaussian(sigma,mu);
+		pitch += RandomGaussian(sigma,mu);
+		roll += RandomGaussian(sigma,mu);
     }
 
     public void SendSensorMessage(string name)
