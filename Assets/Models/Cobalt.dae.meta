@@ -1,0 +1,194 @@
+fileFormatVersion: 2
+guid: 4b07df7d8abc24e2a91f7fac0730eb60
+timeCreated: 1469584948
+licenseType: Free
+ModelImporter:
+  serializedVersion: 19
+  fileIDToRecycleName:
+    100000: //RootNode
+    100002: ShapeIndexedFaceSet_004
+    100004: ShapeIndexedFaceSet_005
+    100006: ShapeIndexedFaceSet_007
+    100008: ShapeIndexedFaceSet_009
+    100010: ShapeIndexedFaceSet_011
+    100012: ShapeIndexedFaceSet_040
+    100014: ShapeIndexedFaceSet_100
+    100016: ShapeIndexedFaceSet_152
+    100018: ShapeIndexedFaceSet_175
+    100020: ShapeIndexedFaceSet_180
+    100022: ShapeIndexedFaceSet_182
+    100024: ShapeIndexedFaceSet_183
+    100026: ShapeIndexedFaceSet_193
+    100028: ShapeIndexedFaceSet_194
+    100030: ShapeIndexedFaceSet_196
+    100032: ShapeIndexedFaceSet_199
+    100034: ShapeIndexedFaceSet_210
+    100036: ShapeIndexedFaceSet_227
+    100038: ShapeIndexedFaceSet_234
+    100040: ShapeIndexedFaceSet_235
+    100042: ShapeIndexedFaceSet_240
+    100044: ShapeIndexedFaceSet_248
+    100046: ShapeIndexedFaceSet_253
+    100048: ShapeIndexedFaceSet_256
+    400000: //RootNode
+    400002: ShapeIndexedFaceSet_004
+    400004: ShapeIndexedFaceSet_005
+    400006: ShapeIndexedFaceSet_007
+    400008: ShapeIndexedFaceSet_009
+    400010: ShapeIndexedFaceSet_011
+    400012: ShapeIndexedFaceSet_040
+    400014: ShapeIndexedFaceSet_100
+    400016: ShapeIndexedFaceSet_152
+    400018: ShapeIndexedFaceSet_175
+    400020: ShapeIndexedFaceSet_180
+    400022: ShapeIndexedFaceSet_182
+    400024: ShapeIndexedFaceSet_183
+    400026: ShapeIndexedFaceSet_193
+    400028: ShapeIndexedFaceSet_194
+    400030: ShapeIndexedFaceSet_196
+    400032: ShapeIndexedFaceSet_199
+    400034: ShapeIndexedFaceSet_210
+    400036: ShapeIndexedFaceSet_227
+    400038: ShapeIndexedFaceSet_234
+    400040: ShapeIndexedFaceSet_235
+    400042: ShapeIndexedFaceSet_240
+    400044: ShapeIndexedFaceSet_248
+    400046: ShapeIndexedFaceSet_253
+    400048: ShapeIndexedFaceSet_256
+    2300000: ShapeIndexedFaceSet_004
+    2300002: ShapeIndexedFaceSet_005
+    2300004: ShapeIndexedFaceSet_007
+    2300006: ShapeIndexedFaceSet_009
+    2300008: ShapeIndexedFaceSet_011
+    2300010: ShapeIndexedFaceSet_040
+    2300012: ShapeIndexedFaceSet_100
+    2300014: ShapeIndexedFaceSet_152
+    2300016: ShapeIndexedFaceSet_175
+    2300018: ShapeIndexedFaceSet_180
+    2300020: ShapeIndexedFaceSet_182
+    2300022: ShapeIndexedFaceSet_183
+    2300024: ShapeIndexedFaceSet_193
+    2300026: ShapeIndexedFaceSet_194
+    2300028: ShapeIndexedFaceSet_196
+    2300030: ShapeIndexedFaceSet_199
+    2300032: ShapeIndexedFaceSet_210
+    2300034: ShapeIndexedFaceSet_227
+    2300036: ShapeIndexedFaceSet_234
+    2300038: ShapeIndexedFaceSet_235
+    2300040: ShapeIndexedFaceSet_240
+    2300042: ShapeIndexedFaceSet_248
+    2300044: ShapeIndexedFaceSet_253
+    2300046: ShapeIndexedFaceSet_256
+    3300000: ShapeIndexedFaceSet_004
+    3300002: ShapeIndexedFaceSet_005
+    3300004: ShapeIndexedFaceSet_007
+    3300006: ShapeIndexedFaceSet_009
+    3300008: ShapeIndexedFaceSet_011
+    3300010: ShapeIndexedFaceSet_040
+    3300012: ShapeIndexedFaceSet_100
+    3300014: ShapeIndexedFaceSet_152
+    3300016: ShapeIndexedFaceSet_175
+    3300018: ShapeIndexedFaceSet_180
+    3300020: ShapeIndexedFaceSet_182
+    3300022: ShapeIndexedFaceSet_183
+    3300024: ShapeIndexedFaceSet_193
+    3300026: ShapeIndexedFaceSet_194
+    3300028: ShapeIndexedFaceSet_196
+    3300030: ShapeIndexedFaceSet_199
+    3300032: ShapeIndexedFaceSet_210
+    3300034: ShapeIndexedFaceSet_227
+    3300036: ShapeIndexedFaceSet_234
+    3300038: ShapeIndexedFaceSet_235
+    3300040: ShapeIndexedFaceSet_240
+    3300042: ShapeIndexedFaceSet_248
+    3300044: ShapeIndexedFaceSet_253
+    3300046: ShapeIndexedFaceSet_256
+    4300000: ShapeIndexedFaceSet_004
+    4300002: ShapeIndexedFaceSet_005
+    4300004: ShapeIndexedFaceSet_007
+    4300006: ShapeIndexedFaceSet_009
+    4300008: ShapeIndexedFaceSet_011
+    4300010: ShapeIndexedFaceSet_040
+    4300012: ShapeIndexedFaceSet_100
+    4300014: ShapeIndexedFaceSet_152
+    4300016: ShapeIndexedFaceSet_175
+    4300018: ShapeIndexedFaceSet_180
+    4300020: ShapeIndexedFaceSet_182
+    4300022: ShapeIndexedFaceSet_183
+    4300024: ShapeIndexedFaceSet_193
+    4300026: ShapeIndexedFaceSet_194
+    4300028: ShapeIndexedFaceSet_196
+    4300030: ShapeIndexedFaceSet_199
+    4300032: ShapeIndexedFaceSet_210
+    4300034: ShapeIndexedFaceSet_227
+    4300036: ShapeIndexedFaceSet_234
+    4300038: ShapeIndexedFaceSet_235
+    4300040: ShapeIndexedFaceSet_240
+    4300042: ShapeIndexedFaceSet_248
+    4300044: ShapeIndexedFaceSet_253
+    4300046: ShapeIndexedFaceSet_256
+    9500000: //RootNode
+  materials:
+    importMaterials: 1
+    materialName: 0
+    materialSearch: 1
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    resampleCurves: 1
+    optimizeGameObjects: 0
+    motionNodeName: 
+    animationImportErrors: 
+    animationImportWarnings: 
+    animationRetargetingWarnings: 
+    animationDoRetargetingWarnings: 0
+    animationCompression: 1
+    animationRotationError: 0.5
+    animationPositionError: 0.5
+    animationScaleError: 0.5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    clipAnimations: []
+    isReadable: 1
+  meshes:
+    lODScreenPercentages: []
+    globalScale: 1
+    meshCompression: 0
+    addColliders: 0
+    importBlendShapes: 1
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    optimizeMeshForGPU: 1
+    keepQuads: 0
+    weldVertices: 1
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVPackMargin: 4
+    useFileScale: 1
+  tangentSpace:
+    normalSmoothAngle: 60
+    normalImportMode: 0
+    tangentImportMode: 3
+  importAnimation: 1
+  copyAvatar: 0
+  humanDescription:
+    human: []
+    skeleton: []
+    armTwist: 0.5
+    foreArmTwist: 0.5
+    upperLegTwist: 0.5
+    legTwist: 0.5
+    armStretch: 0.05
+    legStretch: 0.05
+    feetSpacing: 0
+    rootMotionBoneName: 
+    hasTranslationDoF: 0
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  animationType: 2
+  humanoidOversampling: 1
+  additionalBone: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
