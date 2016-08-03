@@ -1,0 +1,155 @@
+fileFormatVersion: 2
+guid: 6f0e695886e664f0d892b4a9e1a10388
+timeCreated: 1470191062
+licenseType: Free
+ModelImporter:
+  serializedVersion: 19
+  fileIDToRecycleName:
+    100000: Camera
+    100002: Cube
+    100004: Lamp
+    100006: mesh_10_LPattern3[8]_face
+    100008: mesh_11_LPattern3[1]_face
+    100010: mesh_12_Boss-Extrude17
+    100012: mesh_1_transdec-1
+    100014: mesh_2_Cut-Extrude15[1]
+    100016: mesh_3_Cut-Extrude15[1]_face
+    100018: mesh_4_Transdec_Above_Water-1
+    100020: mesh_5_Mirror5_face
+    100022: mesh_6_LPattern3[15]_face
+    100024: mesh_7_Mirror4
+    100026: mesh_8_Cut-Extrude9
+    100028: mesh_9_Mirror4_face
+    100030: //RootNode
+    400000: Camera
+    400002: Cube
+    400004: Lamp
+    400006: mesh_10_LPattern3[8]_face
+    400008: mesh_11_LPattern3[1]_face
+    400010: mesh_12_Boss-Extrude17
+    400012: mesh_1_transdec-1
+    400014: mesh_2_Cut-Extrude15[1]
+    400016: mesh_3_Cut-Extrude15[1]_face
+    400018: mesh_4_Transdec_Above_Water-1
+    400020: mesh_5_Mirror5_face
+    400022: mesh_6_LPattern3[15]_face
+    400024: mesh_7_Mirror4
+    400026: mesh_8_Cut-Extrude9
+    400028: mesh_9_Mirror4_face
+    400030: //RootNode
+    2300000: Cube
+    2300002: mesh_10_LPattern3[8]_face
+    2300004: mesh_11_LPattern3[1]_face
+    2300006: mesh_12_Boss-Extrude17
+    2300008: mesh_1_transdec-1
+    2300010: mesh_2_Cut-Extrude15[1]
+    2300012: mesh_3_Cut-Extrude15[1]_face
+    2300014: mesh_4_Transdec_Above_Water-1
+    2300016: mesh_5_Mirror5_face
+    2300018: mesh_6_LPattern3[15]_face
+    2300020: mesh_7_Mirror4
+    2300022: mesh_8_Cut-Extrude9
+    2300024: mesh_9_Mirror4_face
+    3300000: Cube
+    3300002: mesh_10_LPattern3[8]_face
+    3300004: mesh_11_LPattern3[1]_face
+    3300006: mesh_12_Boss-Extrude17
+    3300008: mesh_1_transdec-1
+    3300010: mesh_2_Cut-Extrude15[1]
+    3300012: mesh_3_Cut-Extrude15[1]_face
+    3300014: mesh_4_Transdec_Above_Water-1
+    3300016: mesh_5_Mirror5_face
+    3300018: mesh_6_LPattern3[15]_face
+    3300020: mesh_7_Mirror4
+    3300022: mesh_8_Cut-Extrude9
+    3300024: mesh_9_Mirror4_face
+    4300000: mesh_2_Cut-Extrude15[1]
+    4300002: mesh_4_Transdec_Above_Water-1
+    4300004: mesh_12_Boss-Extrude17
+    4300006: mesh_6_LPattern3[15]_face
+    4300008: mesh_11_LPattern3[1]_face
+    4300010: mesh_9_Mirror4_face
+    4300012: mesh_10_LPattern3[8]_face
+    4300014: mesh_3_Cut-Extrude15[1]_face
+    4300016: mesh_7_Mirror4
+    4300018: mesh_8_Cut-Extrude9
+    4300020: mesh_1_transdec-1
+    4300022: mesh_5_Mirror5_face
+    4300024: Cube
+    6400000: Cube
+    6400002: mesh_10_LPattern3[8]_face
+    6400004: mesh_11_LPattern3[1]_face
+    6400006: mesh_12_Boss-Extrude17
+    6400008: mesh_1_transdec-1
+    6400010: mesh_2_Cut-Extrude15[1]
+    6400012: mesh_3_Cut-Extrude15[1]_face
+    6400014: mesh_4_Transdec_Above_Water-1
+    6400016: mesh_5_Mirror5_face
+    6400018: mesh_6_LPattern3[15]_face
+    6400020: mesh_7_Mirror4
+    6400022: mesh_8_Cut-Extrude9
+    6400024: mesh_9_Mirror4_face
+  materials:
+    importMaterials: 1
+    materialName: 0
+    materialSearch: 1
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    resampleCurves: 1
+    optimizeGameObjects: 0
+    motionNodeName: 
+    animationImportErrors: 
+    animationImportWarnings: 
+    animationRetargetingWarnings: 
+    animationDoRetargetingWarnings: 0
+    animationCompression: 1
+    animationRotationError: 0.5
+    animationPositionError: 0.5
+    animationScaleError: 0.5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    clipAnimations: []
+    isReadable: 1
+  meshes:
+    lODScreenPercentages: []
+    globalScale: 1
+    meshCompression: 0
+    addColliders: 1
+    importBlendShapes: 1
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    optimizeMeshForGPU: 1
+    keepQuads: 0
+    weldVertices: 1
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVPackMargin: 4
+    useFileScale: 1
+  tangentSpace:
+    normalSmoothAngle: 60
+    normalImportMode: 0
+    tangentImportMode: 3
+  importAnimation: 1
+  copyAvatar: 0
+  humanDescription:
+    human: []
+    skeleton: []
+    armTwist: 0.5
+    foreArmTwist: 0.5
+    upperLegTwist: 0.5
+    legTwist: 0.5
+    armStretch: 0.05
+    legStretch: 0.05
+    feetSpacing: 0
+    rootMotionBoneName: 
+    hasTranslationDoF: 0
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  animationType: 0
+  humanoidOversampling: 1
+  additionalBone: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
