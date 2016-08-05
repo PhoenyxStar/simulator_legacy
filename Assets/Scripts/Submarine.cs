@@ -23,7 +23,7 @@ public class Submarine : MonoBehaviour
 
         buoyant_center = rb.centerOfMass;
         buoyant_center.y += 0.1f;
-        buoyant_force = 1.0f;
+        buoyant_force = 3.0f;
 
         smod = new SensorModule(rb);
         smod.Init("sensor");
