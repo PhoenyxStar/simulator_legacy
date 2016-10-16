@@ -53,9 +53,9 @@ public class SensorModule : Module
 
         // send sensor messages
         SendSensorMessage("control");
-        SendSensorMessage("control_gui");
-        SendSensorMessage("helm");
-        SendSensorMessage("ai");
+        //SendSensorMessage("control_gui");
+        //SendSensorMessage("helm");
+        //SendSensorMessage("ai");
     }
 
     protected override void shutdown()

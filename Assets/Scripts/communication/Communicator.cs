@@ -14,7 +14,7 @@ public class Communicator
     private string module_name;
     private int sndbuf = 1024;
     private int hwm = 1024;
-    private string broker_ip = "127.0.0.1:2000";
+    private string broker_ip = "tcp://127.0.0.1:2222";
     public static JObject settings;
     NetMQ.Sockets.DealerSocket socket;
     List<string> messages = new List<string>();
@@ -22,10 +22,11 @@ public class Communicator
     public Communicator(string name)
     {
         this.module_name = name;
+        Debug.Log("starting communicator for module: " + module_name);
+        /*
         string path = "../settings/modules/broker.json";
         string jsonString = File.ReadAllText(path);
         settings = JObject.Parse(jsonString);
-        Debug.Log("starting communicator for module: " + module_name);
 
         // load settings
         try
@@ -38,6 +39,7 @@ public class Communicator
         {
             Debug.Log(e.Message);
         }
+        */
 
         // Start zmq context
         socket = new NetMQ.Sockets.DealerSocket();

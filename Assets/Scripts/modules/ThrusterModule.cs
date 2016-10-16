@@ -70,10 +70,14 @@ public class ThrusterModule : Module
                     com.send_message(new message("thruster", "control_gui", "thruster", parsed_msg.value));
                 }
             }
-        } else {
+        } 
+        /*
+        else 
+        {
             for(int j = 0; j < thrusters.Count; ++j)
                 thrusters[j].SetThrusterPower(0.0f); // zero thruster if no message
         }
+        */
 
         // update physics
         foreach(var thruster in thrusters)
