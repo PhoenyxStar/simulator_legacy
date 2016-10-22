@@ -107,7 +107,11 @@ public class SensorModule : Module
         if(yaw > 180.0f)
             yaw = 180.0f - yaw;
 
-		// add some noise
+        //Debug.Log("Pitch: " + pitch);
+        //Debug.Log("Roll: " + roll);
+        //Debug.Log("Yaw: " + yaw);
+
+        // add some noise
 		yaw += RandomGaussian(sigma,mu);
 		pitch += RandomGaussian(sigma,mu);
 		roll += RandomGaussian(sigma,mu);
@@ -115,8 +119,11 @@ public class SensorModule : Module
 
     public void SendSensorMessage(string name)
     {
-        sensor_packet sp = new sensor_packet((double)pitch, (double)roll, (double)yaw, (double)depth, (double)battery, start_switch, (double)dt,
-                                             (double)dpitch, (double)droll, (double)dyaw, (double)ddepth);
+        //sensor_packet sp = new sensor_packet((double)pitch, (double)roll, (double)yaw, (double)depth, (double)battery, start_switch, (double)dt,
+                                             //(double)dpitch, (double)droll, (double)dyaw, (double)ddepth);
+        Quaternion q = rb.transform.rotation;
+
+        sensor_packet sp = new sensor_packet((double)q.w, (double)q.x, (double)q.y, (double)q.z, (double)depth, (double)battery, start_switch, (double)dt, (double)ddepth);
         message msg = new message("sensor", name, "sensor", sp.whole);
         com.send_message(msg);
     }
