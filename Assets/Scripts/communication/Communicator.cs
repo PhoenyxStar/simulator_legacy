@@ -15,7 +15,7 @@ public class Communicator
     private int sndbuf = 1024;
     private int hwm = 1024;
     private string broker_ip = "tcp://127.0.0.1:2222";
-    public static JObject settings;
+    //public static JObject settings;
     NetMQ.Sockets.DealerSocket socket;
     List<string> messages = new List<string>();
 

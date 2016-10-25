@@ -9,7 +9,7 @@ public class ThrusterModule : Module
 {
     List<Thruster> thrusters;
     Rigidbody rb;
-	private float sigma = 0.02f;
+	private float sigma = 0.00f;
 	private float mu = 0.0f;
 
     public ThrusterModule(Rigidbody rb)
@@ -21,7 +21,7 @@ public class ThrusterModule : Module
     {
         // load thrusters
         thrusters = new List<Thruster>();
-        string path = "../settings/modules/thruster.json";
+        string path = "../param/simulator_thruster.json";
         string jsonString = File.ReadAllText(path);
         JObject tsettings = JObject.Parse(jsonString);
         try

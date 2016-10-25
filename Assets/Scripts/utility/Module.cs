@@ -30,7 +30,8 @@ public abstract class Module
         com = new Communicator(name);
 
         // load settings
-        string path = "../settings/modules/" + name + ".json";
+        /*
+        string path = "../settings/modules" + name + ".json";
         string jsonString = File.ReadAllText(path);
         settings = JObject.Parse(jsonString);
         try
@@ -41,6 +42,7 @@ public abstract class Module
         {
             Debug.Log(e.Message);
         }
+        */
 
         // init derived
         init();
